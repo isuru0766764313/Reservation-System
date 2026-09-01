@@ -1,0 +1,57 @@
+body {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    min-height: 100vh;
+}
+
+.main-container {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.1);
+    overflow: hidden;
+    max-width: 1200px;
+}
+
+.left-side {
+    background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+    color: white;
+    padding: 4rem;
+}
+
+.right-side {
+    padding: 4rem 3rem;
+}
+
+.form-tabs .nav-link {
+    border: none;
+    font-size: 1.2rem;
+    color: #6c757d;
+    padding: 1rem 2rem;
+}
+
+.form-tabs .nav-link.active {
+    color: #3b82f6;
+    border-bottom: 3px solid #3b82f6;
+}
+
+.auth-form {
+    padding: 2rem 0;
+}
+
+.form-control {
+    border-radius: 8px;
+    padding: 1rem;
+    height: auto;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+.forgot-password {
+    text-decoration: none;
+    color: #6c757d;
+}
+
+.forgot-password:hover {
+    color: #3b82f6;
+}
