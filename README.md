@@ -39,4 +39,6 @@ This project is proprietary and intended for internal use at the Prime Minister'
 
 
 ## Symbolic Link (Always Required)
-run this command : php artisan storage:link
+run this commands right after configured
+1. php artisan storage:link
+2. sudo apt-get install php-soap
