@@ -1758,9 +1758,9 @@ $images = $hall->images ?? [];
                 const hallDiscount = {{ $hall->discount ?? 0 }};
 
                 if (!start || !end) {
-                    document.getElementById('propertyChargeRegular').textContent = 'Rs. 0.00';
-                    document.getElementById('facilitiesChargeRegular').textContent = 'Rs. 0.00';
-                    document.getElementById('regularTotalCharge').textContent = 'Rs. 0.00';
+                    document.getElementById('propertyChargeRegular').textContent = 'Rs. ' + formatMoney(0);
+                    document.getElementById('facilitiesChargeRegular').textContent = 'Rs. ' + formatMoney(0);
+                    document.getElementById('regularTotalCharge').textContent = 'Rs. ' + formatMoney(0);
                     return;
                 }
 
@@ -1778,9 +1778,9 @@ $images = $hall->images ?? [];
                     totalCharge = (parseFloat(propertyCharge) + facilitiesCharge).toFixed(2);
                 }                
 
-                document.getElementById('propertyChargeRegular').textContent = `Rs. ${propertyCharge}`;
-                document.getElementById('facilitiesChargeRegular').textContent = `Rs. ${facilitiesCharge.toFixed(2)}`;
-                document.getElementById('regularTotalCharge').textContent = `Rs. ${totalCharge}`;
+                document.getElementById('propertyChargeRegular').textContent = `Rs. ${formatMoney(propertyCharge)}`;
+                document.getElementById('facilitiesChargeRegular').textContent = `Rs. ${formatMoney(facilitiesCharge.toFixed(2))}`;
+                document.getElementById('regularTotalCharge').textContent = `Rs. ${formatMoney(totalCharge)}`;
             }
         }
 
