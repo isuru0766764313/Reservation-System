@@ -64,7 +64,6 @@
 
         /* Package cards */
         .package-card { cursor: default; border: 2px solid #e2e8f0; transition: var(--transition); }
-        .package-card:not(.selected):hover { border-color: var(--primary); }
         .package-card.selected { border-color: var(--primary); background: var(--primary-light); }
 
         /* Price and total displays */
