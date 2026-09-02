@@ -1473,7 +1473,7 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
                     <div class="modal-body">
                         <div class="property-info-grid">
                             <div class="info-item">
-                                <div class="info-label">Type :</div>
+                                <div class="info-label">Hall Type :</div>
                                 <div class="info-value">{{ $reservation->hall->type }}</div>
                             </div>
                             <div class="info-item">
