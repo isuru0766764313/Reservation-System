@@ -965,7 +965,6 @@
                             <th>Reservation Charge</th>
                             <th>Status</th>
                             <th>Payment Details</th>
-                            <th>Contact Admin</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1119,15 +1118,6 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
                                                                                                                                                                                                                  @else
                                                                                                                                                                                                                      <span class="badge bg-danger">{{ \App\Http\Controllers\ReservationController::getReservationStatusLabel($reservation->status) }}</span>
                                                                                                                                                                                                                 @endif-->
-                                                        </td>
-
-
-
-                                                        <td>
-                                                            <button class="btn btn-view btn-custom" data-bs-toggle="modal"
-                                                                data-bs-target="#contactUsModel-{{ $reservation->id }}">
-                                                                <i class="fas fa-phone"></i> Contact Us
-                                                            </button>
                                                         </td>
                                                     </tr>
                         @endforeach
