@@ -16,7 +16,12 @@ venv/
 .venv/
 .env
 .env.local
-*.env.*
+.env.*
+
+# Build directories
+dist/
+build/
+target/
 
 # Logs and temp files
 *.log
@@ -28,24 +33,22 @@ venv/
 .vscode/
 .idea/
 
-# Build directories
-dist/
-build/
-target/
-.gradle/
-
-# Python specific
-*.pyc
-__pycache__/
-.mypy_cache/
-.pytest_cache/
-.coverage
-htmlcov/
-coverage/
-
 # System files
 .DS_Store
 Thumbs.db
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Python specific
+.mypy_cache/
+.pytest_cache/
+
+# Java specific
+.gradle/
+*.class
 
 # Compressed files
 *.zip
