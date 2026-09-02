@@ -1498,22 +1498,6 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
                                 <div class="info-label">Owner :</div>
                                 <div class="info-value">{{ $reservation->hall->admin->company_name }}</div>
                             </div>
-                            <div class="info-item">
-                                <div class="info-label">Address :</div>
-                                <div class="info-value">{{ $reservation->hall->address }}</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Province :</div>
-                                <div class="info-value">{{ $reservation->hall->province }}</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">District :</div>
-                                <div class="info-value">{{ $reservation->hall->district }}</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Area :</div>
-                                <div class="info-value">{{ $reservation->hall->area }}</div>
-                            </div>
                         </div>
                         <div class="location-section">
                             <div class="location-header">
