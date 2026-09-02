@@ -1477,8 +1477,12 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
                                 <div class="info-value">{{ $reservation->hall->type }}</div>
                             </div>
                             <div class="info-item">
-                                <div class="info-label">Price :</div>
-                                <div class="info-value">Rs. {{ number_format($reservation->hall->price, 2) }} Per Hour</div>
+                                <div class="info-label">Reservation Type :</div>
+                                @if($reservation->reservation_type === 'regular')
+                                    <div class="info-value">Regular</div>
+                                @else
+                                    <div class="info-value">Package</div>
+                                @endif                                
                             </div>
                             <div class="info-item">
                                 <div class="info-label">Capacity :</div>
