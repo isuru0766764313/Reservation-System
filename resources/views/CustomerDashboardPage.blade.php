@@ -1772,6 +1772,14 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
                                                 value="{{ $totalPaid >= $preliminaryPayment ? number_format($remainingAmount, 2) : number_format($preliminaryPayment, 2) }}">
                                             <div class="d-grid">
                                                 @php
+                                                    $hasPendingPayment = $reservation->payments->where('status', 1)->count() > 0;
+                                                @endphp
+                                                <button type="submit" class="btn btn-success btn-lg" id="paySubmitBtn-{{ $reservation->id }}" @if(in_array($reservation->status, [1, 4, 5]) || $hasPendingPayment) disabled @endif>
+                                                    Submit Payment Receipt
+                                                </button>
+                                            </div>
+                                            <!--<div class="d-grid">
+                                                @php
                                                     $prelim = $reservation->payments->where('payment_alias', 'Preliminary')->first();
                                                     $remain = $reservation->payments->where('payment_alias', 'Remainings')->first();
                                                     $hasPendingPayment = $reservation->payments->where('status', 1)->count() > 0;
@@ -1809,8 +1817,8 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
                                                     @else
                                                         <i class="fas fa-clock me-2"></i>Wait for admin approval
                                                     @endif
-                                                </button>                                                
-                                            </div>
+                                                </button>                                               
+                                            </div>-->
                                         </form>
                                     </div>
                                     @endif
