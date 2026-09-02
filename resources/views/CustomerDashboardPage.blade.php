@@ -1551,35 +1551,7 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
                 </div>
             </div>
         </div>
-    @endforeach
-
-    <!-- Contact details modals -->
-    @foreach($reservations as $reservation)
-        <div class="modal fade" id="contactUsModel-{{ $reservation->id }}" tabindex="-1"
-            aria-labelledby="propertyDetailsLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="propertyDetailsLabel"><i class="fas fa-building"></i>
-                            {{ $reservation->hall_name }}
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="property-info-grid">
-                            <div class="info-item"><span class="info-label">Owner : </span><span
-                                    class="info-value">{{ $reservation->hall->admin->company_name }}</span></div>
-                            <div class="info-item"><span class="info-label">Inquiry : </span><span
-                                    class="info-value">{{ $reservation->hall->admin->telephone_number }}</span></div>
-                            <div class="info-item"><span class="info-label">Email : </span><span
-                                    class="info-value">{{ $reservation->hall->admin->email }}</span></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endforeach
+    @endforeach   
 
     <!--Pay Now Modal-->
     @foreach($reservations as $reservation)
