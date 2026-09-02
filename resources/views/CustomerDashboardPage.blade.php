@@ -1568,8 +1568,7 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
                         <div class="modal-dialog {{ (int)$reservation->status === 1 ? 'modal-lg' : 'modal-fullscreen' }}">
                             <div class="modal-content h-100 d-flex flex-column">
                                 <div class="modal-header bg-primary text-white">
-                                    <h5 class="modal-title" id="payNowModalLabel"><i class="fas fa-money-check-alt me-2"></i>Upload
-                                        payment slip as a proof</h5>
+                                    <h5 class="modal-title" id="payNowModalLabel"><i class="fas fa-money-check-alt me-2"></i>Reservation/Payment Details</h5>
                                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                         aria-label="Close"></button>
                                 </div>
