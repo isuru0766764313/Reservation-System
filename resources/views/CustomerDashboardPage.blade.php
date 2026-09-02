@@ -1521,18 +1521,32 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
                         </div>
                         <h5 class="section-title"><i class="fas fa-star me-2"></i>Fix Price Facilities</h5>
                         <div class="facilities-grid">
+                            @php
+                                $selectedFixedFacilityIds = $reservation->fixedFacilities->pluck('id')->toArray();
+                            @endphp
                             @foreach($reservation->hall->fixedfacilities as $fp_facility)
                                 <div class="facility-item">
-                                    <div class="facility-icon"><i class="fas fa-check"></i></div>
+                                    <div class="facility-icon">
+                                        @if(in_array($fp_facility->id, $selectedFixedFacilityIds))
+                                            <i class="fas fa-check"></i>
+                                        @endif
+                                    </div>
                                     <span>{{ $fp_facility->name }}</span>
                                 </div>
                             @endforeach
                         </div>
                         <h5 class="section-title"><i class="fas fa-star me-2"></i>Unit Price Facilities</h5>
                         <div class="facilities-grid">
+                            @php
+                                $selectedUnitFacilityIds = $reservation->unitFacilities->pluck('id')->toArray();
+                            @endphp
                             @foreach($reservation->hall->unitfacilities as $up_facility)
                                 <div class="facility-item">
-                                    <div class="facility-icon"><i class="fas fa-check"></i></div>
+                                    <div class="facility-icon">
+                                        @if(in_array($up_facility->id, $selectedUnitFacilityIds))
+                                            <i class="fas fa-check"></i>
+                                        @endif
+                                    </div>
                                     <span>{{ $up_facility->name }}</span>
                                 </div>
                             @endforeach
