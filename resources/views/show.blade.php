@@ -113,6 +113,60 @@
         #customTimeStatusRegular.alert-danger, #customTimeStatusPackage.alert-danger { border-left: 4px solid var(--danger,#ef4444); }
         #customTimeStatusRegular.alert-info, #customTimeStatusPackage.alert-info { border-left: 4px solid var(--info); }
 
+        /* Success Alert Overlay */
+        .alert-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .alert-box {
+            background: white;
+            padding: 2.5rem;
+            border-radius: var(--radius);
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            max-width: 400px;
+            animation: alertSlideIn 0.3s ease;
+        }
+        @keyframes alertSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .alert-icon {
+            font-size: 4rem;
+            color: var(--success);
+            margin-bottom: 1rem;
+        }
+        .alert-box h3 {
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        .alert-box p {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+        }
+        .alert-close-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 2rem;
+            border-radius: var(--radius-xs);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .alert-close-btn:hover {
+            background: var(--primary-dark);
+        }
+
         @media (max-width: 768px) { .image-slider { height: 300px; } }
         @media (max-width: 576px) { .navbar-show .nav-user span { display: none; } }
     </style>
@@ -143,6 +197,20 @@
         </div>
     </nav>
     <div class="container py-4">
+        <!-- Success Alert Modal -->
+        @if(session('success'))
+        <div id="successAlert" class="alert-overlay" style="display: none;">
+            <div class="alert-box">
+                <div class="alert-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3>Reservation Submitted</h3>
+                <p>Your Reservation is forwarded for admin approval</p>
+                <button class="alert-close-btn" onclick="closeSuccessAlert()">OK</button>
+            </div>
+        </div>
+        @endif
+
         <!-- Image Slider Section -->
         <div class="row mb-5">
             <div class="col-12">
@@ -1831,6 +1899,18 @@ $images = $hall->images ?? [];
             window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`, '_blank');
         }
     });
+
+    // Success Alert Close Function
+    function closeSuccessAlert() {
+        document.getElementById('successAlert').style.display = 'none';
+    }
+
+    // Auto-show alert on page load if success session exists
+    @if(session('success'))
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('successAlert').style.display = 'flex';
+    });
+    @endif
 </script>
 </body>
 
