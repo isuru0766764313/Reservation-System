@@ -1735,12 +1735,7 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
                                     @if((int)$reservation->status !== 1)
                                     <div class="mb-4">
                                         <h4 class="mb-3"><i class="fas fa-university me-2"></i>Bank Transfer Details</h4>
-                                        <div class="alert alert-info">
-                                            @php
-                                                $prelim = $reservation->payments->where('payment_alias', 'Preliminary')->first();
-                                                $remain = $reservation->payments->where('payment_alias', 'Remainings')->first();
-                                                $hasPendingPayment = $reservation->payments->where('status', 1)->count() > 0;
-                                                @endphp
+                                        <div class="alert alert-info">                                            
                                                 @if($reservation->status == 1)
                                                     <p class="mb-3">Wait for admin acept the reservation. Once Done You could proceed.</p>
                                                 @elseif($reservation->status == 2)
