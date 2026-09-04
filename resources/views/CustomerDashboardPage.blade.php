@@ -993,7 +993,7 @@
                                                                 <span>{{ $Rbadge['label'] }}</span>
                                                                 @if (in_array($Rbadge['status_id'], [3, 4]) && !$cancelRecord && ($cancelAvail || $rescheduleAvail))
                                                                     @if($cancelAvail)
-                                                                    <button type="button" class="btn btn-warning btn-sm action-btn w-100"
+                                                                    <button type="button" class="btn btn-danger btn-sm action-btn w-100"
 onclick="setupCancellationPayment('{{ $reservation->id }}', '{{ number_format($reservation->hall->cancellation_fee, 2) }}', '{{ $reservation->cancellationExpiryDate ?? '' }}', '{{ $reservation->status }}', '{{ route('customer.reservation.cancel', $reservation->id) }}')">
                                                                         <i class="fas fa-times me-1"></i>Cancel
                                                                     </button>
@@ -1838,13 +1838,6 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
                         </div>
                     </div>
     @endforeach
-
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
 
     @if(session('error'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">

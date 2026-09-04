@@ -898,16 +898,14 @@
                 <input type="hidden" name="cancellationExpiryDate" id="cancellationExpiryDate-hidden-{{ $reservation->id }}" value="{{ $reservation->cancellationExpiryDate ?? '' }}">
                 <input type="hidden" name="rescheduledExpiryDate" id="rescheduledExpiryDate-hidden-{{ $reservation->id }}" value="{{ $reservation->rescheduledExpiryDate ?? '' }}">
                 <button type="button" class="btn btn-success" onclick="acceptReservation(this, '{{ $reservation->id }}')" @if($reservation->accepted !== null) disabled @endif>
-                  <i
-                    class="fas fa-check me-2"></i>{{ $reservation->accepted !== null && $reservation->accepted ? 'Already Accepted' : 'Accept' }}</button>
+                  <i class="fas fa-check me-2"></i>{{ $reservation->accepted !== null && $reservation->accepted ? 'Already Accepted' : 'Accept' }}</button>
               </form>
             </div>
             <div>
               <form method="POST" action="{{route('admin.reservations.reject', $reservation->id)}}">
                 @csrf @method('PATCH')
                 <button type="submit" class="btn btn-danger" @if($reservation->accepted !== null) disabled @endif>
-                  <i
-                    class="fas fa-times me-2"></i>{{ $reservation->accepted !== null && !$reservation->accepted ? 'Already rejected' : 'Reject' }}
+                  <i class="fas fa-times me-2"></i>{{ $reservation->accepted !== null && !$reservation->accepted ? 'Already rejected' : 'Reject' }}
                 </button>
               </form>
             </div>
@@ -919,203 +917,205 @@
 
   <!-- Reservation Slip Detail Modal -->
   @foreach($reservations as $reservation)
-      <div class="modal fade" id="slipModal-{{ $reservation->id }}" tabindex="-1">
-<div class="modal-dialog modal-xl" style="max-width: 1250px;">
-          <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-              <h5 class="modal-title">
-                <i class="fas fa-file-invoice me-2"></i>
-                Payment Details - You could approve or reject payment done by customer for {{ $reservation->hall_name }}
-              </h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body">
-              <!-- Reservation Details -->
-              <div class="mb-4">
-                <div class="row">
-                  <div class="col-md-6">
-                    <h6 class="border-bottom pb-2" style="color: #291fecff;">
-                      <i class="fas fa-user me-2" style="color: #241ae2ff;"></i>Customer Details
-                    </h6>
-                    <dl class="row">
-                      <dt class="col-sm-4">Name:</dt>
-                      <dd class="col-sm-8">{{ $reservation->customer_name }}</dd>
-
-                      <dt class="col-sm-4">Email:</dt>
-                      <dd class="col-sm-8">{{ $reservation->customer_email }}</dd>
-
-                      <dt class="col-sm-4">Phone:</dt>
-                      <dd class="col-sm-8">{{ $reservation->customer_tel }}</dd>
-                    </dl>
+            <div class="modal fade" id="slipModal-{{ $reservation->id }}" tabindex="-1">
+      <div class="modal-dialog modal-xl" style="max-width: 1250px;">
+                <div class="modal-content">
+                  <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                      <i class="fas fa-file-invoice me-2"></i>
+                      <- Payment Details -> Reservation Ref Code :  {{ $reservation->ref_code }}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                   </div>
 
-                  <div class="col-md-6">
-                    <h6 class="border-bottom pb-2" style="color: #160ce4ff;">
-                      <i class="fas fa-building me-2" style="color: #1b10e6ff;"></i>Reservation Details
-                    </h6>
-                    <dl class="row">
-                      <dt class="col-sm-4">Hall Name:</dt>
-                      <dd class="col-sm-8">{{ $reservation->hall_name }}</dd>
+                  <div class="modal-body">
+                    <!-- Reservation Details -->
+                    <div class="mb-4">
+                      <div class="row">
+                        <div class="col-md-6">
+                          <h6 class="border-bottom pb-2" style="color: #291fecff;">
+                            <i class="fas fa-user me-2" style="color: #241ae2ff;"></i>Customer Details
+                          </h6>
+                          <dl class="row">
+                            <dt class="col-sm-4">Name:</dt>
+                            <dd class="col-sm-8">{{ $reservation->customer_name }}</dd>
 
-                      <dt class="col-sm-4">Reservation Type:</dt>
-                      <dd class="col-sm-8">{{ ucfirst($reservation->reservation_type) }}</dd>
-                      @if($reservation->reservation_type === 'package' && $reservation->package)
-                        <dt class="col-sm-4">Package:</dt>
-                        <dd class="col-sm-8">{{ $reservation->package->name }}</dd>
-                      @endif                      
+                            <dt class="col-sm-4">Email:</dt>
+                            <dd class="col-sm-8">{{ $reservation->customer_email }}</dd>
 
-                      <dt class="col-sm-4">Reservation Date:</dt>
-                      <dd class="col-sm-8">{{ date('M d, Y', strtotime($reservation->reservation_date)) }}</dd>
+                            <dt class="col-sm-4">Phone:</dt>
+                            <dd class="col-sm-8">{{ $reservation->customer_tel }}</dd>
+                          </dl>
+                        </div>
 
-                      <dt class="col-sm-4">Reservation period:</dt>
-                      <dd class="col-sm-8">
-                        {{ date('h:i A', strtotime($reservation->start_time)) }} -
-                        {{ date('h:i A', strtotime($reservation->end_time)) }}
-                      </dd>
-                      @if($reservation->reservation_type === 'package')
-                      <dt class="col-sm-4">Pre-arrange hours:</dt>
-                      <dd class="col-sm-8">{{ $reservation->pre_arrange_time }} hours</dd>
-                      <dt class="col-sm-4">Post-arrange hours:</dt>
-                      <dd class="col-sm-8">{{ $reservation->post_arrange_time }} hours</dd>
-                      @endif
+                        <div class="col-md-6">
+                          <h6 class="border-bottom pb-2" style="color: #160ce4ff;">
+                            <i class="fas fa-building me-2" style="color: #1b10e6ff;"></i>Reservation Details
+                          </h6>
+                          <dl class="row">
+                            <dt class="col-sm-4">Hall Name:</dt>
+                            <dd class="col-sm-8">{{ $reservation->hall_name }}</dd>
 
-                      <dt class="col-sm-4">Charge:</dt>
-                      <dd class="col-sm-8 fw-bold">Rs. {{ number_format($reservation->charge, 2) }}</dd>
+                            <dt class="col-sm-4">Reservation Type:</dt>
+                            <dd class="col-sm-8">{{ ucfirst($reservation->reservation_type) }}</dd>
+                            @if($reservation->reservation_type === 'package' && $reservation->package)
+                              <dt class="col-sm-4">Package:</dt>
+                              <dd class="col-sm-8">{{ $reservation->package->name }}</dd>
+                            @endif                      
 
-                      @php
+                            <dt class="col-sm-4">Reservation Date:</dt>
+                            <dd class="col-sm-8">{{ date('M d, Y', strtotime($reservation->reservation_date)) }}</dd>
+
+                            <dt class="col-sm-4">Reservation period:</dt>
+                            <dd class="col-sm-8">
+                              {{ date('h:i A', strtotime($reservation->start_time)) }} -
+                              {{ date('h:i A', strtotime($reservation->end_time)) }}
+                            </dd>
+                            @if($reservation->reservation_type === 'package')
+                            <dt class="col-sm-4">Pre-arrange hours:</dt>
+                            <dd class="col-sm-8">{{ $reservation->pre_arrange_time }} hours</dd>
+                            <dt class="col-sm-4">Post-arrange hours:</dt>
+                            <dd class="col-sm-8">{{ $reservation->post_arrange_time }} hours</dd>
+                            @endif
+
+                            <dt class="col-sm-4">Charge:</dt>
+                            <dd class="col-sm-8 fw-bold">Rs. {{ number_format($reservation->charge, 2) }}</dd>
+
+                            @php
     $totalPaidSlip = $reservation->payments->where('status', 2)->sum('amount');
     if ((int) $reservation->status === 5) {
-        $approvedExceptCancellation = $reservation->payments->where('status', 2)->where('payment_alias', '!=', 'Cancellation')->sum('amount');
-        $totalPaidSlip = max(0, $approvedExceptCancellation - ($reservation->hall->cancellation_fee ?? 0));
+      $approvedExceptCancellation = $reservation->payments->where('status', 2)->where('payment_alias', '!=', 'Cancellation')->sum('amount');
+      $totalPaidSlip = max(0, $approvedExceptCancellation - ($reservation->hall->cancellation_fee ?? 0));
     }
     $advancePaidStatus = $reservation->advancePaid ? 'Yes' : 'No';
     $remainingSlip = max(0, (($reservation->charge - $reservation->discount_custom) + $reservation->deposit) - $totalPaidSlip);
+                            @endphp
+
+                            <dt class="col-sm-4">Discount:</dt>
+                            <dd class="col-sm-8 fw-bold">
+                              @if($reservation->discount_custom)
+                                Rs. {{ number_format($reservation->discount_custom, 2) }}
+                              @else
+                                <span class="text-muted">None</span>
+                              @endif
+                            </dd>
+
+                            <dt class="col-sm-4">Final Charge:</dt>
+                            <dd class="col-sm-8 fw-bold text-success" id="final-charge-{{ $reservation->id }}">
+                              Rs. {{ number_format($reservation->charge - ($reservation->discount_custom ?? 0), 2) }}
+                            </dd>
+
+                            <dt class="col-sm-4">Advance Payment:</dt>
+                            <dd class="col-sm-8 fw-bold">Rs. {{ number_format($reservation->advanceAmount, 2) }}</dd>
+
+                            <dt class="col-sm-4">Refundable Deposit:</dt>
+                            <dd class="col-sm-8 fw-bold">Rs. {{ number_format($reservation->deposit, 2) }}</dd>
+
+                            <dt class="col-sm-4">Total Paid:</dt>
+                            <dd class="col-sm-8 fw-bold text-success">Rs. {{ number_format($totalPaidSlip, 2) }}</dd>
+
+                            @if(!in_array($reservation->status, [5, 6, 7]))
+                            <dt class="col-sm-4">Remaining to be paid:</dt>
+                            <dd class="col-sm-8 fw-bold text-danger">Rs. {{ number_format($remainingSlip, 2) }}</dd>
+                            @endif
+                          </dl>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Payment Slip Display - Show all payment slips from payments table -->
+                    <div class="mb-4">
+                      <h6 class="border-bottom pb-2" >Payment Slips</h6>
+                      <div class="text-center bg-light p-3 rounded">
+                        @php $paymentCount = $reservation->payments->where('payment_alias', '!=', 'Cancellation')->count(); @endphp
+                        @if($paymentCount > 0)
+                          @foreach($reservation->payments->where('payment_alias', '!=', 'Cancellation') as $index => $payment)
+                            <div class="mb-3">
+                              <h6 class="text-muted">Payment number : {{ $index + 1 }} 
+                                @if($payment->payment_alias && $payment->payment_alias != 'Preliminary')
+                                  <span class="badge bg-info ms-2">Advance Payment</span>
+                                @elseif($payment->payment_alias && $payment->payment_alias != 'Remainings')
+                                  <span class="badge bg-info ms-2">Balance Payment</span>
+                                @endif
+                                <span class="badge bg-secondary ms-1">Rs. {{ number_format($payment->amount, 2) }}</span>
+                              </h6>
+                              @if(\Illuminate\Support\Str::endsWith($payment->receipt_path, '.pdf'))
+                                <iframe src="{{ asset('storage/' . $payment->receipt_path) }}" width="100%" height="400px"
+                                  class="border">
+                                </iframe>
+                              @else
+                                <img src="{{ asset('storage/' . $payment->receipt_path) }}" alt="Payment Slip #{{ $index + 1 }}" class="img-fluid"
+                                  style="max-height: 400px">
+                              @endif
+                              <div class="mt-3 d-flex justify-content-center align-items-center gap-3" id="slipActions-{{ $payment->id }}">
+                                @if($payment->status == 1)
+                                  <form action="{{ route('admin.payment.accept', $payment) }}" method="POST" class="d-inline slip-action-form">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="btn btn-success btn-sm rounded-circle" title="Accept payment" style="width: 38px; height: 38px;">
+                                      <i class="fas fa-check"></i>
+                                    </button>
+                                  </form>
+                                  <form action="{{ route('admin.payment.reject', $payment) }}" method="POST" class="d-inline slip-action-form">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="btn btn-danger btn-sm rounded-circle" title="Reject payment" style="width: 38px; height: 38px;">
+                                      <i class="fas fa-times"></i>
+                                    </button>
+                                  </form>
+                                @else
+                                  @if($payment->status == 2)
+                                    <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Accepted</span>
+                                  @elseif($payment->status == 3)
+                                    <span class="badge bg-danger"><i class="fas fa-times-circle me-1"></i>Rejected</span>
+                                  @endif
+                                @endif
+                              </div>
+                            </div>
+                            @if(!$loop->last)<hr>@endif
+                          @endforeach
+                        @else
+                          <div class="alert alert-warning mb-0">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            No payment is done yet for this reservation. May be it is pending or rejected.
+                          </div>
+                        @endif
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="modal-footer d-flex justify-content-between">
+                    <div class="d-flex gap-2">
+                      @php
+    $hasCancellationPending = $reservation->payments->where('payment_alias', 'Cancellation')->where('status', 1)->count() > 0;
                       @endphp
 
-                      <dt class="col-sm-4">Discount:</dt>
-                      <dd class="col-sm-8 fw-bold">
-                        @if($reservation->discount_custom)
-                          Rs. {{ number_format($reservation->discount_custom, 2) }}
-                        @else
-                          <span class="text-muted">None</span>
-                        @endif
-                      </dd>
-
-                      <dt class="col-sm-4">Final Charge:</dt>
-                      <dd class="col-sm-8 fw-bold text-success" id="final-charge-{{ $reservation->id }}">
-                        Rs. {{ number_format($reservation->charge - ($reservation->discount_custom ?? 0), 2) }}
-                      </dd>
-
-                      <dt class="col-sm-4">Advance Payment:</dt>
-                      <dd class="col-sm-8 fw-bold">Rs. {{ number_format($reservation->advanceAmount, 2) }}</dd>
-
-                      <dt class="col-sm-4">Refundable Deposit:</dt>
-                      <dd class="col-sm-8 fw-bold">Rs. {{ number_format($reservation->deposit, 2) }}</dd>
-
-                      <dt class="col-sm-4">Total Paid:</dt>
-                      <dd class="col-sm-8 fw-bold text-success">Rs. {{ number_format($totalPaidSlip, 2) }}</dd>
-
-                      @if(!in_array($reservation->status, [5, 6, 7]))
-                      <dt class="col-sm-4">Remaining to be paid:</dt>
-                      <dd class="col-sm-8 fw-bold text-danger">Rs. {{ number_format($remainingSlip, 2) }}</dd>
+                      {{-- Accept Cancellation Payment Button --}}
+                      @if($hasCancellationPending)
+                      <form action="{{ route('admin.slip.accept', $reservation) }}" method="POST">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" class="btn btn-warning">
+                          <i class="fas fa-check-circle me-2"></i>Accept Cancellation Payment
+                        </button>
+                      </form>
                       @endif
-                    </dl>
+
+                      {{-- Reject Reservation Button --}}
+                      @if((int) $reservation->status !== 6)
+                      <form action="{{ route('admin.reservation.reject', $reservation) }}" method="POST">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" class="btn btn-danger">
+                          <i class="fas fa-times-circle me-2"></i>Reject Reservation
+                        </button>
+                      </form>
+                      @endif
+                    </div>
                   </div>
                 </div>
               </div>
-
-              <!-- Payment Slip Display - Show all payment slips from payments table -->
-              <div class="mb-4">
-                <h6 class="border-bottom pb-2" >Payment Slips</h6>
-                <div class="text-center bg-light p-3 rounded">
-                  @php $paymentCount = $reservation->payments->where('payment_alias', '!=', 'Cancellation')->count(); @endphp
-                  @if($paymentCount > 0)
-                    @foreach($reservation->payments->where('payment_alias', '!=', 'Cancellation') as $index => $payment)
-                      <div class="mb-3">
-                        <h6 class="text-muted">Payment number : {{ $index + 1 }} 
-                          @if($payment->payment_alias)
-                            <span class="badge bg-info ms-2">{{ $payment->payment_alias }}</span>
-                          @endif
-                          <span class="badge bg-secondary ms-1">Rs. {{ number_format($payment->amount, 2) }}</span>
-                        </h6>
-                        @if(\Illuminate\Support\Str::endsWith($payment->receipt_path, '.pdf'))
-                          <iframe src="{{ asset('storage/' . $payment->receipt_path) }}" width="100%" height="400px"
-                            class="border">
-                          </iframe>
-                        @else
-                          <img src="{{ asset('storage/' . $payment->receipt_path) }}" alt="Payment Slip #{{ $index + 1 }}" class="img-fluid"
-                            style="max-height: 400px">
-                        @endif
-                        <div class="mt-3 d-flex justify-content-center align-items-center gap-3" id="slipActions-{{ $payment->id }}">
-                          @if($payment->status == 1)
-                            <form action="{{ route('admin.payment.accept', $payment) }}" method="POST" class="d-inline slip-action-form">
-                              @csrf
-                              @method('PATCH')
-                              <button type="submit" class="btn btn-success" title="Accept payment">
-                                <i class="fas fa-check me-2"></i>Accept
-                              </button>
-                            </form>
-                            <form action="{{ route('admin.payment.reject', $payment) }}" method="POST" class="d-inline slip-action-form">
-                              @csrf
-                              @method('PATCH')
-                              <button type="submit" class="btn btn-danger" title="Reject payment">
-                                <i class="fas fa-times me-2"></i>Reject
-                              </button>
-                            </form>
-                          @else
-                            @if($payment->status == 2)
-                              <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Accepted</span>
-                            @elseif($payment->status == 3)
-                              <span class="badge bg-danger"><i class="fas fa-times-circle me-1"></i>Rejected</span>
-                            @endif
-                          @endif
-                        </div>
-                      </div>
-                      @if(!$loop->last)<hr>@endif
-                    @endforeach
-                  @else
-                    <div class="alert alert-warning mb-0">
-                      <i class="fas fa-exclamation-circle me-2"></i>
-                      No payment is done yet for this reservation. May be it is pending or rejected.
-                    </div>
-                  @endif
-                </div>
-              </div>
             </div>
-
-            <div class="modal-footer d-flex justify-content-between">
-              <div class="d-flex gap-2">
-                @php
-    $hasCancellationPending = $reservation->payments->where('payment_alias', 'Cancellation')->where('status', 1)->count() > 0;
-                @endphp
-
-                {{-- Accept Cancellation Payment Button --}}
-                @if($hasCancellationPending)
-                <form action="{{ route('admin.slip.accept', $reservation) }}" method="POST">
-                  @csrf
-                  @method('PATCH')
-                  <button type="submit" class="btn btn-warning">
-                    <i class="fas fa-check-circle me-2"></i>Accept Cancellation Payment
-                  </button>
-                </form>
-                @endif
-
-                {{-- Reject Reservation Button --}}
-                @if((int)$reservation->status !== 6)
-                <form action="{{ route('admin.reservation.reject', $reservation) }}" method="POST">
-                  @csrf
-                  @method('PATCH')
-                  <button type="submit" class="btn btn-danger">
-                    <i class="fas fa-times-circle me-2"></i>Reject Reservation
-                  </button>
-                </form>
-                @endif
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
   @endforeach
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
