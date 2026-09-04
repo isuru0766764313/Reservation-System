@@ -48,6 +48,7 @@ class ReservationModel extends Model
             'advance_accepted',
             'user_cancelled',
             're_scheduled',
+            'remarks'
         ];
 
     protected $casts =
@@ -68,7 +69,8 @@ class ReservationModel extends Model
             'reserved' => 'boolean',
             'pre_arrange_time' => 'integer',
             'post_arrange_time' => 'integer',
-            'status' => 'integer'
+            'status' => 'integer',
+            'remarks' => 'string'
         ];
 
     // These relationships allow you to access the associated customer and hall for each reservation.

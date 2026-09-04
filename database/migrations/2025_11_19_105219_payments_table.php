@@ -21,6 +21,7 @@ class PaymentsTable extends Migration
             $table->decimal('amount', 10, 2);
             $table->string('receipt_path')->nullable()->default(null);
             $table->enum('status', range(1, 20))->default('1');
+            $table->text('remarks')->nullable();
             $table->timestamps(); // created_at and updated_at
         });
     }
