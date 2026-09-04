@@ -1056,13 +1056,13 @@
                                           <i class="fas fa-check me-2"></i> Accept
                                         </button>
                                       </form>
-                                      <form action="{{ route('admin.payment.reject', $payment) }}" method="POST" class="d-inline slip-action-form">
+                                      <!--<form action="{{ route('admin.payment.reject', $payment) }}" method="POST" class="d-inline slip-action-form">
                                         @csrf
                                         @method('PATCH')
                                         <button type="submit" class="btn btn-danger" title="Reject payment">
                                           <i class="fas fa-times me-2"></i> Reject
                                         </button>
-                                      </form>
+                                      </form>-->
                                     @else
                                       @if($payment->status == 2)
                                         <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Accepted</span>
