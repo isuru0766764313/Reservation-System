@@ -1052,15 +1052,15 @@
                             <form action="{{ route('admin.payment.accept', $payment) }}" method="POST" class="d-inline slip-action-form">
                               @csrf
                               @method('PATCH')
-                              <button type="submit" class="btn btn-success btn-sm rounded-circle" title="Accept payment" style="width: 38px; height: 38px;">
-                                <i class="fas fa-check"></i>
+                              <button type="submit" class="btn btn-success" title="Accept payment">
+                                <i class="fas fa-check me-2"></i>Accept
                               </button>
                             </form>
                             <form action="{{ route('admin.payment.reject', $payment) }}" method="POST" class="d-inline slip-action-form">
                               @csrf
                               @method('PATCH')
-                              <button type="submit" class="btn btn-danger btn-sm rounded-circle" title="Reject payment" style="width: 38px; height: 38px;">
-                                <i class="fas fa-times"></i>
+                              <button type="submit" class="btn btn-danger" title="Reject payment">
+                                <i class="fas fa-times me-2"></i>Reject
                               </button>
                             </form>
                           @else
