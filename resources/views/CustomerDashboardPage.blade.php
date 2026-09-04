@@ -1674,7 +1674,26 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
                                                         @break
                                                         @default
                                                             <dd class="col-sm-8">Withdrawn</dd>
-                                                    @endswitch                                                    
+                                                    @endswitch
+                                                    @php
+                                                        // Determine if there is a pending payment action
+                                                        $nextLabel = null;
+                                                        $nextAmount = null;
+                                                        if ($statusId == 2 && (!$prelimPay || $prelimPay->status == 3)) {
+                                                            $nextLabel = 'Pay Advance';
+                                                            $nextAmount = $reservation->advanceAmount;
+                                                        } elseif ($statusId == 3 && (!$remainPay || $remainPay->status == 3)) {
+                                                            $nextLabel = 'Pay balance amount';
+                                                            $nextAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
+                                                        } elseif ($statusId == 5 && (!$cancelPay || $cancelPay->status == 3)) {
+                                                            $nextLabel = 'Pay Cancellation Fee';
+                                                            $nextAmount = $reservation->hall->cancellation_fee ?? 0;
+                                                        }
+                                                    @endphp
+                                                    @if($nextLabel)
+                                                        <dt class="col-sm-4">Next Step : </dt>
+                                                        <dd class="col-sm-8">{{ $nextLabel }} : Rs. {{ number_format($nextAmount, 2) }}</dd>
+                                                    @endif
                                                 </dl>
                                             </div>
                                             <div class="col-md-6">
@@ -1710,26 +1729,6 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
                                                         <dt class="col-sm-4">Remaining Amount:</dt>
                                                         <dd class="col-sm-8">Rs. {{ number_format(max(0, (($reservation->charge - $reservation->discount_custom) + $reservation->deposit) - $totalPaid), 2) }}</dd>
                                                     @endif
-                                                    @endif
-                                                    
-                                                    @php
-                                                        // Determine if there is a pending payment action
-                                                        $nextLabel = null;
-                                                        $nextAmount = null;
-                                                        if ($statusId == 2 && (!$prelimPay || $prelimPay->status == 3)) {
-                                                            $nextLabel = 'Pay Advance';
-                                                            $nextAmount = $reservation->advanceAmount;
-                                                        } elseif ($statusId == 3 && (!$remainPay || $remainPay->status == 3)) {
-                                                            $nextLabel = 'Pay balance amount';
-                                                            $nextAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
-                                                        } elseif ($statusId == 5 && (!$cancelPay || $cancelPay->status == 3)) {
-                                                            $nextLabel = 'Pay Cancellation Fee';
-                                                            $nextAmount = $reservation->hall->cancellation_fee ?? 0;
-                                                        }
-                                                    @endphp
-                                                    @if($nextLabel)
-                                                        <dt class="col-sm-4">Next Step : </dt>
-                                                        <dd class="col-sm-8">{{ $nextLabel }} : Rs. {{ number_format($nextAmount, 2) }}</dd>
                                                     @endif
                                                 </dl>
                                             </div>
