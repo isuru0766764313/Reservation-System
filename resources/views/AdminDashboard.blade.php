@@ -1699,6 +1699,8 @@
 
     // Function to reject reservation with reason
     function rejectReservationWithReason(reservationId) {
+      console.log("Reject button clicked for reservation:", reservationId);
+      
       let reason = prompt("Please enter the reason for rejecting this reservation:");
       
       if (reason === null || reason.trim() === "") {
@@ -1707,10 +1709,18 @@
       }
 
       let form = document.getElementById('reject-reservation-form-' + reservationId);
+      console.log("Form element:", form);
       
       if (!form) {
         console.error("Form not found for reservation " + reservationId);
+        alert("Error: Could not find the rejection form. Please try again.");
         return;
+      }
+
+      // Check if remarks input already exists and remove it
+      let existingInput = form.querySelector('input[name="remarks"]');
+      if (existingInput) {
+        existingInput.remove();
       }
 
       // Create hidden input for remarks
@@ -1719,6 +1729,7 @@
       input.name = "remarks";
       input.value = reason.trim();
       
+      console.log("Submitting form with reason:", reason.trim());
       form.appendChild(input);
       form.submit();
     }
