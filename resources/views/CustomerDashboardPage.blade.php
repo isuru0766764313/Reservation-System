@@ -1732,7 +1732,7 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
                                             </div>
                                         </div>
                                     </div>
-                                    @if((int)$reservation->status !== 1)
+                                    @if((int)$reservation->status !== 1 && (int)$reservation->status !== 4 && (int)$reservation->status !== 5 && !$hasPendingPayment)
                                     <div class="mb-4">
                                         <h4 class="mb-3"><i class="fas fa-university me-2"></i>Bank Transfer Details</h4>
                                         <div class="alert alert-info">                                            
