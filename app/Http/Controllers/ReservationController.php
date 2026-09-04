@@ -644,7 +644,7 @@ class ReservationController extends Controller
         return back()->with('success', 'Payment #' . $payment->id . ' rejected.');
     }
 
-    public function rejectReservation(ReservationModel $reservation)
+    public function rejectReservation(ReservationModel $reservation, Request $request)
     {
         if (auth('admin')->id() !== $reservation->hall->admin_id) {
             abort(403, 'Unauthorized action');
@@ -652,8 +652,17 @@ class ReservationController extends Controller
         if ((int) $reservation->status === 6) {
             return back()->with('error', 'Reservation already rejected!');
         }
-        $reservation->update(['accepted' => true, 'reserved' => false, 'status' => 6]);
-        return back()->with('success', 'Reservation rejected!');
+        
+        $remarks = $request->input('remarks', 'No reason provided');
+        
+        $reservation->update([
+            'accepted' => true, 
+            'reserved' => false, 
+            'status' => 6,
+            'remarks' => $remarks
+        ]);
+        
+        return back()->with('success', 'Reservation rejected successfully!');
     }
 
     public function cancel_reservation_by_customer(ReservationModel $reservation)

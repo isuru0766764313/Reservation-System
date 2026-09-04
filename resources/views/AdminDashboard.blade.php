@@ -1103,10 +1103,10 @@
 
                       {{-- Reject Reservation Button --}}
                       @if((int) $reservation->status !== 6)
-                      <form action="{{ route('admin.reservation.reject', $reservation) }}" method="POST">
+                      <form action="{{ route('admin.reservation.reject', $reservation) }}" method="POST" id="reject-reservation-form-{{ $reservation->id }}">
                         @csrf
                         @method('PATCH')
-                        <button type="submit" class="btn btn-danger">
+                        <button type="button" class="btn btn-danger" onclick="rejectReservationWithReason({{ $reservation->id }})">
                           <i class="fas fa-times-circle me-2"></i>Reject Reservation
                         </button>
                       </form>
@@ -1696,6 +1696,32 @@
         adminCalendar = null;
       }
     });
+
+    // Function to reject reservation with reason
+    function rejectReservationWithReason(reservationId) {
+      let reason = prompt("Please enter the reason for rejecting this reservation:");
+      
+      if (reason === null || reason.trim() === "") {
+        alert("Reason is required to reject the reservation.");
+        return;
+      }
+
+      let form = document.getElementById('reject-reservation-form-' + reservationId);
+      
+      if (!form) {
+        console.error("Form not found for reservation " + reservationId);
+        return;
+      }
+
+      // Create hidden input for remarks
+      let input = document.createElement("input");
+      input.type = "hidden";
+      input.name = "remarks";
+      input.value = reason.trim();
+      
+      form.appendChild(input);
+      form.submit();
+    }
   </script>
 
 </body>
