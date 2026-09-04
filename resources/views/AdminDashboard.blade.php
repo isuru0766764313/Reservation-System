@@ -1103,10 +1103,10 @@
 
                           {{-- Reject Reservation Button --}}
                           @if((int) $reservation->status !== 6)
-                          <form action="{{ route('admin.reservation.reject', $reservation) }}" method="POST">
+                          <form id="reject-reservation-form-{{ $reservation->id }}" action="{{ route('admin.reservation.reject', $reservation) }}" method="POST">
                             @csrf
                             @method('PATCH')
-                            <button type="submit" class="btn btn-danger">
+                            <button type="button" class="btn btn-danger" onclick="rejectReservationWithReason({{ $reservation->id }})">
                               <i class="fas fa-times-circle me-2"></i>Reject Reservation
                             </button>
                           </form>
