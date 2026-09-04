@@ -1740,17 +1740,17 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
                                         <h4 class="mb-3"><i class="fas fa-university me-2"></i>Bank Transfer Details</h4>
                                         <div class="alert alert-info">                                            
                                                 @if($reservation->status == 1)
-                                                    <p class="mb-3">Wait for admin acept the reservation. Once Done You could proceed.</p>
+                                                    <p class="mb-3 text-dark fw-bold" style="font-size: 1.1rem;">Wait for admin acept the reservation. Once Done You could proceed.</p>
                                                 @elseif($reservation->status == 2)
-                                                    <p class="mb-3">Please transfer Rs. {{ number_format($preliminaryPayment, 2) }} to the following bank account and upload your payment receipt below:</p>
+                                                    <p class="mb-3 text-dark fw-bold" style="font-size: 1.1rem;">Please transfer Rs. {{ number_format($preliminaryPayment, 2) }} to the following bank account and upload your payment receipt below:</p>
                                                 @elseif($reservation->status == 3)
-                                                    <p class="mb-3">Please transfer Rs. {{ number_format($remainingAmount, 2) }} to the following bank account and upload your payment receipt below:</p>
+                                                    <p class="mb-3 text-dark fw-bold" style="font-size: 1.1rem;">Please transfer Rs. {{ number_format($remainingAmount, 2) }} to the following bank account and upload your payment receipt below:</p>
                                                 @elseif($reservation->status == 4)
-                                                    <p class="mb-3">Everything is paid already.</p>
+                                                    <p class="mb-3 text-dark fw-bold" style="font-size: 1.1rem;">Everything is paid already.</p>
                                                 @elseif($reservation->status == 5)
-                                                    <p class="mb-3">Since cancelled nothing to pay</p>
+                                                    <p class="mb-3 text-dark fw-bold" style="font-size: 1.1rem;">Since cancelled nothing to pay</p>
                                                 @elseif($reservation->status == 6)
-                                                    <p class="mb-3">Nothing to pay. You have just re-scheduled.</p>
+                                                    <p class="mb-3 text-dark fw-bold" style="font-size: 1.1rem;">Nothing to pay. You have just re-scheduled.</p>
                                                 @else
                                                 @endif
                                             
