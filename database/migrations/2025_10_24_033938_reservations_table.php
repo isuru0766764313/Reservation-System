@@ -51,6 +51,7 @@ class ReservationsTable extends Migration
             $table->boolean('reserved')->nullable()->default(null);
             $table->string('receipt_path')->nullable()->default(null);
             $table->string('clearence_form')->nullable()->default(null);
+            $table->text('remarks')->nullable();
             $table->timestamps();
         });
     }
