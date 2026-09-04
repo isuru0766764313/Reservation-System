@@ -441,7 +441,7 @@ class CustomerController extends Controller
                 'hall.availability', // Load hall's unavailable slots
                 'hall.admin',        // Load hall's owner (admin)
                 'payments',    // load with payments
-            ])->orderBy('created_at', 'desc')->paginate(5);
+            ])->orderBy('created_at', 'desc')->paginate(10);
 
         $reservations->getCollection()->transform(function ($reservation) 
         {
