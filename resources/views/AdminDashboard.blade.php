@@ -898,16 +898,14 @@
                 <input type="hidden" name="cancellationExpiryDate" id="cancellationExpiryDate-hidden-{{ $reservation->id }}" value="{{ $reservation->cancellationExpiryDate ?? '' }}">
                 <input type="hidden" name="rescheduledExpiryDate" id="rescheduledExpiryDate-hidden-{{ $reservation->id }}" value="{{ $reservation->rescheduledExpiryDate ?? '' }}">
                 <button type="button" class="btn btn-success" onclick="acceptReservation(this, '{{ $reservation->id }}')" @if($reservation->accepted !== null) disabled @endif>
-                  <i
-                    class="fas fa-check me-2"></i>{{ $reservation->accepted !== null && $reservation->accepted ? 'Already Accepted' : 'Accept' }}</button>
+                  <i class="fas fa-check me-2"></i>{{ $reservation->accepted !== null && $reservation->accepted ? 'Already Accepted' : 'Accept' }}</button>
               </form>
             </div>
             <div>
               <form method="POST" action="{{route('admin.reservations.reject', $reservation->id)}}">
                 @csrf @method('PATCH')
                 <button type="submit" class="btn btn-danger" @if($reservation->accepted !== null) disabled @endif>
-                  <i
-                    class="fas fa-times me-2"></i>{{ $reservation->accepted !== null && !$reservation->accepted ? 'Already rejected' : 'Reject' }}
+                  <i class="fas fa-times me-2"></i>{{ $reservation->accepted !== null && !$reservation->accepted ? 'Already rejected' : 'Reject' }}
                 </button>
               </form>
             </div>
