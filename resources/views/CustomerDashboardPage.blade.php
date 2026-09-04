@@ -1582,7 +1582,6 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
                                 </div>
                                 <div class="modal-body overflow-auto" style="max-height: 75vh;">
                                     <div class="mb-4">
-                                        <h4 class="mb-3"><i class="fas fa-calendar-alt me-2"></i>Reservation Details</h4>
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <dl class="row reservation-dl">                                        
@@ -1692,7 +1691,7 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
                                                     @endphp
                                                     @if($nextLabel)
                                                         <dt class="col-sm-4">Next Step : </dt>
-                                                        <dd class="col-sm-8">{{ $nextLabel }} : Rs. {{ number_format($nextAmount, 2) }}</dd>
+                                                        <dd class="col-sm-8 fw-bold text-success">{{ $nextLabel }} Rs. {{ number_format($nextAmount, 2) }}</dd>
                                                     @endif
                                                 </dl>
                                             </div>
