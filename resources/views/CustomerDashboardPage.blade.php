@@ -1728,7 +1728,7 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
                                                         }
                                                     @endphp
                                                     @if($nextLabel)
-                                                        <dt class="col-sm-4">Next : </dt>
+                                                        <dt class="col-sm-4">Next Step : </dt>
                                                         <dd class="col-sm-8">{{ $nextLabel }} : Rs. {{ number_format($nextAmount, 2) }}</dd>
                                                     @endif
                                                 </dl>
