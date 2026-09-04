@@ -865,22 +865,60 @@ class ReservationController extends Controller
         $status = (int) $reservation->status;
 
         switch ($status) {
-            case 1:
-                return ['status_id' => $status, 'label' => self::getReservationStatusLabel($status), 'class' => 'bg-warning text-dark'];
-            case 2:
-                return ['status_id' => $status,'label' => self::getReservationStatusLabel($status), 'class' => 'bg-warning text-dark'];
-            case 3:
-                return ['status_id' => $status,'label' => self::getReservationStatusLabel($status), 'class' => 'bg-warning text-dark'];
-            case 4:
-                return ['status_id' => $status,'label' => self::getReservationStatusLabel($status), 'class' => 'bg-success'];
-            case 5:
-                return ['status_id' => $status,'label' => self::getReservationStatusLabel($status), 'class' => 'bg-danger'];
-            case 6:
-                return ['status_id' => $status,'label' => self::getReservationStatusLabel($status), 'class' => 'bg-danger'];
-            case 7:
-                return ['status_id' => $status,'label' => self::getReservationStatusLabel($status), 'class' => 'bg-danger'];
+            case 1: // Pending
+                return [
+                    'status_id' => $status,
+                    'label' => self::getReservationStatusLabel($status),
+                    'class' => 'bg-warning text-dark'
+                ];
+            case 2: // Accepted
+                return [
+                    'status_id' => $status,
+                    'label' => self::getReservationStatusLabel($status),
+                    'class' => 'bg-primary text-white'
+                ];
+            case 3: // Confirmed
+                return [
+                    'status_id' => $status,
+                    'label' => self::getReservationStatusLabel($status),
+                    'class' => 'bg-info text-white'
+                ];
+            case 4: // Reserved (final success)
+                return [
+                    'status_id' => $status,
+                    'label' => self::getReservationStatusLabel($status),
+                    'class' => 'bg-success text-white'
+                ];
+            case 5: // Cancelled (by admin or system)
+                return [
+                    'status_id' => $status,
+                    'label' => self::getReservationStatusLabel($status),
+                    'class' => 'bg-danger text-white'
+                ];
+            case 6: // Rejected
+                return [
+                    'status_id' => $status,
+                    'label' => self::getReservationStatusLabel($status),
+                    'class' => 'bg-secondary text-white'
+                ];
+            case 7: // Rescheduled
+                return [
+                    'status_id' => $status,
+                    'label' => self::getReservationStatusLabel($status),
+                    'class' => 'bg-warning text-dark' // or 'bg-orange' if you have custom
+                ];
+            case 8: // User-cancelled (distinct from admin-cancelled)
+                return [
+                    'status_id' => $status,
+                    'label' => self::getReservationStatusLabel($status),
+                    'class' => 'bg-dark text-white'
+                ];
             default:
-                return ['status_id' => $status,'label' => 'Unknown', 'class' => 'bg-danger'];
+                return [
+                    'status_id' => $status,
+                    'label' => 'Unknown',
+                    'class' => 'bg-secondary text-white'
+                ];
         }
     }
 
