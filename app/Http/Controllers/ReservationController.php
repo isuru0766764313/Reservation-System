@@ -834,7 +834,7 @@ class ReservationController extends Controller
             1 => 'Pending',
             2 => 'Accepted',
             3 => 'Confirmed',
-            4 => 'Finished',
+            4 => 'Reserved',
             5 => 'Cancelled',
             6 => 'Rejected',
             7 => 'Rescheduled',
