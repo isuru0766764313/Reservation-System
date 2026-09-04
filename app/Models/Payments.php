@@ -19,11 +19,13 @@ class Payments extends Model
         'amount',
         'receipt_path',
         'status',
+        'remarks'
     ] ;
     protected $casts = 
     [
         'amount'=> 'decimal:2',
         'status' => 'integer',
+        'remarks' => 'string'
     ] ;
     
 
