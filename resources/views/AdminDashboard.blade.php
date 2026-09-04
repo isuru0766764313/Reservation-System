@@ -1696,6 +1696,32 @@
         adminCalendar = null;
       }
     });
+
+    // Function to reject reservation with reason
+    function rejectReservationWithReason(reservationId) {
+      let reason = prompt("Please enter the reason for rejecting this reservation:");
+      
+      if (reason === null || reason.trim() === "") {
+        alert("Reason is required to reject the reservation.");
+        return;
+      }
+
+      let form = document.getElementById('reject-reservation-form-' + reservationId);
+      
+      if (!form) {
+        console.error("Form not found for reservation " + reservationId);
+        return;
+      }
+
+      // Create hidden input for remarks
+      let input = document.createElement("input");
+      input.type = "hidden";
+      input.name = "remarks";
+      input.value = reason.trim();
+      
+      form.appendChild(input);
+      form.submit();
+    }
   </script>
 
 </body>
