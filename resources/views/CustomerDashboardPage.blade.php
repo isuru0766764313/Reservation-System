@@ -1565,19 +1565,22 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
     @foreach($reservations as $reservation)
                     <div class="modal fade" id="PayNowModel-{{ $reservation->id }}" tabindex="-1" aria-labelledby="payNowModalLabel"
                         aria-hidden="true">
-                        <div class="modal-dialog {{ (int)$reservation->status === 1 ? 'modal-lg' : 'modal-fullscreen' }}">
-                            <div class="modal-content h-100 d-flex flex-column">
+                        @php
+                            $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
+                            $preliminaryPayment = $reservation->advanceAmount;
+                            $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
+                            $hasPendingPayment = $reservation->payments->where('status', 1)->count() > 0;
+                            $showPaymentSection = (int)$reservation->status !== 1 && (int)$reservation->status !== 4 && (int)$reservation->status !== 5 && !$hasPendingPayment;
+                            $modalClass = $showPaymentSection ? 'modal-fullscreen-md-down' : 'modal-lg';
+                        @endphp
+                        <div class="modal-dialog modal-dialog-centered {{ $modalClass }}">
+                            <div class="modal-content">
                                 <div class="modal-header bg-primary text-white">
                                     <h5 class="modal-title" id="payNowModalLabel"><i class="fas fa-money-check-alt me-2"></i>Reservation/Payment Details</h5>
                                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                         aria-label="Close"></button>
                                 </div>
-                                <div class="modal-body flex-grow-1 overflow-auto">
-                                    @php
-        $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
-        $preliminaryPayment = $reservation->advanceAmount;
-        $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
-                                    @endphp
+                                <div class="modal-body overflow-auto" style="max-height: 75vh;">
                                     <div class="mb-4">
                                         <h4 class="mb-3"><i class="fas fa-calendar-alt me-2"></i>Reservation Details</h4>
                                         <div class="row">
@@ -1732,7 +1735,7 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
                                             </div>
                                         </div>
                                     </div>
-                                    @if((int)$reservation->status !== 1 && (int)$reservation->status !== 4 && (int)$reservation->status !== 5 && !$hasPendingPayment)
+                                    @if($showPaymentSection)
                                     <div class="mb-4">
                                         <h4 class="mb-3"><i class="fas fa-university me-2"></i>Bank Transfer Details</h4>
                                         <div class="alert alert-info">                                            
@@ -1784,9 +1787,6 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
                                             <input type="hidden" name="amount" id="paymentAmount-{{ $reservation->id }}"
                                                 value="{{ $totalPaid >= $preliminaryPayment ? number_format($remainingAmount, 2) : number_format($preliminaryPayment, 2) }}">
                                             <div class="d-grid">
-                                                @php
-                                                    $hasPendingPayment = $reservation->payments->where('status', 1)->count() > 0;
-                                                @endphp
                                                 <button type="submit" class="btn btn-success btn-lg" id="paySubmitBtn-{{ $reservation->id }}" @if(in_array($reservation->status, [1, 4, 5]) || $hasPendingPayment) disabled @endif>
                                                     Submit Payment Receipt
                                                 </button>
