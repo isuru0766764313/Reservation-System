@@ -1612,9 +1612,9 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
                                                     @if((int)$reservation->status !== 1)
                                                     <dt class="col-sm-4">Advance Payment Due Date:</dt>
                                                     <dd class="col-sm-8">{{ $reservation->advancePaymentDate ?? 'N/A' }}</dd>
-                                                    <dt class="col-sm-4">Cancellation Due:</dt>
+                                                    <dt class="col-sm-4">Cancellation Due Date:</dt>
                                                     <dd class="col-sm-8">{{ $reservation->cancellationExpiryDate ?? 'N/A' }}</dd>
-                                                    <dt class="col-sm-4">Re-schedule Due:</dt>
+                                                    <dt class="col-sm-4">Re-schedule Due Date:</dt>
                                                     <dd class="col-sm-8">{{ $reservation->rescheduledExpiryDate ?? 'N/A' }}</dd>
                                                     @endif
                                                     <dt class="col-sm-4">Current Status:</dt>
