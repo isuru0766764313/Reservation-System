@@ -51,49 +51,35 @@ class reservation_request_admin extends Notification implements ShouldQueue
         $mail = (new MailMessage)
             ->subject('New Reservation Request #' . ($reservation->ref_code ?? $reservation->id) . ' - ' . $reservation->hall_name)
             ->greeting('Dear Admin,')
-            ->line('A new reservation request has been submitted and requires your review.')
+            ->line('A new reservation request has been submitted.')
             ->line('---')
-            ->line('**RESERVATION SUMMARY**')
-            ->line('Reservation ID: **#' . ($reservation->ref_code ?? $reservation->id) . '**')
-            ->line('Reservation Type: **' . ucfirst($reservation->reservation_type) . '**')
+            ->line('**RESERVATION DETAILS**')
+            ->line('Reservation Ref Code: **#' . ($reservation->ref_code ?? $reservation->id) . '**')
+            ->line('Hall Name: **' . $reservation->hall_name . '**')
+            ->line('Customer Name: **' . $reservation->customer_name . '**')
+            ->line('Customer Email: **' . $reservation->customer_email . '**')
+            ->line('Customer Telephone: **' . $reservation->customer_tel . '**')
+            ->line('Reservation Type: **' . ucfirst($reservation->reservation_type) . '**');
+            if ($reservation->reservation_type === 'package' && $reservation->package)
+            {
+            $mail
+            ->line('Package Name: **' . ucfirst($reservation->package->name) . '**');
+            }
+        $mail
             ->line('Reservation Date: **' . \Carbon\Carbon::parse($reservation->reservation_date)->format('l, d M Y') . '**')
-            ->line('Event Time: **' . $reservation->start_time . ' - ' . $reservation->end_time . '**')
-            ->line('Venue Capacity: **' . number_format($hall->capacity) . ' people**')
+            ->line('Event Time Period: **' . date('h:i A', strtotime($reservation->start_time)) . ' - ' . date('h:i A', strtotime($reservation->end_time)) . '**')
             ->line('Pre-arrange Time: **' . $reservation->pre_arrange_time . ' hour(s)**')
             ->line('Post-arrange Time: **' . $reservation->post_arrange_time . ' hour(s)**')
-            ->line('Full Time Block: **' . $actualStart . ' - ' . $actualEnd . '**');
+            ->line('Full Event Time Period: **' . date('h:i A', strtotime($actualStart)) . ' - ' . date('h:i A', strtotime($actualEnd)) . '**')
+            ->line('Charge: **Rs. ' . number_format($reservation->charge, 2) . '**');
 
-        if ($reservation->reservation_type === 'package' && $reservation->package) {
-            $mail->line('Package: **' . $reservation->package->name . '**');
-        }
-
-        $mail->line('Total Charge: **Rs. ' . number_format($reservation->charge, 2) . '**')
-            ->line('Advance Amount Required: **Rs. ' . number_format($reservation->advanceAmount, 2) . '**');
-
-        if ($reservation->discount > 0) {
-            $mail->line('Hall Discount: **Rs. ' . number_format($reservation->discount, 2) . '**');
-        }
-        if ($reservation->deposit > 0) {
-            $mail->line('Refundable Deposit: **Rs. ' . number_format($reservation->deposit, 2) . '**');
-        }
-
-        $mail->line('---')
-            ->line('**CUSTOMER DETAILS**')
-            ->line('Name: **' . $reservation->customer_name . '**')
-            ->line('Email: **' . $reservation->customer_email . '**')
-            ->line('Telephone: **' . $reservation->customer_tel . '**')
-            ->line('---')
-            ->line('**VENUE DETAILS**')
-            ->line('Hall: **' . $reservation->hall_name . '**')
-            ->line('Address: **' . ($hall->address ?? 'N/A') . '**')
-            ->line('Location: **' . ($hall->area ?? 'N/A') . ', ' . ($hall->district ?? 'N/A') . '**')
-            ->line('---')
+        $mail->line('---')                       
             ->line('**REQUIRED ACTION**')
-            ->line('Review the reservation and **Accept** or **Reject** it. Accepting will notify the customer to proceed with payment.')
+            ->line('Review the reservation request.')
             ->line('---')
-            ->action('View & Manage Reservation', route('admin.dashboard.route'))
+            ->action('Review Reservation Request', route('admin.dashboard.route'))
             ->line('Please take action at your earliest convenience.')
-            ->salutation("Regards,\n" . 'Prime Minister\'s Office');
+            ->salutation("Best regards,\nPublic Facilities Reservation System.");
 
         return $mail;
     }

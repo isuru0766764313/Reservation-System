@@ -46,22 +46,24 @@ class reservation_request_customer extends Notification implements ShouldQueue
         $hall = $reservation->hall;
         $admin = $hall->admin;
         $customer = $reservation->customer;
+        $actualStart = date('H:i', strtotime($reservation->start_time) - ($reservation->pre_arrange_time * 3600));
+        $actualEnd = date('H:i', strtotime($reservation->end_time) + ($reservation->post_arrange_time * 3600));
 
         $mail = (new MailMessage)
             ->subject('Reservation Request Logged #' . ($reservation->ref_code ?? $reservation->id) . ' - ' . $reservation->hall_name)
             ->greeting('Dear ' . trim(($customer->profile_title ?? '') . ' ' . ($customer->first_name ?? '') . ' ' . ($customer->last_name ?? '')) . ',')
-            ->line('Thank you for using the Public Facilities Reservation Portal. Your reservation request has been successfully logged and is now pending admin approval.')
+            ->line('Thank you for using the Public Facilities Reservation System. Your reservation request was successfully logged.')
             ->line('---')
             ->line('**RESERVATION DETAILS**')
-            ->line('Ref Code: **' . ($reservation->ref_code ?? 'N/A') . '**')
-            ->line('Reservation Type: **' . ucfirst($reservation->reservation_type) . '**')
+            ->line('Reservation Ref Code: **' . ($reservation->ref_code ?? 'N/A') . '**')
             ->line('Hall Name: **' . $reservation->hall_name . '**')
+            ->line('Reservation Type: **' . ucfirst($reservation->reservation_type) . '**')
+            ->line('Reservation Date: **' . \Carbon\Carbon::parse($reservation->reservation_date)->format('Y-m-d') . '**')
+            ->line('Event Time Period: **' . date('h:i A', strtotime($actualStart)) . ' - ' . date('h:i A', strtotime($actualEnd)) . '**')
             ->line('Charge: **Rs. ' . number_format($reservation->charge, 2) . '**')
-            ->line('Date: **' . \Carbon\Carbon::parse($reservation->reservation_date)->format('Y-m-d') . '**')
-            ->line('Time Slot: **' . date('h:i A', strtotime($reservation->start_time)) . ' - ' . date('h:i A', strtotime($reservation->end_time)) . '**')
             ->line('---')
-            ->line('Your reservation is **pending admin approval**. You will be notified once the admin reviews your request.')
-            ->salutation("Best regards,\nAdmin,\nPrime Minister's Office.");
+            ->line('Your reservation request is under review.')
+            ->salutation("Best regards,\nAdmin,\nPublic Facilities Reservation System.");
 
         return $mail;
     }
