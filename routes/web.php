@@ -202,8 +202,9 @@ Route::middleware(['auth:admin', 'verified.admin'])->prefix('admin')->group(func
     Route::delete('/halls/delete/{hall}', [AdminDashboardController::class, 'DeactivateHall'])->name('deactivate.hall');
     // check for ongoing (not yet passed) reservations of a hall
     Route::get('/halls/{hall}/ongoing-reservations', [AdminDashboardController::class, 'checkOngoingReservations'])->name('deactivate.hall.check');
-    // reject or accept customer reservations
+    // accept customer reservation request
     Route::patch('/reservations/{reservation}/accept', [AdminDashboardController::class, 'accept_reservation_request'])->name('admin.reservations.accept');
+    // reject customer reservation request
     Route::patch('/reservations/{reservation}/reject', [AdminDashboardController::class, 'reject_reservation_request'])->name('admin.reservations.reject');
     // view the payment slip by from "PaymentConfirmation" email
     Route::get('/view-slip/{reservation}',[AdminDashboardController::class,'viewSlip'])->name('admin.view.slip');
