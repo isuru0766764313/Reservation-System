@@ -101,15 +101,6 @@
             gap: 10px;
         }
 
-        .btn-success {
-            background: #1b10e6ff !important;
-            border: none !important;
-        }
-
-        .btn-success:hover {
-            background: #160ce4ff !important;
-        }
-
         .action-btn {
             min-width: 90px;
             margin: 2px;
