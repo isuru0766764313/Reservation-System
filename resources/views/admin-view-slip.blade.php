@@ -273,7 +273,7 @@
                         @if($paymentCount > 0)
                             @foreach($reservation->payments->where('payment_alias', '!=', 'Cancellation') as $index => $payment)
                                 <div class="mb-3">
-                                    <h6 class="text-muted">Payment number : {{ $index + 1 }} 
+                                    <h6 class="text-muted">Payment number  {{ $index + 1 }} :
                                         @if($payment->payment_alias && $payment->payment_alias != 'Preliminary')
                                             <span class="badge bg-info ms-2">Advance Payment</span>
                                         @elseif($payment->payment_alias && $payment->payment_alias != 'Remainings')
