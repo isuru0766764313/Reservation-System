@@ -427,7 +427,7 @@ class ReservationController extends Controller
                     ->update(['status' => 2]);
                 // Notify customer
                 $reservation->customer->notify(new AdvancePaymentAccepted($reservation));
-                return redirect()->route('admin.dashboard.route')->with('success', 'Advance payment accepted! Customer can now submit remaining payment.');
+                return redirect()->route('admin.dashboard.route')->with('success', 'Advance Payment accepted');
             } elseif ($reservation->advance_accepted !== null) {
                 return back()->with('error', 'Advance payment already processed!');
             } else {
@@ -590,7 +590,7 @@ class ReservationController extends Controller
             $recipients = ($reservation->customer_tel);
             $smsService = new SmsServiceController($message, $recipients);
             $smsService->sendSms();
-            return back()->with('success', 'Advance payment accepted! Customer can now submit remaining payment.');
+            return back()->with('success', 'Advance Payment accepted');
         }
 
         // Cancellation payment approval
