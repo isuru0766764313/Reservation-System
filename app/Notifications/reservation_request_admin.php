@@ -59,6 +59,7 @@ class reservation_request_admin extends Notification implements ShouldQueue
             ->line('Customer Name: **' . $reservation->customer_name . '**')
             ->line('Customer Email: **' . $reservation->customer_email . '**')
             ->line('Customer Telephone: **' . $reservation->customer_tel . '**')
+            ->line('Customer Type: **' . ucfirst($reservation->customer->type ?? 'N/A') . '**')
             ->line('Reservation Type: **' . ucfirst($reservation->reservation_type) . '**');
             if ($reservation->reservation_type === 'package' && $reservation->package)
             {
