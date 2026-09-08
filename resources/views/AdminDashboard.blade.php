@@ -618,10 +618,10 @@
           <tbody>
             @foreach($reservations as $reservation)
               @php
-  // Calculate total amount paid for this reservation
-  $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
-  $preliminaryPayment = $reservation->advanceAmount;
-  $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
+                // Calculate total amount paid for this reservation
+                $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
+                $preliminaryPayment = $reservation->advanceAmount;
+                $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
               @endphp
               <tr>
                 <td class="align-middle">{{ $reservation->ref_code ?? $loop->iteration }}</td>
