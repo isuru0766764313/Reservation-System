@@ -431,17 +431,32 @@ class CustomerController extends Controller
     }
 
     // opens customer dashboard and fetch data
-    public function Load_Customer_Dashboard(HallModel $hall, ReservationModel $reservation)
+    public function Load_Customer_Dashboard(Request $request, HallModel $hall, ReservationModel $reservation)
     {
         // Get authenticated customer
         $customer = Auth::guard('customer')->user();
         // getting relevant all reservations with thier halls regarding above customer
-        $reservations = ReservationModel::where('customer_id', $customer->id)
+        $reservationQuery = ReservationModel::where('customer_id', $customer->id)
             ->with([
                 'hall.availability', // Load hall's unavailable slots
                 'hall.admin',        // Load hall's owner (admin)
                 'payments',    // load with payments
-            ])->orderBy('created_at', 'desc')->paginate(10);
+            ]);
+
+        // Search reservations by reference code or property/hall name.
+        if ($request->filled('search')) {
+            $searchTerm = trim($request->input('search'));
+
+            $reservationQuery->where(function ($query) use ($searchTerm) {
+                $query->where('ref_code', 'LIKE', '%' . $searchTerm . '%')
+                    ->orWhere('hall_name', 'LIKE', '%' . $searchTerm . '%');
+            });
+        }
+
+        $reservations = $reservationQuery
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->withQueryString();
 
         $reservations->getCollection()->transform(function ($reservation) 
         {
