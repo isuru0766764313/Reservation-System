@@ -72,10 +72,10 @@ class AdvancePaymentAccepted extends Notification implements ShouldQueue
             ->line('Final Charge: **Rs. ' . number_format((($reservation->charge) - ($reservation->discount_custom ?? 0)), 2) . '**');
             if ($reservation->deposit > 0)
             {
-            $mail->line('Refundable Deposit: **Rs. ' . number_format($reservation->deposit, 2) . '**');
+            $mail
+            ->line('Refundable Deposit: **Rs. ' . number_format($reservation->deposit, 2) . '**');
             }
             $mail
-            ->line('Refundable Deposit: **Rs. ' . number_format($reservation->deposit, 2) . '**')
             ->line('Advance Payment: **Rs. ' . number_format($reservation->advanceAmount, 2) . '**' . '-' . 'Approved')
             ->line('Balance Amount: **Rs. ' . number_format($remaining, 2) . '**')
             ->line('---')
