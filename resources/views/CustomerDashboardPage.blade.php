@@ -941,6 +941,18 @@
             </div>
         </div>
 
+        <!-- Search bar to find reservation record easily -->
+            <form method="GET" action="{{ route('load_customer_dashboard') }}" class="mb-3" style="max-width: 420px;">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="search"
+                        placeholder="Enter reference code or hall name..."
+                        value="{{ request('search') }}">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+
         <!-- Reservations Section -->
         <div class="reservations-card">
             <div class="card-header">
@@ -952,7 +964,8 @@
                 </div>
             </div>
 
-            <!-- Desktop Table -->
+            
+
             <div class="table-responsive reservations-table">
                 <table class="table table-custom">
                     <thead>
