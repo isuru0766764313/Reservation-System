@@ -55,7 +55,7 @@ class AdminDashboardController extends Controller
 
         $reservations = $reservationQuery
             ->orderBy('created_at', 'desc')
-            ->paginate(5)
+            ->paginate(10)
             ->withQueryString();
             
         return view('AdminDashboard', compact('halls', 'reservations', 'admin'));
