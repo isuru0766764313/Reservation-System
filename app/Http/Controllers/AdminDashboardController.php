@@ -17,7 +17,7 @@ use App\Http\Controllers\SmsServiceController;
 
 class AdminDashboardController extends Controller
 {
-    public function admin_dashboard_fetch_data(HallModel $hall, ReservationModel $reservation)
+    public function admin_dashboard_fetch_data(Request $request, HallModel $hall, ReservationModel $reservation)
     {
         // Get authenticated admin
         $admin = Auth::guard('admin')->user();
@@ -32,7 +32,31 @@ class AdminDashboardController extends Controller
         // Get all hall IDs belonging to this admin
         $hallIds = HallModel::where('admin_id', $admin->id)->pluck('id');
         // Get reservations for these halls
-        $reservations = ReservationModel::whereIn('hall_id', $hallIds)->with('hall','customer')->orderBy('created_at', 'desc')->paginate(5);
+        $reservationQuery = ReservationModel::whereIn('hall_id', $hallIds)
+            ->with(['hall', 'customer', 'payments']);
+
+        // Search reservations by reference code, customer name, or property/hall name.
+        if ($request->filled('search')) {
+            $searchTerm = trim($request->input('search'));
+
+            $reservationQuery->where(function ($query) use ($searchTerm) {
+                $query->where('ref_code', 'LIKE', '%' . $searchTerm . '%')
+                    ->orWhere('customer_name', 'LIKE', '%' . $searchTerm . '%')
+                    ->orWhere('hall_name', 'LIKE', '%' . $searchTerm . '%')
+                    ->orWhereHas('customer', function ($customerQuery) use ($searchTerm) {
+                        $customerQuery->where('first_name', 'LIKE', '%' . $searchTerm . '%')
+                            ->orWhere('last_name', 'LIKE', '%' . $searchTerm . '%');
+                    })
+                    ->orWhereHas('hall', function ($hallQuery) use ($searchTerm) {
+                        $hallQuery->where('name', 'LIKE', '%' . $searchTerm . '%');
+                    });
+            });
+        }
+
+        $reservations = $reservationQuery
+            ->orderBy('created_at', 'desc')
+            ->paginate(5)
+            ->withQueryString();
             
         return view('AdminDashboard', compact('halls', 'reservations', 'admin'));
     }
