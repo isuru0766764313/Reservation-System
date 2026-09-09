@@ -28,6 +28,9 @@ class AdvancePaymentAccepted extends Notification implements ShouldQueue
         $reservation = $this->reservation;
         $hall = $reservation->hall;
         $admin = $hall->admin;
+        $customer = $reservation->customer;
+        $actualStart = date('H:i', strtotime($reservation->start_time) - ($reservation->pre_arrange_time * 3600));
+        $actualEnd = date('H:i', strtotime($reservation->end_time) + ($reservation->post_arrange_time * 3600));
 
         $remaining = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $reservation->advanceAmount);
 
@@ -42,42 +45,48 @@ class AdvancePaymentAccepted extends Notification implements ShouldQueue
 
         $mail = (new MailMessage)
             ->subject('Advance Payment Accepted - Reservation #' . ($reservation->ref_code ?? $reservation->id))
-            ->greeting('Dear ' . trim(($reservation->customer->profile_title ?? '') . ' ' . ($reservation->customer->first_name ?? '') . ' ' . ($reservation->customer->last_name ?? '')) . ',')
-            ->line('Your **advance payment of Rs. ' . number_format($reservation->advanceAmount, 2) . '** has been accepted by the admin.')
-            ->line('Your reservation is now **confirmed** and the time slot is secured. Please proceed with the remaining payment to finalize your booking.')
+            ->greeting('Dear ' . trim(($customer->profile_title ?? '') . ' ' . $customer->first_name . ' ' . $customer->last_name))
+            ->line('Your **Advance Payment Rs. ' . number_format($reservation->advanceAmount, 2) . '** has been approved by the admin. Your reservation is now **confirmed** and the event time period is secured.')
             ->line('---')
-            ->line('**RESERVATION SUMMARY**')
-            ->line('Reservation ID: **#' . ($reservation->ref_code ?? $reservation->id) . '**')
-            ->line('Reservation Type: **' . ucfirst($reservation->reservation_type) . '**')
-            ->line('Venue: **' . $hall->name . '**')
-            ->line('Venue Capacity: **' . number_format($hall->capacity) . ' people**')
-            ->line('Date: **' . \Carbon\Carbon::parse($reservation->reservation_date)->format('l, d M Y') . '**')
-            ->line('Event Time: **' . $reservation->start_time . ' - ' . $reservation->end_time . '**')
-            ->line('---')
-            ->line('**PAYMENT BREAKDOWN**')
-            ->line('Charge: **Rs. ' . number_format($reservation->charge, 2) . '**')
-            ->line('Discount: **Rs. ' . number_format($reservation->discount_custom, 2) . '**')
-            ->line('Final Charge: **Rs. ' . number_format(($reservation->charge - $reservation->discount_custom), 2) . '**')
-            ->line('Advance Paid: **Rs. ' . number_format($reservation->advanceAmount, 2) . '**')
-            ->line('Remaining Balance: **Rs. ' . number_format($remaining, 2) . '**');
-
-        if ($reservation->deposit > 0) {
+            ->line('**RESERVATION DETAILS**')
+            ->line('Reservation Ref Code: **#' . ($reservation->ref_code ?? $reservation->id) . '**')
+            ->line('Hall Name: **' . $reservation->hall_name . '**')
+            ->line('Reservation Type: **' . ucfirst($reservation->reservation_type) . '**');
+            if ($reservation->reservation_type === 'package' && $reservation->package)
+            {
+            $mail
+            ->line('Package Name: **' . ucfirst($reservation->package->name) . '**');
+            }
+            $mail
+            ->line('Reservation Date: **' . \Carbon\Carbon::parse($reservation->reservation_date)->format('l, d M Y') . '**')
+            ->line('Event Time Period: **' . date('h:i A', strtotime($actualStart)) . ' - ' . date('h:i A', strtotime($actualEnd)) . '**')
+            ->line('Re-schedule Due Date: **' . \Carbon\Carbon::parse($reservation->rescheduledExpiryDate)->format('l, d M Y') . '**')
+            ->line('Cancellation Due Date: **' . \Carbon\Carbon::parse($reservation->cancellationExpiryDate)->format('l, d M Y') . '**')
+            ->line('Charge: **Rs. ' . number_format($reservation->charge, 2) . '**');
+            if ($reservation->discount_custom > 0)
+            {
+            $mail
+            ->line('Discount: **Rs. ' . number_format($reservation->discount_custom ?? 0, 2) . '**');
+            }
+            $mail
+            ->line('Final Charge: **Rs. ' . number_format((($reservation->charge) - ($reservation->discount_custom ?? 0)), 2) . '**');
+            if ($reservation->deposit > 0)
+            {
             $mail->line('Refundable Deposit: **Rs. ' . number_format($reservation->deposit, 2) . '**');
-        }
-
-        $mail->line('---')
+            }
+            $mail
+            ->line('Refundable Deposit: **Rs. ' . number_format($reservation->deposit, 2) . '**')
+            ->line('Advance Payment: **Rs. ' . number_format($reservation->advanceAmount, 2) . '**' . '-' . 'Approved')
+            ->line('Balance Amount: **Rs. ' . number_format($remaining, 2) . '**')
+            ->line('---')
             ->line('**NEXT STEP**')
-            ->line('Your advance payment has been **accepted**. Please log in to your dashboard to submit the **remaining payment of Rs. ' . number_format($remaining, 2) . '**.')
+            ->line('Please submit the **balance payment of Rs. ' . number_format($remaining, 2) . '**.')
             ->line('---')
-            ->line('**VENUE ADDRESS & CONTACT**')
-            ->line('Location: **' . ($hall->address ?? $hall->area ?? 'N/A') . '**')
-            ->line('Admin Email: **' . $admin->email . '**')
-            ->line('Admin Telephone: **' . $admin->telephone_number . '**')
-            ->line('---')
-            ->action('Go to My Dashboard', route('load_customer_dashboard'))
             ->line('Find the venue on Google Maps: ' . $mapUrl)
+            ->line('---')
+            ->action('Upload Balance payment Slip', route('load_customer_dashboard'))            
             ->line('Thank you for choosing the Prime Minister\'s Office facilities.')
-            ->salutation("Best regards,\nAdmin,\nPrime Minister's Office.");
+            ->salutation("Best regards,\nPublic Facilities Reservation System.");
 
         return $mail;
     }
