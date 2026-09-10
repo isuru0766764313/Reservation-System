@@ -88,7 +88,7 @@ class ReservationAccepted extends Notification implements ShouldQueue
             }
             $mail
             ->line('Advance Payment: **Rs. ' . number_format($reservation->advanceAmount, 2) . '**')
-            ->line('⚠️ Please note that if the advance payment is not recieved by the deadline above, your reservation will be automatically cancelled.')
+            ->line('⚠️ Please note that if the advance payment is not recieved by the "Advance Payment Due Date", your reservation will be automatically cancelled.')
             ->line('---')
             ->line('**NEXT STEP**')
             ->line('Pay Advance Amount: **Rs. ' . number_format($reservation->advanceAmount, 2) . '**')
