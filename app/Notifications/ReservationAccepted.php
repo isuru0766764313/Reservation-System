@@ -56,7 +56,7 @@ class ReservationAccepted extends Notification implements ShouldQueue
         $mail = (new MailMessage)
             ->subject('Reservation Accepted! Advance Payment Required - ')
             ->greeting('Dear ' . trim(($customer->profile_title ?? '') . ' ' . $customer->first_name . ' ' . $customer->last_name))
-            ->line('Your reservation request was **accepted** by the admin. Please pay advance payment to secure your reseervation.')
+            ->line('Your reservation request was **accepted** by the admin. Please pay advance payment to secure your reservation.')
             ->line('---')
             ->line('**RESERVATION DETAILS**')
             ->line('Reservation Ref Code: **#' . ($reservation->ref_code ?? $reservation->id) . '**')
