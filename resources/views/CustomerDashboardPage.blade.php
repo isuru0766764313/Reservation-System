@@ -1665,7 +1665,7 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
                                                             @endif 
                                                         @break
                                                         @case(4)
-                                                            <dd class="col-sm-8"><strong>Finished</strong><br><small class="text-muted">Full Payment is done.</small></dd>
+                                                            <dd class="col-sm-8"><strong>Reserved</strong><br><small class="text-muted">Full Payment is done.</small></dd>
                                                         @break
                                                         @case(5)
                                                             @if($cancelPay && $cancelPay->status == 1)
