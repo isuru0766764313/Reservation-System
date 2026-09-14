@@ -793,16 +793,14 @@
   @foreach($reservations as $reservation)
     @php
       // Calculate total amount paid for this reservation
-      $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
-      $totalPaidSlip = $reservation->payments->where('status', 2)->sum('amount');
       $preliminaryPayment = $reservation->advanceAmount;
+      $totalPaid = $reservation->payments->where('status', 2)->sum('amount');      
       $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);      
       if ((int) $reservation->status === 5) {
         $approvedExceptCancellation = $reservation->payments->where('status', 2)->where('payment_alias', '!=', 'Cancellation')->sum('amount');
         $totalPaid = max(0, $approvedExceptCancellation - ($reservation->hall->cancellation_fee ?? 0));
       }
       $advancePaidStatus = $reservation->advancePaid ? 'Yes' : 'No';
-      $remainingSlip = max(0, (($reservation->charge - $reservation->discount_custom) + $reservation->deposit) - $totalPaidSlip);
     @endphp
     <div class="modal fade" id="reservationModal-{{ $reservation->id }}" tabindex="-1">
       <div class="modal-dialog modal-lg" style="max-width: 1100px;">
@@ -909,8 +907,7 @@
               </div>
             </div>
           </div>
-
-          <!-- Payment Slips Section (moved from slipModal) -->
+          <!--Payment Slips appearing here-->
           <div class="mb-4 px-4">
             <h6 class="border-bottom pb-2"><i class="fas fa-file-invoice me-2"></i>Payment Slips</h6>
             <div class="text-center bg-light p-3 rounded">
