@@ -32,7 +32,8 @@ Thumbs.db
 # Coverage reports
 coverage/
 htmlcov/
-.coverage
+.pytest_cache/
+.mypy_cache/
 
 # Python specific
 *.py[cod]
@@ -69,8 +70,10 @@ pip-delete-this-directory.txt
 *.Z
 *.lz
 *.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
+
+# Other common ignores
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
 ```
