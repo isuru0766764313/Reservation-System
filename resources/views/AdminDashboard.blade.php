@@ -628,10 +628,10 @@
           <tbody>
             @foreach($reservations as $reservation)
               @php
-                // Calculate total amount paid for this reservation
-                $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
-                $preliminaryPayment = $reservation->advanceAmount;
-                $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
+  // Calculate total amount paid for this reservation
+  $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
+  $preliminaryPayment = $reservation->advanceAmount;
+  $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
               @endphp
               <tr>
                 <td class="align-middle">{{ $reservation->ref_code ?? $loop->iteration }}</td>
@@ -792,10 +792,17 @@
   <!-- Reservation request Detail Modal -->
   @foreach($reservations as $reservation)
     @php
-  // Calculate total amount paid for this reservation
-  $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
-  $preliminaryPayment = $reservation->advanceAmount;
-  $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
+      // Calculate total amount paid for this reservation
+      $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
+      $preliminaryPayment = $reservation->advanceAmount;
+      $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
+      $totalPaidSlip = $reservation->payments->where('status', 2)->sum('amount');
+      if ((int) $reservation->status === 5) {
+        $approvedExceptCancellation = $reservation->payments->where('status', 2)->where('payment_alias', '!=', 'Cancellation')->sum('amount');
+        $totalPaidSlip = max(0, $approvedExceptCancellation - ($reservation->hall->cancellation_fee ?? 0));
+      }
+      $advancePaidStatus = $reservation->advancePaid ? 'Yes' : 'No';
+      $remainingSlip = max(0, (($reservation->charge - $reservation->discount_custom) + $reservation->deposit) - $totalPaidSlip);
     @endphp
     <div class="modal fade" id="reservationModal-{{ $reservation->id }}" tabindex="-1">
       <div class="modal-dialog modal-lg" style="max-width: 1100px;">
@@ -887,6 +894,13 @@
                   </dd>
                   <dt class="col-sm-4">Refundable Deposit:</dt>
                   <dd class="col-sm-8 fw-bold">Rs. {{ number_format($reservation->deposit, 2) }}</dd>
+                  <dt class="col-sm-4">Total Paid:</dt>
+                  <dd class="col-sm-8 fw-bold text-success">Rs. {{ number_format($totalPaidSlip, 2) }}</dd>
+
+                  @if(!in_array($reservation->status, [5, 6, 7]))
+                    <dt class="col-sm-4">Remaining to be paid:</dt>
+                    <dd class="col-sm-8 fw-bold text-danger">Rs. {{ number_format($remainingSlip, 2) }}</dd>
+                  @endif
                 </dl>
                 <button class="btn btn-primary open-terms-btn mt-2"
                   data-pdf="{{ asset('storage/' . $reservation->clearence_form) }}">
@@ -895,7 +909,7 @@
               </div>
             </div>
           </div>
-          
+
           <!-- Payment Slips Section (moved from slipModal) -->
           <div class="mb-4 px-4">
             <h6 class="border-bottom pb-2"><i class="fas fa-file-invoice me-2"></i>Payment Slips</h6>
@@ -955,7 +969,7 @@
               @endif
             </div>
           </div>
-          
+
           <div class="modal-footer">
             <div class="me-auto">
               <form method="POST" action="{{route('admin.reservations.accept', $reservation->id)}}" onsubmit="updateDiscountCustom('{{ $reservation->id }}')">
