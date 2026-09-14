@@ -921,36 +921,17 @@
                                         <dt class="col-sm-4">Re-schedule Due Date:</dt>
                                         <dd class="col-sm-8">{{ $reservation->rescheduledExpiryDate ?? 'N/A' }}</dd>
                                       @endif
-
-
-
-
-
-
-
-
-
-
-
-
-
                                     </dl>
                                   </div>
                                   <div class="col-md-6">
                                     <!--<h6><i class="fas fa-building me-2"></i>Hall Details</h6>-->
                                     <dl class="row">
-
-
                                       <dt class="col-sm-4">Reservation Type:</dt>
                                       <dd class="col-sm-8">{{ ucfirst($reservation->reservation_type) }}</dd>
                                       @if($reservation->reservation_type === 'package' && $reservation->package)
                                         <dt class="col-sm-4">Package:</dt>
                                         <dd class="col-sm-8">{{ $reservation->package->name }}</dd>
                                       @endif
-
-
-
-
                                       @if($reservation->reservation_type === 'package')
                                         <dt class="col-sm-4">Pre-arrange hours:</dt>
                                         <dd class="col-sm-8">{{ $reservation->pre_arrange_time }} hours</dd>
