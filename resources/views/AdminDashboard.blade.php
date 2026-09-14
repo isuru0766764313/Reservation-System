@@ -968,7 +968,11 @@
           </div>
 
           <div class="modal-footer">
+<<<<<<< Updated upstream
             @if($reservation->status == 1)
+=======
+
+>>>>>>> Stashed changes
             <div class="me-auto">
               <form method="POST" action="{{route('admin.reservations.accept', $reservation->id)}}" onsubmit="updateDiscountCustom('{{ $reservation->id }}')">
                 @csrf @method('PATCH')
@@ -981,7 +985,11 @@
                   <i class="fas fa-check me-2"></i>{{ $reservation->accepted !== null && $reservation->accepted ? 'Already Accepted' : 'Accept' }}</button>
               </form>
             </div>
+<<<<<<< Updated upstream
             @endif
+=======
+
+>>>>>>> Stashed changes
             <div>
               <form method="POST" action="{{route('admin.reservations.reject', $reservation->id)}}">
                 @csrf @method('PATCH')
@@ -990,6 +998,7 @@
                 </button>
               </form>
             </div>
+            
           </div>
         </div>
       </div>
