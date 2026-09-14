@@ -968,6 +968,7 @@
           </div>
 
           <div class="modal-footer">
+            @if($reservation->status == 1)
             <div class="me-auto">
               <form method="POST" action="{{route('admin.reservations.accept', $reservation->id)}}" onsubmit="updateDiscountCustom('{{ $reservation->id }}')">
                 @csrf @method('PATCH')
@@ -980,6 +981,7 @@
                   <i class="fas fa-check me-2"></i>{{ $reservation->accepted !== null && $reservation->accepted ? 'Already Accepted' : 'Accept' }}</button>
               </form>
             </div>
+            @endif
             <div>
               <form method="POST" action="{{route('admin.reservations.reject', $reservation->id)}}">
                 @csrf @method('PATCH')
