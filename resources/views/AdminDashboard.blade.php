@@ -1070,7 +1070,7 @@
               </div>
             @endif
             @if ((int) $reservation->status !== 6)
-              <div>
+              <div class="w-100">
                 <form id="reject-reservation-form-{{ $reservation->id }}"
                   action="{{ route('admin.reservation.reject', $reservation) }}" method="POST">
                   @csrf
@@ -1078,7 +1078,7 @@
                   <div class="mb-3">
                     <label for="remarks-{{ $reservation->id }}" class="form-label">Reason for Rejection:</label>
                     <textarea class="form-control" id="remarks-{{ $reservation->id }}" name="remarks" rows="4" 
-                      placeholder="Please enter the reason for rejecting this reservation..."></textarea>
+                      placeholder="Please enter the reason for rejecting this reservation..." style="width: 100%;"></textarea>
                   </div>
                   <button type="submit" class="btn btn-danger">
                     <i class="fas fa-times-circle me-2"></i>Reject Reservation
