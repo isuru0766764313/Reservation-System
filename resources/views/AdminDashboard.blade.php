@@ -1067,18 +1067,6 @@
                 </div>
               @endif
 
-
-
-
-
-
-
-
-
-
-
-
-
               <div class="modal-footer">
 
                 @if ((int) $reservation->status !== 6)
