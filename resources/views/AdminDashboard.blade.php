@@ -906,6 +906,36 @@
                     </button>
                   </div>
                 </div>
+              @endif
+            </div>
+          </div>
+          
+          <div class="modal-footer">
+            @if($reservation->status == 1)
+            <div class="me-auto">
+              <form method="POST" action="{{route('admin.reservations.accept', $reservation->id)}}" onsubmit="updateDiscountCustom('{{ $reservation->id }}')">
+                @csrf @method('PATCH')
+                <input type="hidden" name="discount_custom" id="discount-custom-hidden-{{ $reservation->id }}" value="{{ $reservation->discount_custom ?? 0 }}">
+                <input type="hidden" name="advanceAmount" id="advanceAmount-hidden-{{ $reservation->id }}" value="{{ $reservation->advanceAmount ?? 0 }}">
+                <input type="hidden" name="advancePaymentDate" id="advancePaymentDate-hidden-{{ $reservation->id }}" value="{{ $reservation->advancePaymentDate ?? '' }}">
+                <input type="hidden" name="cancellationExpiryDate" id="cancellationExpiryDate-hidden-{{ $reservation->id }}" value="{{ $reservation->cancellationExpiryDate ?? '' }}">
+                <input type="hidden" name="rescheduledExpiryDate" id="rescheduledExpiryDate-hidden-{{ $reservation->id }}" value="{{ $reservation->rescheduledExpiryDate ?? '' }}">
+                <button type="button" class="btn btn-success" onclick="acceptReservation(this, '{{ $reservation->id }}')" @if($reservation->accepted !== null) disabled @endif>
+                  <i class="fas fa-check me-2"></i>{{ $reservation->accepted !== null && $reservation->accepted ? 'Already Accepted' : 'Accept' }}</button>
+              </form>
+            </div>
+            @endif
+            <div>
+              <form method="POST" action="{{route('admin.reservations.reject', $reservation->id)}}">
+                @csrf @method('PATCH')
+                <div class="mb-3">
+                  <label for="rejection-reason-{{ $reservation->id }}" class="form-label">Rejection Reason:</label>
+                  <textarea class="form-control" id="rejection-reason-{{ $reservation->id }}" name="remarks" rows="4" placeholder="Enter the reason for rejecting this reservation..."></textarea>
+                </div>
+                <button type="button" class="btn btn-danger" onclick="rejectReservationWithReason('{{ $reservation->id }}')" @if($reservation->accepted !== null) disabled @endif>
+                  <i class="fas fa-times me-2"></i>{{ $reservation->accepted !== null && !$reservation->accepted ? 'Already rejected' : 'Reject' }}
+                </button>
+              </form>
               </div>
               <!--Payment Slips appearing here-->
               <div class="mb-4 px-4">
@@ -1586,14 +1616,16 @@
     function rejectReservationWithReason(reservationId) {
       console.log("Reject button clicked for reservation:", reservationId);
       
-      let reason = prompt("Please enter the reason for rejecting this reservation:");
+      let textarea = document.getElementById('rejection-reason-' + reservationId);
+      let reason = textarea.value.trim();
       
-      if (reason === null || reason.trim() === "") {
+      if (reason === "") {
         alert("Reason is required to reject the reservation.");
+        textarea.focus();
         return;
       }
 
-      let form = document.getElementById('reject-reservation-form-' + reservationId);
+      let form = textarea.closest('form');
       console.log("Form element:", form);
       
       if (!form) {
@@ -1602,20 +1634,7 @@
         return;
       }
 
-      // Check if remarks input already exists and remove it
-      let existingInput = form.querySelector('input[name="remarks"]');
-      if (existingInput) {
-        existingInput.remove();
-      }
-
-      // Create hidden input for remarks
-      let input = document.createElement("input");
-      input.type = "hidden";
-      input.name = "remarks";
-      input.value = reason.trim();
-      
-      console.log("Submitting form with reason:", reason.trim());
-      form.appendChild(input);
+      console.log("Submitting form with reason:", reason);
       form.submit();
     }
   </script>
