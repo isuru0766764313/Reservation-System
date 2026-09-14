@@ -1075,8 +1075,12 @@
                   action="{{ route('admin.reservation.reject', $reservation) }}" method="POST">
                   @csrf
                   @method('PATCH')
-                  <button type="button" class="btn btn-danger"
-                    onclick="rejectReservationWithReason({{ $reservation->id }})">
+                  <div class="mb-3">
+                    <label for="remarks-{{ $reservation->id }}" class="form-label">Reason for Rejection:</label>
+                    <textarea class="form-control" id="remarks-{{ $reservation->id }}" name="remarks" rows="4" 
+                      placeholder="Please enter the reason for rejecting this reservation..."></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-danger">
                     <i class="fas fa-times-circle me-2"></i>Reject Reservation
                   </button>
                 </form>
@@ -1670,42 +1674,6 @@
       }
     });
 
-    // Function to reject reservation with reason
-    function rejectReservationWithReason(reservationId) {
-      console.log("Reject button clicked for reservation:", reservationId);
-
-      let reason = prompt("Please enter the reason for rejecting this reservation:");
-
-      if (reason === null || reason.trim() === "") {
-        alert("Reason is required to reject the reservation.");
-        return;
-      }
-
-      let form = document.getElementById('reject-reservation-form-' + reservationId);
-      console.log("Form element:", form);
-
-      if (!form) {
-        console.error("Form not found for reservation " + reservationId);
-        alert("Error: Could not find the rejection form. Please try again.");
-        return;
-      }
-
-      // Check if remarks input already exists and remove it
-      let existingInput = form.querySelector('input[name="remarks"]');
-      if (existingInput) {
-        existingInput.remove();
-      }
-
-      // Create hidden input for remarks
-      let input = document.createElement("input");
-      input.type = "hidden";
-      input.name = "remarks";
-      input.value = reason.trim();
-
-      console.log("Submitting form with reason:", reason.trim());
-      form.appendChild(input);
-      form.submit();
-    }
   </script>
 
 </body>
