@@ -875,12 +875,12 @@
                   <div class="row mb-4">
                     <div class="col-md-6">
                       <dl class="row">
+                        <dt class="col-sm-4">Hall Name:</dt>
+                        <dd class="col-sm-8">{{ $reservation->hall_name }}</dd>
                         <dt class="col-sm-4">Customer Name:</dt>
                         <dd class="col-sm-8">{{ $reservation->customer_name }}</dd>
-
                         <dt class="col-sm-4">Customer Email:</dt>
                         <dd class="col-sm-8">{{ $reservation->customer_email }}</dd>
-
                         <dt class="col-sm-4">Customer Phone:</dt>
                         <dd class="col-sm-8">{{ $reservation->customer_tel }}</dd>
                         <dt class="col-sm-4">Advance payment due date:</dt>
@@ -911,8 +911,7 @@
                     <div class="col-md-6">
                       <!--<h6><i class="fas fa-building me-2"></i>Hall Details</h6>-->
                       <dl class="row">
-                        <dt class="col-sm-4">Hall Name:</dt>
-                        <dd class="col-sm-8">{{ $reservation->hall_name }}</dd>
+                        
 
                         <dt class="col-sm-4">Reservation Type:</dt>
                         <dd class="col-sm-8">{{ ucfirst($reservation->reservation_type) }}</dd>
