@@ -792,17 +792,17 @@
   <!-- Reservation request Detail Modal -->
   @foreach($reservations as $reservation)
     @php
-      // Calculate total amount paid for this reservation
-      $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
-      $preliminaryPayment = $reservation->advanceAmount;
-      $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
-      $totalPaidSlip = $reservation->payments->where('status', 2)->sum('amount');
-      if ((int) $reservation->status === 5) {
-        $approvedExceptCancellation = $reservation->payments->where('status', 2)->where('payment_alias', '!=', 'Cancellation')->sum('amount');
-        $totalPaidSlip = max(0, $approvedExceptCancellation - ($reservation->hall->cancellation_fee ?? 0));
-      }
-      $advancePaidStatus = $reservation->advancePaid ? 'Yes' : 'No';
-      $remainingSlip = max(0, (($reservation->charge - $reservation->discount_custom) + $reservation->deposit) - $totalPaidSlip);
+        // Calculate total amount paid for this reservation
+        $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
+        $totalPaidSlip = $reservation->payments->where('status', 2)->sum('amount');
+        $preliminaryPayment = $reservation->advanceAmount;
+        $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);      
+        if ((int) $reservation->status === 5) {
+          $approvedExceptCancellation = $reservation->payments->where('status', 2)->where('payment_alias', '!=', 'Cancellation')->sum('amount');
+          $totalPaidSlip = max(0, $approvedExceptCancellation - ($reservation->hall->cancellation_fee ?? 0));
+        }
+        $advancePaidStatus = $reservation->advancePaid ? 'Yes' : 'No';
+        $remainingSlip = max(0, (($reservation->charge - $reservation->discount_custom) + $reservation->deposit) - $totalPaidSlip);
     @endphp
     <div class="modal fade" id="reservationModal-{{ $reservation->id }}" tabindex="-1">
       <div class="modal-dialog modal-lg" style="max-width: 1100px;">
@@ -895,7 +895,7 @@
                   <dt class="col-sm-4">Refundable Deposit:</dt>
                   <dd class="col-sm-8 fw-bold">Rs. {{ number_format($reservation->deposit, 2) }}</dd>
                   <dt class="col-sm-4">Total Paid:</dt>
-                  <dd class="col-sm-8 fw-bold text-success">Rs. {{ number_format($totalPaidSlip, 2) }}</dd>
+                  <dd class="col-sm-8 fw-bold text-success">Rs. {{ number_format($totalPaid, 2) }}</dd>
 
                   @if(!in_array($reservation->status, [5, 6, 7]))
                     <dt class="col-sm-4">Remaining to be paid:</dt>
