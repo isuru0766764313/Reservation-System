@@ -878,43 +878,43 @@ class ReservationController extends Controller
                 return [
                     'status_id' => $status,
                     'label' => self::getReservationStatusLabel($status),
-                    'class' => 'bg-warning text-dark'
+                    'class' => 'bg-custom-pending text-dark'
                 ];
             case 2: // Accepted
                 return [
                     'status_id' => $status,
                     'label' => self::getReservationStatusLabel($status),
-                    'class' => 'bg-primary text-white'
+                    'class' => 'bg-custom-accepted text-dark'
                 ];
             case 3: // Confirmed
                 return [
                     'status_id' => $status,
                     'label' => self::getReservationStatusLabel($status),
-                    'class' => 'bg-info text-white'
+                    'class' => 'bg-custom-confirmed text-dark'
                 ];
             case 4: // Reserved (final success)
                 return [
                     'status_id' => $status,
                     'label' => self::getReservationStatusLabel($status),
-                    'class' => 'bg-success text-white'
+                    'class' => 'bg-custom-reserved text-dark'
                 ];
             case 5: // Cancelled (by admin or system)
                 return [
                     'status_id' => $status,
                     'label' => self::getReservationStatusLabel($status),
-                    'class' => 'bg-danger text-white'
+                    'class' => 'bg-custom-cancelled text-dark'
                 ];
             case 6: // Rejected
                 return [
                     'status_id' => $status,
                     'label' => self::getReservationStatusLabel($status),
-                    'class' => 'bg-secondary text-white'
+                    'class' => 'bg-custom-rejected text-dark'
                 ];
             case 7: // Rescheduled
                 return [
                     'status_id' => $status,
                     'label' => self::getReservationStatusLabel($status),
-                    'class' => 'bg-warning text-dark' // or 'bg-orange' if you have custom
+                    'class' => 'bg-custom-rescheduled text-dark'
                 ];
             case 8: // User-cancelled (distinct from admin-cancelled)
                 return [
@@ -926,7 +926,7 @@ class ReservationController extends Controller
                 return [
                     'status_id' => $status,
                     'label' => 'Unknown',
-                    'class' => 'bg-secondary text-white'
+                    'class' => 'bg-custom-unknown text-dark'
                 ];
         }
     }
