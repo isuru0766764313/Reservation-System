@@ -1065,7 +1065,7 @@
                                                                         default => '<i class="fas fa-clock text-warning"></i>',
                                                                     };
                                                                     @endphp
-                                                                    <li class="mb-1 d-flex justify-content-between align-items-center">
+                                                                    <li class="mb-1 d-flex align-items-center gap-2">
                                                                         <span>{!! $statusIcon !!}</span>
                                                                         <span class="text-muted">{{ $stageLabel }} : Rs. {{ number_format($payment->amount, 2) }}</span>
                                                                     </li>
