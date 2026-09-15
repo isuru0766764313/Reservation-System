@@ -269,6 +269,13 @@
       width: 15%;
     }
 
+    /* Reservation table - center align all content */
+    .table-custom.reservation-table th,
+    .table-custom.reservation-table td {
+      text-align: center !important;
+      vertical-align: middle !important;
+    }
+
     /* ===== Status Badges ===== */
     .status-badge {
       padding: 0.4rem 0.9rem;
@@ -671,7 +678,7 @@
       </form>
 
       <div class="table-responsive">
-        <table class="table table-custom">
+        <table class="table table-custom reservation-table">
           <thead>
             <tr>
               <th>Reference Code</th>
