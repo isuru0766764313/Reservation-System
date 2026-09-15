@@ -1782,7 +1782,6 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
                                         </div>
                                     </div>
                                     <div class="payment-upload pt-3 mt-3 border-top">
-                                        <h4 class="mb-3"><i class="fas fa-receipt me-2"></i>Upload Payment Receipt</h4>
                                         <form action="{{ route('payment.submit', $reservation->id) }}" method="POST"
                                             enctype="multipart/form-data">
                                             @csrf
@@ -1799,7 +1798,7 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
                                                 value="{{ $totalPaid >= $preliminaryPayment ? number_format($remainingAmount, 2) : number_format($preliminaryPayment, 2) }}">
                                             <div class="d-grid">
                                                 <button type="submit" class="btn btn-success btn-lg" id="paySubmitBtn-{{ $reservation->id }}" @if(in_array($reservation->status, [1, 4, 5]) || $hasPendingPayment) disabled @endif>
-                                                    Submit Payment Receipt
+                                                    Submit Payment Slip
                                                 </button>
                                             </div>
                                             <!--<div class="d-grid">
