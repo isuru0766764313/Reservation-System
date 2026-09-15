@@ -681,7 +681,6 @@
               <th>Period</th>
               <th>Status</th>
               <th>Reservation Details</th>
-              <th>Payment Details</th>
             </tr>
           </thead>
           <tbody>
