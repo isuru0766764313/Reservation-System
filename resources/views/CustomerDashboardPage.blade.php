@@ -1050,7 +1050,7 @@
                                                                 $payments = $reservation->payments; // collection of all payments for this reservation
                                                             @endphp
                                                             <ul class="list-unstyled mb-0" style="font-size:0.85rem;">
-                                                                <button class="btn btn-primary btn-sm action-btn view-btn" data-bs-toggle="modal" data-bs-target="#PayNowModel-{{ $reservation->id }}">View</button>
+                                                                <button class="btn btn-primary btn-sm action-btn view-btn mb-2" data-bs-toggle="modal" data-bs-target="#PayNowModel-{{ $reservation->id }}">View</button>
                                                                 @foreach($payments as $payment)
                                                                     @php
                                                                     $stageLabel = match ($payment->payment_alias)
