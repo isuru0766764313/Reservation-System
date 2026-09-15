@@ -1050,8 +1050,9 @@
                                                                 $payments = $reservation->payments; // collection of all payments for this reservation
                                                             @endphp
                                                             <ul class="list-unstyled mb-0" style="font-size:0.85rem;">
+                                                                <button class="btn btn-primary btn-sm action-btn view-btn" data-bs-toggle="modal" data-bs-target="#PayNowModel-{{ $reservation->id }}">View</button>
                                                                 @foreach($payments as $payment)
-                                                                @php
+                                                                    @php
                                                                     $stageLabel = match ($payment->payment_alias)
                                                                     {
                                                                         'Preliminary' => 'Advance Payment',
@@ -1069,8 +1070,7 @@
                                                                         <span>{!! $statusIcon !!}</span>
                                                                         <span class="text-muted">{{ $stageLabel }} : Rs. {{ number_format($payment->amount, 2) }}</span>
                                                                     </li>
-                                                                    @endforeach
-                                                                    <button class="btn btn-primary btn-sm action-btn view-btn" data-bs-toggle="modal" data-bs-target="#PayNowModel-{{ $reservation->id }}">View</button>
+                                                                @endforeach                                                                    
                                                                 </ul>
                                                             </td>
                                                         </tr>
