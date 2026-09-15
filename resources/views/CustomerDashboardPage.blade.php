@@ -907,7 +907,7 @@
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon pending"><i class="fas fa-clock"></i></div>
+                <div class="stat-icon pending"><i class="fas fa-hourglass-half"></i></div>
                 <div class="stat-content">
                     <div class="stat-number">{{ $pendingRequest }}</div>
                     <div class="stat-label">Pending Requests</div>
