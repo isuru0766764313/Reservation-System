@@ -697,7 +697,7 @@
               <th>Date</th>
               <th>Period</th>
               <th>Status</th>
-              <th>Reservation Details</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
