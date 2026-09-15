@@ -1066,8 +1066,8 @@
                                                                     };
                                                                     @endphp
                                                                     <li class="mb-1 d-flex justify-content-between align-items-center">
-                                                                        <span class="text-muted">{{ $stageLabel }} : Rs. {{ number_format($payment->amount, 2) }}</span>
                                                                         <span>{!! $statusIcon !!}</span>
+                                                                        <span class="text-muted">{{ $stageLabel }} : Rs. {{ number_format($payment->amount, 2) }}</span>
                                                                     </li>
                                                                     @endforeach
                                                                     <button class="btn btn-primary btn-sm action-btn view-btn" data-bs-toggle="modal" data-bs-target="#PayNowModel-{{ $reservation->id }}">View</button>
