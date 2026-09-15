@@ -887,7 +887,7 @@
                       <dt class="col-sm-4">Customer Phone:</dt>
                       <dd class="col-sm-8">{{ $reservation->customer_tel }}</dd>
                       <dt class="col-sm-4">Reservation Date:</dt>
-                      <dd class="col-sm-8">{{ date('M d, Y', strtotime($reservation->reservation_date)) }}</dd>
+                      <dd class="col-sm-8">{{ date('Y-m-d', strtotime($reservation->reservation_date)) }}</dd>
                       <dt class="col-sm-4">Event period:</dt>
                       <dd class="col-sm-8">
                         {{ date('h:i A', strtotime($reservation->start_time)) }} -
