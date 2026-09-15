@@ -1003,7 +1003,7 @@
                                                                     $cancelAvail = empty($reservation->cancellationExpiryDate) || \Carbon\Carbon::parse($reservation->cancellationExpiryDate)->isFuture();
                                                                     $rescheduleAvail = empty($reservation->rescheduledExpiryDate) || \Carbon\Carbon::parse($reservation->rescheduledExpiryDate)->isFuture();
                                                                 @endphp
-                                                                <span>{{ $Rbadge['label'] }}</span>
+                                                                <span class="badge {{ $Rbadge['class'] }}">{{ $Rbadge['label'] }}</span>
                                                                 @if (in_array($Rbadge['status_id'], [3, 4]) && !$cancelRecord && ($cancelAvail || $rescheduleAvail))
                                                                     @if($cancelAvail)
                                                                     <button type="button" class="btn btn-danger btn-sm action-btn w-100"
