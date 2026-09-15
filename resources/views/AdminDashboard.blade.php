@@ -482,6 +482,16 @@
       color: var(--gray);
     }
 
+    /* Custom status badge colors */
+    .bg-custom-pending { background-color: #F2A405 !important; }
+    .bg-custom-accepted { background-color: #0EDE02 !important; }
+    .bg-custom-confirmed { background-color: #70B502 !important; }
+    .bg-custom-reserved { background-color: #0C6300 !important; }
+    .bg-custom-cancelled { background-color: #FF6D4D !important; }
+    .bg-custom-rejected { background-color: #FF0000 !important; }
+    .bg-custom-rescheduled { background-color: #FFDC12 !important; }
+    .bg-custom-unknown { background-color: #ABA9A9 !important; }
+
     @media(max-width:768px) {
       .action-btn {
         width: 100%;
@@ -499,16 +509,6 @@
       .dashboard-section .section-header h4 {
         font-size: 1rem;
       }
-
-      /* Custom status badge colors */
-      .bg-custom-pending { background-color: #F2A405 !important; }
-      .bg-custom-accepted { background-color: #0EDE02 !important; }
-      .bg-custom-confirmed { background-color: #70B502 !important; }
-      .bg-custom-reserved { background-color: #0C6300 !important; }
-      .bg-custom-cancelled { background-color: #FF6D4D !important; }
-      .bg-custom-rejected { background-color: #FF0000 !important; }
-      .bg-custom-rescheduled { background-color: #FFDC12 !important; }
-      .bg-custom-unknown { background-color: #ABA9A9 !important; }
     }
   </style>
 </head>
