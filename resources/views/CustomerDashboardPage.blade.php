@@ -1583,7 +1583,7 @@ $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custo
                             $preliminaryPayment = $reservation->advanceAmount;
                             $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
                             $hasPendingPayment = $reservation->payments->where('status', 1)->count() > 0;
-                            $showPaymentSection = (int)$reservation->status !== 1 && (int)$reservation->status !== 4 && (int)$reservation->status !== 5 && !$hasPendingPayment;
+                            $showPaymentSection = (int)$reservation->status !== 1 && (int)$reservation->status !== 4 && (int)$reservation->status !== 5 && (int)$reservation->status !== 6 && !$hasPendingPayment;
                             $modalClass = $showPaymentSection ? 'modal-fullscreen-md-down modal-xl' : 'modal-lg';
                         @endphp
                         <div class="modal-dialog modal-dialog-centered {{ $modalClass }}">
