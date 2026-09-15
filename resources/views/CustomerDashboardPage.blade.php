@@ -1063,7 +1063,7 @@
                                                                     $statusIcon = match ((int) $payment->status) {
                                                                         2 => '<i class="fas fa-check-circle text-success"></i>',
                                                                         3 => '<i class="fas fa-times-circle text-danger"></i>',
-                                                                        default => '<i class="fas fa-clock text-warning"></i>',
+                                                                        default => '<i class="fas fa-hourglass-half text-warning"></i>',
                                                                     };
                                                                     @endphp
                                                                     <li class="mb-1 d-flex align-items-center gap-2">
