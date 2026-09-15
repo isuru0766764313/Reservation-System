@@ -709,10 +709,6 @@
                     data-bs-target="#reservationModal-{{ $reservation->id }}"><i class="fas fa-eye me-2"></i>View
                   </button>
                 </td>
-
-                <td class="align-middle">
-                  <span class="text-muted"><small>See payment slips in View</small></span>
-                </td>
               </tr>
             @endforeach
           </tbody>
