@@ -482,15 +482,15 @@
       color: var(--gray);
     }
 
-    /* Custom status badge colors */
-    .bg-custom-pending { background-color: #F2A405 !important; }
-    .bg-custom-accepted { background-color: #0EDE02 !important; }
-    .bg-custom-confirmed { background-color: #70B502 !important; }
-    .bg-custom-reserved { background-color: #0C6300 !important; }
-    .bg-custom-cancelled { background-color: #FF6D4D !important; }
-    .bg-custom-rejected { background-color: #FF0000 !important; }
-    .bg-custom-rescheduled { background-color: #FFDC12 !important; }
-    .bg-custom-unknown { background-color: #ABA9A9 !important; }
+    /* Custom status badge colors & sizing */
+    .bg-custom-pending { background-color: #F2A405 !important; color: #000 !important; padding: 6px 10px !important; font-size: 0.9rem !important; }
+    .bg-custom-accepted { background-color: #0EDE02 !important; color: #000 !important; padding: 6px 10px !important; font-size: 0.9rem !important; }
+    .bg-custom-confirmed { background-color: #70B502 !important; color: #000 !important; padding: 6px 10px !important; font-size: 0.9rem !important; }
+    .bg-custom-reserved { background-color: #0C6300 !important; color: #000 !important; padding: 6px 10px !important; font-size: 0.9rem !important; }
+    .bg-custom-cancelled { background-color: #FF6D4D !important; color: #000 !important; padding: 6px 10px !important; font-size: 0.9rem !important; }
+    .bg-custom-rejected { background-color: #FF0000 !important; color: #000 !important; padding: 6px 10px !important; font-size: 0.9rem !important; }
+    .bg-custom-rescheduled { background-color: #FFDC12 !important; color: #000 !important; padding: 6px 10px !important; font-size: 0.9rem !important; }
+    .bg-custom-unknown { background-color: #ABA9A9 !important; color: #000 !important; padding: 6px 10px !important; font-size: 0.9rem !important; }
 
     @media(max-width:768px) {
       .action-btn {
