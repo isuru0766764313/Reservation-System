@@ -292,11 +292,20 @@
 
         /* ===== Badges ===== */
         .badge {
-            padding: 0.35rem 0.65rem;
+            padding: 6px 10px;
             font-weight: 500;
             border-radius: var(--radius-xs);
-            font-size: 0.8rem;
+            font-size: 0.9rem;
         }
+
+        .bg-custom-pending    { background-color: #F2A405 !important; color: #000 !important; }
+        .bg-custom-accepted   { background-color: #0EDE02 !important; color: #000 !important; }
+        .bg-custom-confirmed  { background-color: #70B502 !important; color: #000 !important; }
+        .bg-custom-reserved   { background-color: #0C6300 !important; color: #000 !important; }
+        .bg-custom-cancelled  { background-color: #FF6D4D !important; color: #000 !important; }
+        .bg-custom-rejected   { background-color: #FF0000 !important; color: #000 !important; }
+        .bg-custom-rescheduled{ background-color: #FFDC12 !important; color: #000 !important; }
+        .bg-custom-unknown    { background-color: #ABA9A9 !important; color: #000 !important; }
 
         .badge-pending {
             background: var(--warning-light);
