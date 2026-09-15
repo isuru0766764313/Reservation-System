@@ -986,13 +986,7 @@
                         <dt class="col-sm-4">Advance Payment:</dt>
                         <dd class="col-sm-8">Rs. {{ number_format($reservation->advanceAmount, 2) }}</dd>
                       @endif
-
-
-
-
-
-
-
+                      
                       <dt class="col-sm-4">Refundable Deposit:</dt>
                       <dd class="col-sm-8 fw-bold">Rs. {{ number_format($reservation->deposit, 2) }}</dd>
                       <dt class="col-sm-4">Total Paid:</dt>
