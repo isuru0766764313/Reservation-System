@@ -992,27 +992,15 @@
                     <tbody>
                         @foreach($reservations as $reservation)
                                                     <tr>
-                                                        <td class="reservation-id">{{ $reservation->ref_code ?? $reservation->id }}</td>
-                                                        <td class="property-name">{{ $reservation->hall_name }}</td>
-                                                        <td>
-                                                            <button class="btn btn-view btn-custom" data-bs-toggle="modal"
-                                                                data-bs-target="#PropertyDetailsModel-{{ $reservation->id }}">
-                                                                <i class="fas fa-eye"></i> Details
-                                                            </button>
-                                                        </td>
-                                                        <td>{{ $reservation->reservation_date }}</td>
-                                                        <td class="time-period">{{ date('h.i A', strtotime($reservation->start_time)) }} to {{ date('h.i A', strtotime($reservation->end_time)) }}</td>
-                                                        <td>Rs. {{ number_format($reservation->charge, 2) }}</td>
-                                                        <!-- Reservation Status -->
-                                                        <td>
-                                                            <div class="d-flex flex-column gap-1 align-items-start">
+                                                        <td class="reservation-id">                                                        
+                                                        <div class="d-flex flex-column gap-1 align-items-start">
+                                                            {{ $reservation->ref_code ?? $reservation->id }}
                                                                 @php
                                                                     $Rbadge = \App\Http\Controllers\ReservationController::getCustomerStatusBadge($reservation);
                                                                     $cancelRecord = $reservation->payments->where('payment_alias', 'Cancellation')->first();
                                                                     $cancelAvail = empty($reservation->cancellationExpiryDate) || \Carbon\Carbon::parse($reservation->cancellationExpiryDate)->isFuture();
                                                                     $rescheduleAvail = empty($reservation->rescheduledExpiryDate) || \Carbon\Carbon::parse($reservation->rescheduledExpiryDate)->isFuture();
                                                                 @endphp
-                                                                <span class="badge {{ $Rbadge['class'] }}">{{ $Rbadge['label'] }}</span>
                                                                 @if (in_array($Rbadge['status_id'], [3, 4]) && !$cancelRecord && ($cancelAvail || $rescheduleAvail))
                                                                     @if($cancelAvail)
                                                                     <button type="button" class="btn btn-danger btn-sm action-btn w-100" onclick="setupCancellationPayment('{{ $reservation->id }}', '{{ number_format($reservation->hall->cancellation_fee, 2) }}', '{{ $reservation->cancellationExpiryDate ?? '' }}', '{{ $reservation->status }}', '{{ route('customer.reservation.cancel', $reservation->id) }}')">
@@ -1034,6 +1022,49 @@
                                                                     </button>
                                                                     @endif
                                                                 @endif
+                                                            </div>
+                                                        </td>
+                                                        <td class="property-name">{{ $reservation->hall_name }}</td>
+                                                        <td>
+                                                            <button class="btn btn-view btn-custom" data-bs-toggle="modal"
+                                                                data-bs-target="#PropertyDetailsModel-{{ $reservation->id }}">
+                                                                <i class="fas fa-eye"></i> Details
+                                                            </button>
+                                                        </td>
+                                                        <td>{{ $reservation->reservation_date }}</td>
+                                                        <td class="time-period">{{ date('h.i A', strtotime($reservation->start_time)) }} to {{ date('h.i A', strtotime($reservation->end_time)) }}</td>
+                                                        <td>Rs. {{ number_format($reservation->charge, 2) }}</td>
+                                                        <!-- Reservation Status -->
+                                                        <td>
+                                                            <div class="d-flex flex-column gap-1 align-items-start">
+                                                                @php
+                                                                    $Rbadge = \App\Http\Controllers\ReservationController::getCustomerStatusBadge($reservation);
+                                                                    $cancelRecord = $reservation->payments->where('payment_alias', 'Cancellation')->first();
+                                                                    $cancelAvail = empty($reservation->cancellationExpiryDate) || \Carbon\Carbon::parse($reservation->cancellationExpiryDate)->isFuture();
+                                                                    $rescheduleAvail = empty($reservation->rescheduledExpiryDate) || \Carbon\Carbon::parse($reservation->rescheduledExpiryDate)->isFuture();
+                                                                @endphp
+                                                                <span class="badge {{ $Rbadge['class'] }}">{{ $Rbadge['label'] }}</span>
+                                                                <!--@if (in_array($Rbadge['status_id'], [3, 4]) && !$cancelRecord && ($cancelAvail || $rescheduleAvail))
+                                                                    @if($cancelAvail)
+                                                                    <button type="button" class="btn btn-danger btn-sm action-btn w-100" onclick="setupCancellationPayment('{{ $reservation->id }}', '{{ number_format($reservation->hall->cancellation_fee, 2) }}', '{{ $reservation->cancellationExpiryDate ?? '' }}', '{{ $reservation->status }}', '{{ route('customer.reservation.cancel', $reservation->id) }}')">
+                                                                        <i class="fas fa-times me-1"></i>Cancel
+                                                                    </button>
+                                                                    @endif
+                                                                    @if($rescheduleAvail)
+                                                                    <button type="button" class="btn btn-warning btn-sm action-btn w-100 reschedule-btn"
+                                                                        data-reservation-id="{{ $reservation->id }}"
+                                                                        data-hall-id="{{ $reservation->hall_id }}"
+                                                                        data-hall-name="{{ $reservation->hall_name }}"
+                                                                        data-date="{{ $reservation->reservation_date }}"
+                                                                        data-start-time="{{ $reservation->start_time }}"
+                                                                        data-end-time="{{ $reservation->end_time }}"
+                                                                        data-pre-arrange="{{ $reservation->pre_arrange_time }}"
+                                                                        data-post-arrange="{{ $reservation->post_arrange_time }}"
+                                                                        data-rescheduled-expiry="{{ $reservation->rescheduledExpiryDate ?? '' }}">
+                                                                        <i class="fas fa-calendar-alt me-1"></i>Re-schedule
+                                                                    </button>
+                                                                    @endif
+                                                                @endif-->
                                                             </div>
                                                         </td>
 
