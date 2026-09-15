@@ -1015,8 +1015,7 @@
                                                                 <span class="badge {{ $Rbadge['class'] }}">{{ $Rbadge['label'] }}</span>
                                                                 @if (in_array($Rbadge['status_id'], [3, 4]) && !$cancelRecord && ($cancelAvail || $rescheduleAvail))
                                                                     @if($cancelAvail)
-                                                                    <button type="button" class="btn btn-danger btn-sm action-btn w-100"
-onclick="setupCancellationPayment('{{ $reservation->id }}', '{{ number_format($reservation->hall->cancellation_fee, 2) }}', '{{ $reservation->cancellationExpiryDate ?? '' }}', '{{ $reservation->status }}', '{{ route('customer.reservation.cancel', $reservation->id) }}')">
+                                                                    <button type="button" class="btn btn-danger btn-sm action-btn w-100" onclick="setupCancellationPayment('{{ $reservation->id }}', '{{ number_format($reservation->hall->cancellation_fee, 2) }}', '{{ $reservation->cancellationExpiryDate ?? '' }}', '{{ $reservation->status }}', '{{ route('customer.reservation.cancel', $reservation->id) }}')">
                                                                         <i class="fas fa-times me-1"></i>Cancel
                                                                     </button>
                                                                     @endif
@@ -1041,114 +1040,47 @@ onclick="setupCancellationPayment('{{ $reservation->id }}', '{{ number_format($r
                                                         <!-- Payment Details -->
                                                         <td>
                                                             @php
-    $prelim = $reservation->payments->where('payment_alias', 'Preliminary')->first();
-    $remain = $reservation->payments->where('payment_alias', 'Remainings')->first();
-	    $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
-	    $preliminaryPayment = $reservation->advanceAmount;
-$remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
-	    $Rbadge = \App\Http\Controllers\ReservationController::getCustomerStatusBadge($reservation);
-    $Pbadge = \App\Http\Controllers\ReservationController::getCustomerPaymentStatusBadge($reservation);
-    $payments = $reservation->payments; // collection of all payments for this reservation
+                                                                $prelim = $reservation->payments->where('payment_alias', 'Preliminary')->first();
+                                                                $remain = $reservation->payments->where('payment_alias', 'Remainings')->first();
+                                                                $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
+                                                                $preliminaryPayment = $reservation->advanceAmount;
+                                                                $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
+                                                                $Rbadge = \App\Http\Controllers\ReservationController::getCustomerStatusBadge($reservation);
+                                                                $Pbadge = \App\Http\Controllers\ReservationController::getCustomerPaymentStatusBadge($reservation);
+                                                                $payments = $reservation->payments; // collection of all payments for this reservation
                                                             @endphp
-
                                                             <ul class="list-unstyled mb-0" style="font-size:0.85rem;">
-                                                                    @foreach($payments as $payment)
-                                                                        @php
-        $stageLabel = match ($payment->payment_alias) {
-            'Preliminary' => 'Advance Payment',
-            'Remainings' => 'Balance Payment',
-            'Cancellation' => 'Cancellation Fee',
-            default => $payment->payment_alias,
-        };
-        $statusIcon = match ((int) $payment->status) {
-            2 => '<i class="fas fa-check-circle text-success"></i>',
-            3 => '<i class="fas fa-times-circle text-danger"></i>',
-            default => '<i class="fas fa-clock text-warning"></i>',
-        };
-                                                                        @endphp
-                                                                        <li class="mb-1 d-flex justify-content-between align-items-center">
-                                                                            <span class="text-muted">{{ $stageLabel }} : Rs. {{ number_format($payment->amount, 2) }}</span>
-                                                                            <span>{!! $statusIcon !!}</span>
-                                                                        </li>
+                                                                @foreach($payments as $payment)
+                                                                @php
+                                                                    $stageLabel = match ($payment->payment_alias)
+                                                                    {
+                                                                        'Preliminary' => 'Advance Payment',
+                                                                        'Remainings' => 'Balance Payment',
+                                                                        'Cancellation' => 'Cancellation Fee',
+                                                                        default => $payment->payment_alias,
+                                                                    };
+                                                                    $statusIcon = match ((int) $payment->status) {
+                                                                        2 => '<i class="fas fa-check-circle text-success"></i>',
+                                                                        3 => '<i class="fas fa-times-circle text-danger"></i>',
+                                                                        default => '<i class="fas fa-clock text-warning"></i>',
+                                                                    };
+                                                                    @endphp
+                                                                    <li class="mb-1 d-flex justify-content-between align-items-center">
+                                                                        <span class="text-muted">{{ $stageLabel }} : Rs. {{ number_format($payment->amount, 2) }}</span>
+                                                                        <span>{!! $statusIcon !!}</span>
+                                                                    </li>
                                                                     @endforeach
                                                                     <button class="btn btn-primary btn-sm action-btn view-btn" data-bs-toggle="modal" data-bs-target="#PayNowModel-{{ $reservation->id }}">View</button>
                                                                 </ul>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                                            <!--@if ($reservation->status == 1)
-                                                                                                                                                                                                                    <button
-                                                                                                                                                                                                                        class="btn {{ $reservation->total_paid == 0 ? 'btn-success' : 'btn-danger' }} btn-sm action-btn view-btn"
-                                                                                                                                                                                                                        data-bs-toggle="modal"
-                                                                                                                                                                                                                        data-bs-target="#PayNowModel-{{ $reservation->id }}">View</button>
-                                                                                                                                                                                                                @elseif ($reservation->status == 2)
-                                                                                                                                                                                                                    @if ($prelim && $prelim->status == 1)
-                                                                                                                                                                                                                        <button
-                                                                                                                                                                                                                            class="btn {{ $reservation->total_paid == 0 ? 'btn-success' : 'btn-danger' }} btn-sm action-btn view-btn"
-                                                                                                                                                                                                                            data-bs-toggle="modal"
-                                                                                                                                                                                                                            data-bs-target="#PayNowModel-{{ $reservation->id }}">View</button>
-                                                                                                                                                                                                                    @elseif ($prelim && $prelim->status == 3)
-                                                                                                                                                                                                                        <span class="badge bg-danger">Advance Payment Rejected</span>
-                                                                                                                                                                                                                    @else
-                                                                                                                                                                                                                        <button
-                                                                                                                                                                                                                            class="btn {{ $reservation->total_paid == 0 ? 'btn-success' : 'btn-danger' }} btn-sm action-btn view-btn"
-                                                                                                                                                                                                                            data-bs-toggle="modal" data-bs-target="#PayNowModel-{{ $reservation->id }}">
-                                                                                                                                                                                                                            Pay Advance Rs. {{ number_format($preliminaryPayment, 2) }}
-                                                                                                                                                                                                                        </button>
-                                                                                                                                                                                                                    @endif
-                                                                                                                                                                                                                @elseif ($reservation->status == 3)                                                                                                                                
-                                                                                                                                                                                                                    @if ($remain && $remain->status == 1)
-                                                                                                                                                                                                                        <button
-                                                                                                                                                                                                                            class="btn {{ $reservation->total_paid == 0 ? 'btn-success' : 'btn-danger' }} btn-sm action-btn view-btn"
-                                                                                                                                                                                                                            data-bs-toggle="modal"
-                                                                                                                                                                                                                            data-bs-target="#PayNowModel-{{ $reservation->id }}">View</button>
-                                                                                                                                                                                                                    @elseif ($remain && $remain->status == 3)
-                                                                                                                                                                                                                        <span class="badge bg-danger">Remaining Payment Rejected</span>
-                                                                                                                                                                                                                    @else
-                                                                                                                                                                                                                        <button
-                                                                                                                                                                                                                            class="btn {{ $reservation->total_paid == 0 ? 'btn-success' : 'btn-danger' }} btn-sm action-btn view-btn"
-                                                                                                                                                                                                                            data-bs-toggle="modal" data-bs-target="#PayNowModel-{{ $reservation->id }}">
-                                                                                                                                                                                                                            Pay Remaining Rs. {{ number_format($remainingAmount, 2) }}</button>
-                                                                                                                                                                                                                    @endif
-                                                                                                                                                                                                                @elseif ($reservation->status == 4)                                                                
-                                                                                                                                                                                                                @elseif ($reservation->status == 5)
-                                                                                                                                                                                                                     <span class="badge bg-danger">{{ \App\Http\Controllers\ReservationController::getReservationStatusLabel($reservation->status) }}</span>
-                                                                                                                                                                                                                 @elseif ($reservation->status == 7)
-                                                                                                                                                                                                                     <span class="badge bg-danger">{{ \App\Http\Controllers\ReservationController::getReservationStatusLabel($reservation->status) }}</span>
-                                                                                                                                                                                                                 @else
-                                                                                                                                                                                                                     <span class="badge bg-danger">{{ \App\Http\Controllers\ReservationController::getReservationStatusLabel($reservation->status) }}</span>
-                                                                                                                                                                                                                @endif-->
-                                                        </td>
-                                                    </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-                <div class="mt-4 d-flex justify-content-center">
-                    {{ $reservations->links('pagination::bootstrap-4') }}
-                </div>
-            </div>
+                                                            </td>
+                                                        </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                                <div class="mt-4 d-flex justify-content-center">
+                                                {{ $reservations->links('pagination::bootstrap-4') }}
+                                            </div>
+                                        </div>
 
             <!-- Mobile Reservations -->
             <div class="mobile-reservations">
