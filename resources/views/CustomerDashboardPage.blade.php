@@ -1003,12 +1003,12 @@
                                                                 @endphp
                                                                 @if (in_array($Rbadge['status_id'], [3, 4]) && !$cancelRecord && ($cancelAvail || $rescheduleAvail))
                                                                     @if($cancelAvail)
-                                                                    <button type="button" class="btn btn-danger btn-sm action-btn w-100" onclick="setupCancellationPayment('{{ $reservation->id }}', '{{ number_format($reservation->hall->cancellation_fee, 2) }}', '{{ $reservation->cancellationExpiryDate ?? '' }}', '{{ $reservation->status }}', '{{ route('customer.reservation.cancel', $reservation->id) }}')">
-                                                                        <i class="fas fa-times me-1"></i>Cancel
+                                                                    <button type="button" class="btn btn-danger btn-sm action-btn w-100" title="Cancel" onclick="setupCancellationPayment('{{ $reservation->id }}', '{{ number_format($reservation->hall->cancellation_fee, 2) }}', '{{ $reservation->cancellationExpiryDate ?? '' }}', '{{ $reservation->status }}', '{{ route('customer.reservation.cancel', $reservation->id) }}')">
+                                                                        <i class="fas fa-times"></i>
                                                                     </button>
                                                                     @endif
                                                                     @if($rescheduleAvail)
-                                                                    <button type="button" class="btn btn-warning btn-sm action-btn w-100 reschedule-btn"
+                                                                    <button type="button" class="btn btn-warning btn-sm action-btn w-100 reschedule-btn" title="Re-schedule"
                                                                         data-reservation-id="{{ $reservation->id }}"
                                                                         data-hall-id="{{ $reservation->hall_id }}"
                                                                         data-hall-name="{{ $reservation->hall_name }}"
@@ -1018,7 +1018,7 @@
                                                                         data-pre-arrange="{{ $reservation->pre_arrange_time }}"
                                                                         data-post-arrange="{{ $reservation->post_arrange_time }}"
                                                                         data-rescheduled-expiry="{{ $reservation->rescheduledExpiryDate ?? '' }}">
-                                                                        <i class="fas fa-calendar-alt me-1"></i>Re-schedule
+                                                                        <i class="fas fa-calendar-alt"></i>
                                                                     </button>
                                                                     @endif
                                                                 @endif
@@ -1171,7 +1171,7 @@
                                     <span class="badge bg-success w-100 text-center py-2">Fully Paid</span>
                                 @endif
                                 @if ($reservation->user_cancelled && !$reservation->re_scheduled)
-                                    <button type="button" class="btn btn-warning btn-sm reschedule-btn"
+                                    <button type="button" class="btn btn-warning btn-sm reschedule-btn" title="Re-schedule"
                                         data-reservation-id="{{ $reservation->id }}" data-hall-id="{{ $reservation->hall_id }}"
                                         data-hall-name="{{ $reservation->hall_name }}"
                                         data-date="{{ $reservation->reservation_date }}"
@@ -1180,12 +1180,12 @@
                                         data-pre-arrange="{{ $reservation->pre_arrange_time }}"
                                         data-post-arrange="{{ $reservation->post_arrange_time }}"
                                         data-rescheduled-expiry="{{ $reservation->rescheduledExpiryDate ?? '' }}">
-                                        <i class="fas fa-calendar-alt me-1"></i>Re-schedule
+                                        <i class="fas fa-calendar-alt"></i>
                                     </button>
                                 @else
-                                    <button type="button" class="btn btn-warning btn-sm"
+                                    <button type="button" class="btn btn-warning btn-sm" title="Cancel"
                                         onclick="setupCancellationPayment('{{ $reservation->id }}', '{{ number_format($reservation->hall->cancellation_fee, 2) }}', '{{ $reservation->cancellationExpiryDate ?? '' }}', '{{ $reservation->status }}', '{{ route('customer.reservation.cancel', $reservation->id) }}')">
-                                        <i class="fas fa-times me-1"></i>Cancel
+                                        <i class="fas fa-times"></i>
                                     </button>
                                 @endif
                             @elseif(in_array($reservation->status, [5, 6, 7]))
