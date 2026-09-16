@@ -375,6 +375,12 @@
             border-color: var(--primary-dark) !important;
         }
 
+        .alert-purple {
+            background-color: var(--primary-light) !important;
+            border-color: #c7d2fe !important;
+            color: var(--primary-dark) !important;
+        }
+
         /* ===== Popover ===== */
         .popover {
             border-radius: var(--radius);
@@ -1253,7 +1259,7 @@
                         @csrf
                         @method('PATCH')
                         <div class="modal-body">
-                            <div class="alert alert-info">
+                            <div class="alert alert-info alert-purple">
                                 <h6><strong>Current Reservation Details:</strong></h6>
                                 <p class="mb-1"><strong>Reservation Date:</strong> <span id="currentDate"></span></p>
                                 <p class="mb-1"><strong>Event Time:</strong> <span id="currentTime"></span></p>
