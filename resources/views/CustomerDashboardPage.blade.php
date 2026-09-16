@@ -1248,9 +1248,7 @@
                                 <p class="mb-1"><strong>Event Time:</strong> <span id="currentTime"></span></p>
                                 <p class="mb-1"><strong>Pre-arrange Time:</strong> <span id="currentPreArrange"></span></p>
                                 <p class="mb-1"><strong>Post-arrange Time:</strong> <span id="currentPostArrange"></span></p>
-                                <p class="mb-1"><strong>Total Duration:</strong> <span id="currentDuration"></span> hours
-                                </p>
-                                <p class="mb-0"><strong>Hall:</strong> <span id="currentHall"></span></p>
+                                <p class="mb-1"><strong>Total Duration:</strong> <span id="currentDuration"></span> hours</p>
                             </div>
                             <hr>
                             <div class="mb-3">
