@@ -364,6 +364,17 @@
             background: var(--primary-dark);
         }
 
+        #saveRescheduleBtn {
+            background-color: var(--primary) !important;
+            border-color: var(--primary) !important;
+            color: #fff !important;
+        }
+
+        #saveRescheduleBtn:hover:not(:disabled) {
+            background-color: var(--primary-dark) !important;
+            border-color: var(--primary-dark) !important;
+        }
+
         /* ===== Popover ===== */
         .popover {
             border-radius: var(--radius);
