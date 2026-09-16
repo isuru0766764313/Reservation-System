@@ -577,6 +577,21 @@
   </nav>
 
   <div class="container-fluid mt-4">
+    
+    @if(session('success'))
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    @endif
+    
+    @if(session('error'))
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    @endif
+    
     <div class="dashboard-section">
       <div class="section-header">
         <h4 style="color: #1b10e6ff;"><i class="fas fa-building me-2" style="color: #1d12eeff;"></i>Hall Management</h4>
