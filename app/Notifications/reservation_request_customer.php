@@ -52,7 +52,7 @@ class reservation_request_customer extends Notification implements ShouldQueue
         $mail = (new MailMessage)
             ->subject('Reservation Request Logged #' . ($reservation->ref_code ?? $reservation->id) . ' - ' . $reservation->hall_name)
             ->greeting('Dear ' . trim(($customer->profile_title ?? '') . ' ' . ($customer->first_name ?? '') . ' ' . ($customer->last_name ?? '')) . ',')
-            ->line('Thank you for using the Public Facilities Reservation System. Your reservation request was successfully logged.')
+            ->line('Thank you for using the Public Facilities Reservation System. Your reservation request has been successfully logged.')
             ->line('---')
             ->line('**RESERVATION DETAILS**')
             ->line('Reservation Ref Code: **' . ($reservation->ref_code ?? 'N/A') . '**')
