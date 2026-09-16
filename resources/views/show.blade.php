@@ -902,8 +902,7 @@
                                                 </div>
                                                 <div class="card-footer text-center">
                                                     <h3 class="card-subtitle mb-1">Rs.
-                                                        {{ number_format($package->price, 2) }}
-                                                    </h3>
+                                                        {{ number_format($package->price, 2) }}</h3>
                                                     @if ($package->discount > 0)
                                                         <small class="text-muted">Discount: Rs.
                                                             {{ number_format($package->discount, 2) }}</small>
@@ -1087,9 +1086,6 @@
         function formatMoney(amount) {
             return Number(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
-        function formatHours(hours) {
-            return Number(Number(hours).toFixed(1));
-        }
         const hourlyRate = {{ $hall->price }};
         const fullyUnavailableDates = @json($fullyUnavailableDates);
         const hallBookingMethod = '{{ $hall->booking_method ?? 'both' }}';
@@ -1098,6 +1094,7 @@
         let selectedPackagePrice = 0;
         let isPackageMode = (hallBookingMethod === 'package');
         let selectedPackageDuration = 0;
+        let selectedFreeHours = 4;
         let currentUnavailablePeriods = [];
         let currentAvailableSlots = [];
         let selectedRegularTimeSlot = null;
@@ -1336,7 +1333,7 @@
                 const preArrange = parseInt(document.getElementById('preArrangeTimeRegular').value) || 0;
                 const postArrange = parseInt(document.getElementById('postArrangeTimeRegular').value) || 0;
                 const statusElement = document.getElementById('customTimeStatusRegular');
-                const submitButton = document.getElementById('regularReserveB                         utton');
+                const submitButton = document.getElementById('regularReserveButton');
                 //const agreeTerms = document.getElementById('agreeTermsRegular').checked;
 
                 /* Check if terms are agreed
@@ -1394,7 +1391,7 @@
                 // Step 7: Check if extended period goes negative (before midnight of same day)
                 if (actualStartMinutes < 0) {
                     const neededPreTime = Math.ceil(Math.abs(actualStartMinutes) / 60);
-                    statusElement.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i> Pre-arrange time (${preArrange}h) extends before midnight. Reduce by ${neededPreTime} hour(s) or select later start time`;
+                    statusElement.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i> Pre-arrange time (${preArrange}h) extends before midnight. Reduce to ${preArrange - neededPreTime} hour(s) or select later start time`;
                     statusElement.className = 'alert alert-danger';
                     submitButton.disabled = true;
                     return false;
@@ -1503,12 +1500,14 @@
                 // Ensure total_charge is always set before form submission
                 // and add hidden inputs for selected package facilities
                 packageForm.addEventListener('submit', function (e) {
-                    // Always re-validate before submitting so a package can never be
-                    // submitted unless its duration matches the total chargeable hours.
-                    const validated = validateCustomTimePackage();
-                    if (!validated) {
-                        e.preventDefault();
-                        return false;
+                    const chargeInput = document.getElementById('packageTotalChargeInput');
+                    if (!chargeInput.value || chargeInput.value === '0' || chargeInput.value === '0.00') {
+                        // Force validation to recalculate the charge
+                        const validated = validateCustomTimePackage();
+                        if (!validated) {
+                            e.preventDefault();
+                            return false;
+                        }
                     }
 
                     // Remove any previously added hidden facility inputs
@@ -1598,8 +1597,14 @@
                     return false;
                 }
 
-                // Step 5: Calculate event hours Q (chargeable hours are computed per package below)
+                // Step 5: Calculate Q (event hours) and P (chargeable pre-post hours)
                 const Q = (endMinutes - startMinutes) / 60;
+                // Free hours per package from selectedFreeHours (falls back to 4 if no package selected yet)
+                const freeHours = selectedFreeHours || 4;
+                const chargeablePre = Math.max(0, preArrange - freeHours);
+                const chargeablePost = Math.max(0, postArrange - freeHours);
+                const P = chargeablePre + chargeablePost;
+                const R = Q + P; // Total chargeable hours
 
                 // Step 6: Calculate the actual extended period
                 const actualStartMinutes = startMinutes - (preArrange * 60);
@@ -1612,7 +1617,7 @@
                 // Step 8: Check if extended period goes negative (before midnight of same day)
                 if (actualStartMinutes < 0) {
                     const neededPreTime = Math.ceil(Math.abs(actualStartMinutes) / 60);
-                    statusElement.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i> Pre-arrange time (${preArrange}h) extends before midnight. Reduce by ${neededPreTime} hour(s) or select later start time`;
+                    statusElement.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i> Pre-arrange time (${preArrange}h) extends before midnight. Reduce to ${preArrange - neededPreTime} hour(s) or select later start time`;
                     statusElement.className = 'alert alert-danger';
                     submitButton.disabled = true;
                     return false;
@@ -1658,47 +1663,36 @@
                     return false;
                 }
 
-                // Step 11: Auto-select package whose duration matches chargeable hours R.
-                // Each package offers its own free pre/post hours, so R is computed per package.
+                // Step 11: Auto-select package whose duration matches R (chargeable hours)
                 const packageCards = document.querySelectorAll('.package-card');
                 let selectedCard = null;
                 let selectedDiscount = 0;
                 let selectedPackageId = null;
                 let selectedPackageName = '';
-                let R = null; // total chargeable hours for the selected (or reference) package
-                let extraPre = 0;  // chargeable setup hours (beyond free)
-                let extraPost = 0; // chargeable cleanup hours (beyond free)
 
                 packageCards.forEach(c => c.classList.remove('selected'));
 
+                // Find exact duration match
                 for (const card of packageCards) {
                     const cardDuration = parseInt(card.dataset.duration) || 0;
-                    const cardFreeHours = parseFloat(card.dataset.freeHours) || 0;
-                    const chargeablePre = Math.max(0, preArrange - cardFreeHours);
-                    const chargeablePost = Math.max(0, postArrange - cardFreeHours);
-                    const cardR = Q + chargeablePre + chargeablePost;
-
-                    // Keep the first package's values as reference for the error message
-                    if (R === null) {
-                        R = cardR;
-                        extraPre = chargeablePre;
-                        extraPost = chargeablePost;
-                    }
-
-                    if (cardDuration === Math.round(cardR)) {
+                    if (cardDuration === Math.round(R)) {
                         selectedCard = card;
-                        R = cardR;
-                        extraPre = chargeablePre;
-                        extraPost = chargeablePost;
                         break;
                     }
                 }
 
-                if (R === null) {
-                    // No packages exist at all — fall back to treating all pre/post as chargeable
-                    R = Q + preArrange + postArrange;
-                    extraPre = preArrange;
-                    extraPost = postArrange;
+                // If no exact match, find closest higher duration
+                if (!selectedCard) {
+                    let bestCard = null;
+                    let bestDuration = Infinity;
+                    for (const card of packageCards) {
+                        const cardDuration = parseInt(card.dataset.duration) || 0;
+                        if (cardDuration >= R && cardDuration < bestDuration) {
+                            bestDuration = cardDuration;
+                            bestCard = card;
+                        }
+                    }
+                    selectedCard = bestCard;
                 }
 
                 if (selectedCard) {
@@ -1708,29 +1702,7 @@
                 }
 
                 if (!selectedCard) {
-                    // Clear any stale package selection so the form cannot be submitted with old data
-                    selectedPackageDuration = 0;
-                    selectedPackagePrice = 0;
-                    document.getElementById('packageIdInput').value = '';
-                    document.getElementById('packageStartTimeInput').value = '';
-                    document.getElementById('packageEndTimeInput').value = '';
-                    document.getElementById('packageActualStartTimeInput').value = '';
-                    document.getElementById('packageActualEndTimeInput').value = '';
-                    document.getElementById('packageTotalChargeInput').value = '0';
-                    document.getElementById('packageCharge').textContent = 'Rs. 0.00';
-                    document.getElementById('packageTotalCharge').textContent = 'Rs. 0.00';
-
-                    const facilitiesChargeSection = document.getElementById('packageFacilitiesChargeSection');
-                    if (facilitiesChargeSection) {
-                        facilitiesChargeSection.style.display = 'none';
-                    }
-                    document.getElementById('packageFacilitiesCharge').textContent = 'Rs. 0.00';
-
-                    const availableDurations = Array.from(packageCards).map(c => `${parseInt(c.dataset.duration) || 0}h`).join(', ') || 'none';
-                    statusElement.innerHTML =
-                        `<i class="fas fa-exclamation-triangle me-2"></i> No package found for ${formatHours(R)} chargeable hours` +
-                        ` (event ${formatHours(Q)}h + setup extra ${formatHours(extraPre)}h + cleanup extra ${formatHours(extraPost)}h).` +
-                        `<br><small>Available package durations: ${availableDurations}.</small>`;
+                    statusElement.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i> No suitable package found for ' + R.toFixed(1) + ' chargeable hours';
                     statusElement.className = 'alert alert-danger';
                     submitButton.disabled = true;
                     return false;
@@ -1741,6 +1713,8 @@
                 // Step 12: Update global variables
                 selectedPackageDuration = parseInt(selectedCard.dataset.duration) || 0;
                 selectedPackagePrice = parseFloat(selectedCard.dataset.price) || 0;
+                selectedFreeHours = parseFloat(selectedCard.dataset.freeHours) || 4;
+
                 // Step 13: Calculate charges — simplified: just the package price
                 const grossTotalWithoutFacilities = selectedPackagePrice;
 
@@ -1816,9 +1790,17 @@
                 document.getElementById('packageActualEndTimeInput').value = actualEndTime;
 
                 // Step 16: Show success message
-                const successMessage =
-                    `<i class="fas fa-check-circle me-2"></i> ${selectedPackageName} (${selectedPackageDuration}h) selected — ` +
-                    `${formatHours(R)}h chargeable (event ${formatHours(Q)}h + setup extra ${formatHours(extraPre)}h + cleanup extra ${formatHours(extraPost)}h).`;
+                let successMessage = `<i class="fas fa-check-circle me-2"></i> ${selectedPackageName} selected (${R.toFixed(1)} chargeable hours)`;
+
+                if (preArrange > 0 || postArrange > 0) {
+                    const details = [];
+                    if (preArrange > 0) details.push(`${preArrange}h setup`);
+                    details.push(`event (${formatTime(startTime)} - ${formatTime(endTime)})`);
+                    if (postArrange > 0) details.push(`${postArrange}h cleanup`);
+                    if (P > 0) details.push(`${P.toFixed(0)}h chargeable prepost`);
+
+                    successMessage = `<i class="fas fa-check-circle me-2"></i> ${selectedPackageName} (${details.join(' + ')})`;
+                }
 
                 statusElement.innerHTML = successMessage;
                 statusElement.className = 'alert alert-success';
