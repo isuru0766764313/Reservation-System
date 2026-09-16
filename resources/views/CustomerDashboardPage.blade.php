@@ -1244,8 +1244,8 @@
                         <div class="modal-body">
                             <div class="alert alert-info">
                                 <h6><strong>Current Reservation Details:</strong></h6>
-                                <p class="mb-1"><strong>Date:</strong> <span id="currentDate"></span></p>
-                                <p class="mb-1"><strong>Time:</strong> <span id="currentTime"></span></p>
+                                <p class="mb-1"><strong>Reservation Date:</strong> <span id="currentDate"></span></p>
+                                <p class="mb-1"><strong>Event Time:</strong> <span id="currentTime"></span></p>
                                 <p class="mb-1"><strong>Pre-arrange Time:</strong> <span id="currentPreArrange"></span></p>
                                 <p class="mb-1"><strong>Post-arrange Time:</strong> <span id="currentPostArrange"></span></p>
                                 <p class="mb-1"><strong>Total Duration:</strong> <span id="currentDuration"></span> hours
