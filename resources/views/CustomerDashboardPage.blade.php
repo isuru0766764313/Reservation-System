@@ -2106,7 +2106,6 @@
                     const endTime = this.getAttribute('data-end-time');
                     const preArrange = this.getAttribute('data-pre-arrange') || 0;
                     const postArrange = this.getAttribute('data-post-arrange') || 0;
-                    const hallName = this.getAttribute('data-hall-name');
                     currentReservationId = reservationId;
                     currentHallId = hallId;
                     selectedRescheduleSlot = null;
@@ -2119,7 +2118,6 @@
                     document.getElementById('currentPreArrange').textContent = `${preArrange} hour(s)`;
                     document.getElementById('currentPostArrange').textContent = `${postArrange} hour(s)`;
                     document.getElementById('currentDuration').textContent = mainDuration;
-                    document.getElementById('currentHall').textContent = hallName;
                     document.getElementById('reservationId').value = reservationId;
                     document.getElementById('hallId').value = hallId;
                     document.getElementById('originalDuration').value = originalTotalDuration;
