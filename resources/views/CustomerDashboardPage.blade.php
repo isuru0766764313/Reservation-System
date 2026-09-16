@@ -1246,6 +1246,8 @@
                                 <h6><strong>Current Reservation Details:</strong></h6>
                                 <p class="mb-1"><strong>Date:</strong> <span id="currentDate"></span></p>
                                 <p class="mb-1"><strong>Time:</strong> <span id="currentTime"></span></p>
+                                <p class="mb-1"><strong>Pre-arrange Time:</strong> <span id="currentPreArrange"></span></p>
+                                <p class="mb-1"><strong>Post-arrange Time:</strong> <span id="currentPostArrange"></span></p>
                                 <p class="mb-1"><strong>Total Duration:</strong> <span id="currentDuration"></span> hours
                                 </p>
                                 <p class="mb-0"><strong>Hall:</strong> <span id="currentHall"></span></p>
@@ -2116,6 +2118,8 @@
                     originalTotalDuration = mainDuration + parseInt(preArrange) + parseInt(postArrange);
                     document.getElementById('currentDate').textContent = date;
                     document.getElementById('currentTime').textContent = `${formatTime12Hour(startTime)} - ${formatTime12Hour(endTime)}`;
+                    document.getElementById('currentPreArrange').textContent = `${preArrange} hour(s)`;
+                    document.getElementById('currentPostArrange').textContent = `${postArrange} hour(s)`;
                     document.getElementById('currentDuration').textContent = mainDuration;
                     document.getElementById('currentHall').textContent = hallName;
                     document.getElementById('reservationId').value = reservationId;
