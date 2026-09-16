@@ -619,6 +619,11 @@
             font-size: 0.9rem;
         }
 
+        .ref-spacer {
+            order: -1;
+            height: 32px;
+        }
+
         /* ===== Modal Mobile Improvements ===== */
         @media (max-width: 576px) {
             .modal-body {
@@ -1004,7 +1009,7 @@
                         @foreach($reservations as $reservation)
                                                     <tr>
                                                         <td class="reservation-id">                                                        
-                                                        <div class="d-flex flex-column gap-1 align-items-start">
+                                                        <div class="d-flex flex-column gap-1 align-items-start ref-cell">
                                                             {{ $reservation->ref_code ?? $reservation->id }}
                                                                 @php
                                                                     $Rbadge = \App\Http\Controllers\ReservationController::getCustomerStatusBadge($reservation);
@@ -1013,6 +1018,7 @@
                                                                     $rescheduleAvail = empty($reservation->rescheduledExpiryDate) || \Carbon\Carbon::parse($reservation->rescheduledExpiryDate)->isFuture();
                                                                 @endphp
                                                                 @if (in_array($Rbadge['status_id'], [3, 4]) && !$cancelRecord && ($cancelAvail || $rescheduleAvail))
+                                                                    <div class="ref-spacer"></div>
                                                                     <div class="d-flex gap-1">
                                                                     @if($cancelAvail)
                                                                     <button type="button" class="btn btn-danger btn-sm action-btn icon-action-btn" title="Cancel" onclick="setupCancellationPayment('{{ $reservation->id }}', '{{ number_format($reservation->hall->cancellation_fee, 2) }}', '{{ $reservation->cancellationExpiryDate ?? '' }}', '{{ $reservation->status }}', '{{ route('customer.reservation.cancel', $reservation->id) }}')">
