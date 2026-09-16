@@ -608,6 +608,17 @@
             white-space: nowrap;
         }
 
+        .icon-action-btn {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            font-size: 0.9rem;
+        }
+
         /* ===== Modal Mobile Improvements ===== */
         @media (max-width: 576px) {
             .modal-body {
@@ -1002,13 +1013,14 @@
                                                                     $rescheduleAvail = empty($reservation->rescheduledExpiryDate) || \Carbon\Carbon::parse($reservation->rescheduledExpiryDate)->isFuture();
                                                                 @endphp
                                                                 @if (in_array($Rbadge['status_id'], [3, 4]) && !$cancelRecord && ($cancelAvail || $rescheduleAvail))
+                                                                    <div class="d-flex gap-1">
                                                                     @if($cancelAvail)
-                                                                    <button type="button" class="btn btn-danger btn-sm action-btn w-100" title="Cancel" onclick="setupCancellationPayment('{{ $reservation->id }}', '{{ number_format($reservation->hall->cancellation_fee, 2) }}', '{{ $reservation->cancellationExpiryDate ?? '' }}', '{{ $reservation->status }}', '{{ route('customer.reservation.cancel', $reservation->id) }}')">
+                                                                    <button type="button" class="btn btn-danger btn-sm action-btn icon-action-btn" title="Cancel" onclick="setupCancellationPayment('{{ $reservation->id }}', '{{ number_format($reservation->hall->cancellation_fee, 2) }}', '{{ $reservation->cancellationExpiryDate ?? '' }}', '{{ $reservation->status }}', '{{ route('customer.reservation.cancel', $reservation->id) }}')">
                                                                         <i class="fas fa-times"></i>
                                                                     </button>
                                                                     @endif
                                                                     @if($rescheduleAvail)
-                                                                    <button type="button" class="btn btn-warning btn-sm action-btn w-100 reschedule-btn" title="Re-schedule"
+                                                                    <button type="button" class="btn btn-warning btn-sm action-btn icon-action-btn reschedule-btn" title="Re-schedule"
                                                                         data-reservation-id="{{ $reservation->id }}"
                                                                         data-hall-id="{{ $reservation->hall_id }}"
                                                                         data-hall-name="{{ $reservation->hall_name }}"
@@ -1021,6 +1033,7 @@
                                                                         <i class="fas fa-calendar-alt"></i>
                                                                     </button>
                                                                     @endif
+                                                                    </div>
                                                                 @endif
                                                             </div>
                                                         </td>
