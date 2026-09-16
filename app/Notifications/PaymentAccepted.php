@@ -102,7 +102,6 @@ class PaymentAccepted extends Notification implements ShouldQueue
             $mail            
             ->line('---')            
             ->action('View My Dashboard', route('load_customer_dashboard'))
-            ->line('Find the venue on Google Maps: ' . $mapUrl)
             ->line('---')
             ->salutation("Best regards,\nPublic Facilities Reservation System.");
 
