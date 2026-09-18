@@ -119,8 +119,8 @@ class PaymentConfirmation extends Notification implements ShouldQueue
                 ->line('---')
                 ->line('**REQUIRED ACTION**')
                 ->line('View the Advance payment slip and take necessary actions.')
-                ->line('---')
-                ->action('View Advance Payment Slip', route('admin.view.slip', $reservation->id));
+                ->action('View Advance Payment Slip', route('admin.view.slip', $reservation->id))
+                ->line('---');                
         }
         $mail            
             ->salutation("Best regards,\nPublic Facilities Reservation System.");
