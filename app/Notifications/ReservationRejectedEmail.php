@@ -75,9 +75,10 @@ class ReservationRejectedEmail extends Notification implements ShouldQueue
             ->line('**VENUE CONTACT**')
             ->line('Admin Email: **' . $admin->email . '**')
             ->line('Admin Telephone: **' . $admin->telephone_number . '**')
-            ->line('---')
+            ->line('---')            
             ->action('Browse Other Venues', route('load_venues_page'))
             ->line('We apologize for any inconvenience this may cause and appreciate your understanding.')
+            ->line('---')
             ->salutation("Best regards,\nAdmin,\nPrime Minister's Office.");
     }
 
