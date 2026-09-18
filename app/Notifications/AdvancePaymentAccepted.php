@@ -81,8 +81,8 @@ class AdvancePaymentAccepted extends Notification implements ShouldQueue
             ->line('---')
             ->line('**NEXT STEP**')
             ->line('Please submit the **balance payment of Rs. ' . number_format($remaining, 2) . '**.')
-            ->line('---')
-            ->action('Upload Balance payment Slip', route('load_customer_dashboard'))            
+            ->action('Upload Balance payment Slip', route('load_customer_dashboard'))
+            ->line('---')                        
             ->line('Thank you for choosing the Prime Minister\'s Office facilities.')
             ->salutation("Best regards,\nPublic Facilities Reservation System.");
 
