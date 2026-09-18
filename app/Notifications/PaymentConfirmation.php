@@ -107,8 +107,9 @@ class PaymentConfirmation extends Notification implements ShouldQueue
                 ->line('---')
                 ->line('**REQUIRED ACTION**')
                 ->line('View the Balance payment slip and take necessary actions.')
-                ->line('---')
-                ->action('View Balance Payment Slip', route('admin.view.slip', $reservation->id));
+                ->action('View Balance Payment Slip', route('admin.view.slip', $reservation->id))
+                ->line('---');
+                
         }
         else
         {
