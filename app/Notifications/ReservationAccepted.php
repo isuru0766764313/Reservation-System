@@ -92,8 +92,8 @@ class ReservationAccepted extends Notification implements ShouldQueue
             ->line('---')
             ->line('**NEXT STEP**')
             ->line('Pay Advance Amount: **Rs. ' . number_format($reservation->advanceAmount, 2) . '**')
-            ->line('---')
             ->action('Go to My Dashboard', route('load_customer_dashboard'))
+            ->line('---')            
             ->line('Thank you for choosing our service. We look forward to hosting your event!')
             ->salutation("Best regards,\nPublic Facilities Reservation System.");
 
