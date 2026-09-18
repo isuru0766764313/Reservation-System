@@ -77,8 +77,8 @@ class reservation_request_admin extends Notification implements ShouldQueue
         $mail->line('---')                       
             ->line('**REQUIRED ACTION**')
             ->line('Review the reservation request.')
-            ->line('---')
             ->action('Review Reservation Request', route('admin.dashboard.route'))
+            ->line('---')            
             ->line('Please take action at your earliest convenience.')
             ->salutation("Best regards,\nPublic Facilities Reservation System.");
 
