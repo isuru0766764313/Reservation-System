@@ -61,8 +61,8 @@ class reservation_request_customer extends Notification implements ShouldQueue
             ->line('Reservation Date: **' . \Carbon\Carbon::parse($reservation->reservation_date)->format('Y-m-d') . '**')
             ->line('Event Time Period: **' . date('h:i A', strtotime($actualStart)) . ' - ' . date('h:i A', strtotime($actualEnd)) . '**')
             ->line('Charge: **Rs. ' . number_format($reservation->charge, 2) . '**')
-            ->line('---')
             ->line('Your reservation request is under review.')
+            ->line('---')            
             ->salutation("Best regards,\nAdmin,\nPublic Facilities Reservation System.");
 
         return $mail;
