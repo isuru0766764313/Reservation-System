@@ -154,11 +154,18 @@ class ReservationController extends Controller
             'end_time' => $request->actual_end_time,
         ]);
 
-        // Notifications
+        // Notifications (non-fatal: email failures should not break the reservation flow)
         $admin = AdminModel::where('id', $hall->admin_id)->first();
         if ($admin) {
-            $admin->notify(new reservation_request_admin($reservation));
-            $customer->notify(new reservation_request_customer($reservation));
+            try {
+                $admin->notify(new reservation_request_admin($reservation));
+                $customer->notify(new reservation_request_customer($reservation));
+            } catch (\Throwable $e) {
+                Log::error('Failed to send reservation request notifications: ' . $e->getMessage(), [
+                    'reservation_id' => $reservation->id,
+                    'exception' => $e,
+                ]);
+            }
         }
 
         // Send SMS
@@ -263,11 +270,18 @@ class ReservationController extends Controller
             'end_time' => $request->actual_end_time,
         ]);
 
-        // Notifications
+        // Notifications (non-fatal: email failures should not break the reservation flow)
         $admin = AdminModel::where('id', $hall->admin_id)->first();
         if ($admin) {
-            $admin->notify(new reservation_request_admin($reservation));
-            $customer->notify(new reservation_request_customer($reservation));
+            try {
+                $admin->notify(new reservation_request_admin($reservation));
+                $customer->notify(new reservation_request_customer($reservation));
+            } catch (\Throwable $e) {
+                Log::error('Failed to send reservation request notifications: ' . $e->getMessage(), [
+                    'reservation_id' => $reservation->id,
+                    'exception' => $e,
+                ]);
+            }
         }
 
         // Send SMS
@@ -652,16 +666,16 @@ class ReservationController extends Controller
         if ((int) $reservation->status === 6) {
             return back()->with('error', 'Reservation already rejected!');
         }
-        
+
         $remarks = $request->input('remarks', 'No reason provided');
-        
+
         $reservation->update([
-            'accepted' => true, 
-            'reserved' => false, 
+            'accepted' => true,
+            'reserved' => false,
             'status' => 6,
             'remarks' => $remarks
         ]);
-        
+
         return back()->with('success', 'Reservation rejected successfully!');
     }
 
