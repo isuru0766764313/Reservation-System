@@ -299,7 +299,7 @@ class AdminDashboardController extends Controller
             $hall = HallModel::find($reservation->hall_id);
             $customer = CustomerModel::find($reservation->customer_id);
             // Send notification to customer
-            $customer->notify(new ReservationRejectedEmail($reservation, $hall, $customer));
+            $customer->notify(new ReservationRejectedEmail($reservation));
             // Delete the unavailability record associated with this reservation
             HallUnAvailability::where('hall_id', $reservation->hall_id)
             ->where('date', $reservation->reservation_date)
