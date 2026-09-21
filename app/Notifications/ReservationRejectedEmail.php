@@ -6,6 +6,9 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use App\Models\HallModel;
+use App\Models\CustomerModel;
+use App\Models\AdminModel;
 
 class ReservationRejectedEmail extends Notification implements ShouldQueue
 {
@@ -20,11 +23,9 @@ class ReservationRejectedEmail extends Notification implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($reservation, $hall, $customer)
+    public function __construct($reservation)
     {
         $this->reservation = $reservation;
-        $this->hall = $hall;
-        $this->customer = $customer;
     }
 
     /**
@@ -47,13 +48,14 @@ class ReservationRejectedEmail extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         $reservation = $this->reservation;
-        $hall = $this->hall;
-        $customer = $this->customer;
-        $admin = $hall->admin;
+        $hall = HallModel::find($reservation->hall_id);
+        $customer = CustomerModel::find($reservation->customer_id);
+        //$admin = $hall->admin;
+        $admin = AdminModel::find($hall->admin_id);
 
         return (new MailMessage)
             ->subject('Reservation Rejected - ' . $hall->name)
-            ->greeting('Dear ' . trim(($customer->profile_title ?? '') . ' ' . $customer->first_name . ' ' . $customer->last_name) . ',')
+            ->greeting('Dear ' . trim(($reservation->customer->profile_title ?? '') . ' ' . $reservation->customer->first_name . ' ' . $reservation->customer->last_name) . ',')
             ->line('We sincerely regret to inform you that your reservation request has been **rejected** due to unforeseen and unavoidable circumstances.')
             ->line('---')
             ->line('**REJECTED RESERVATION DETAILS**')
