@@ -484,49 +484,49 @@
 
     /* Custom status badge colors & sizing */
     .bg-custom-pending {
-      background-color: #F2A405 !important;
+      background-color: #fcd80bff !important;
       color: #000 !important;
       padding: 6px 10px !important;
       font-size: 0.9rem !important;
     }
 
     .bg-custom-accepted {
-      background-color: #0EDE02 !important;
+      background-color: #bcfc81ff !important;
       color: #000 !important;
       padding: 6px 10px !important;
       font-size: 0.9rem !important;
     }
 
     .bg-custom-confirmed {
-      background-color: #70B502 !important;
+      background-color: #8be200f1 !important;
       color: #000 !important;
       padding: 6px 10px !important;
       font-size: 0.9rem !important;
     }
 
     .bg-custom-reserved {
-      background-color: #0C6300 !important;
+      background-color: #7bff86ff !important;
       color: #000 !important;
       padding: 6px 10px !important;
       font-size: 0.9rem !important;
     }
 
     .bg-custom-cancelled {
-      background-color: #FF6D4D !important;
+      background-color: #ff91edff !important;
       color: #000 !important;
       padding: 6px 10px !important;
       font-size: 0.9rem !important;
     }
 
     .bg-custom-rejected {
-      background-color: #FF0000 !important;
+      background-color: #ff8383ff !important;
       color: #000 !important;
       padding: 6px 10px !important;
       font-size: 0.9rem !important;
     }
 
     .bg-custom-rescheduled {
-      background-color: #FFDC12 !important;
+      background-color: #f8a808ff !important;
       color: #000 !important;
       padding: 6px 10px !important;
       font-size: 0.9rem !important;
@@ -765,10 +765,10 @@
           <tbody>
             @foreach($reservations as $reservation)
               @php
-                // Calculate total amount paid for this reservation
-                $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
-                $preliminaryPayment = $reservation->advanceAmount;
-                $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
+  // Calculate total amount paid for this reservation
+  $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
+  $preliminaryPayment = $reservation->advanceAmount;
+  $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
               @endphp
               <tr>
                 <td class="align-middle">{{ $reservation->ref_code ?? $loop->iteration }}</td>
@@ -929,15 +929,15 @@
   <!-- Reservation request Detail Modal -->
   @foreach($reservations as $reservation)
     @php
-      // Calculate total amount paid for this reservation
-      $preliminaryPayment = $reservation->advanceAmount;
-      $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
-      $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
-      if ((int) $reservation->status === 5) {
-        $approvedExceptCancellation = $reservation->payments->where('status', 2)->where('payment_alias', '!=', 'Cancellation')->sum('amount');
-        $totalPaid = max(0, $approvedExceptCancellation - ($reservation->hall->cancellation_fee ?? 0));
-      }
-      $advancePaidStatus = $reservation->advancePaid ? 'Yes' : 'No';
+  // Calculate total amount paid for this reservation
+  $preliminaryPayment = $reservation->advanceAmount;
+  $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
+  $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
+  if ((int) $reservation->status === 5) {
+    $approvedExceptCancellation = $reservation->payments->where('status', 2)->where('payment_alias', '!=', 'Cancellation')->sum('amount');
+    $totalPaid = max(0, $approvedExceptCancellation - ($reservation->hall->cancellation_fee ?? 0));
+  }
+  $advancePaidStatus = $reservation->advancePaid ? 'Yes' : 'No';
     @endphp
     <div class="modal fade" id="reservationModal-{{ $reservation->id }}" tabindex="-1">
       <div class="modal-dialog modal-lg" style="max-width: 1100px;">
