@@ -690,8 +690,15 @@ class ReservationController extends Controller
         $smsService = new SmsServiceController($message, $recipients);
         $smsService->sendSms();
 
-        // Send notification to customer
-        (CustomerModel::find($reservation->customer_id))->notify(new ReservationRejectedEmail($reservation));
+        // Send notification to customer (non-fatal: email failures should not break the rejection flow)
+        try {
+            (CustomerModel::find($reservation->customer_id))->notify(new ReservationRejectedEmail($reservation));
+        } catch (\Throwable $e) {
+            Log::error('Failed to send reservation rejection email: ' . $e->getMessage(), [
+                'reservation_id' => $reservation->id,
+                'exception' => $e,
+            ]);
+        }
 
         return back()->with('success', 'Reservation rejected successfully!');
     }
