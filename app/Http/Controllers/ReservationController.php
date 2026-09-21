@@ -25,6 +25,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Ramsey\Uuid\Type\Decimal;
+use App\Notifications\ReservationRejectedEmail;
+use App\Models\CustomerModel;
 
 class ReservationController extends Controller
 {
@@ -675,6 +677,21 @@ class ReservationController extends Controller
             'status' => 6,
             'remarks' => $remarks
         ]);
+        // Remove unavailability details of the this reservation
+        HallUnAvailability::where('hall_id', $reservation->hall_id)
+            ->where('date', $reservation->reservation_date)
+            ->where('start_time', $reservation->start_time)
+            ->where('end_time', $reservation->end_time)
+            ->delete();
+
+        // send sms notifying reservation request was rejected.
+        $message = 'We regret to inform you that your reservation request (' . $reservation->hall->name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . ' ) could not be approved due to unavoidable circumstances. Your reservation ID is : ' . $reservation->id;
+        $recipients = ($reservation->customer->telephone_number);
+        $smsService = new SmsServiceController($message, $recipients);
+        $smsService->sendSms();
+
+        // Send notification to customer
+        (CustomerModel::find($reservation->customer_id))->notify(new ReservationRejectedEmail($reservation));
 
         return back()->with('success', 'Reservation rejected successfully!');
     }
