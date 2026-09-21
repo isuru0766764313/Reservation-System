@@ -205,7 +205,7 @@ Route::middleware(['auth:admin', 'verified.admin'])->prefix('admin')->group(func
     // accept customer reservation request
     Route::patch('/reservations/{reservation}/accept', [AdminDashboardController::class, 'accept_reservation_request'])->name('admin.reservations.accept');
     // reject customer reservation request
-    Route::patch('/reservations/{reservation}/reject', [AdminDashboardController::class, 'reject_reservation_request'])->name('admin.reservations.reject');
+    //Route::patch('/reservations/{reservation}/reject', [AdminDashboardController::class, 'reject_reservation_request'])->name('admin.reservations.reject');
     // view the payment slip by from "PaymentConfirmation" email
     Route::get('/view-slip/{reservation}',[AdminDashboardController::class,'viewSlip'])->name('admin.view.slip');
     // accept the payment slip or not
