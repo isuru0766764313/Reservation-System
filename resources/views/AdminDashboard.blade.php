@@ -577,21 +577,21 @@
   </nav>
 
   <div class="container-fluid mt-4">
-    
+
     @if(session('success'))
       <div class="alert alert-success alert-dismissible fade show" role="alert">
         {{ session('success') }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
     @endif
-    
+
     @if(session('error'))
       <div class="alert alert-danger alert-dismissible fade show" role="alert">
         {{ session('error') }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
     @endif
-    
+
     <div class="dashboard-section">
       <div class="section-header">
         <h4 style="color: #1b10e6ff;"><i class="fas fa-building me-2" style="color: #1d12eeff;"></i>Hall Management</h4>
@@ -765,10 +765,10 @@
           <tbody>
             @foreach($reservations as $reservation)
               @php
-  // Calculate total amount paid for this reservation
-  $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
-  $preliminaryPayment = $reservation->advanceAmount;
-  $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
+                // Calculate total amount paid for this reservation
+                $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
+                $preliminaryPayment = $reservation->advanceAmount;
+                $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
               @endphp
               <tr>
                 <td class="align-middle">{{ $reservation->ref_code ?? $loop->iteration }}</td>
@@ -934,12 +934,14 @@
       $preliminaryPayment = $reservation->advanceAmount;
 
       if ((int) $reservation->status === 5) {
-        // Cancelled: exclude the cancellation fee record from both totals
-        $totalPaid = $reservation->payments->where('status', 2)->where('payment_alias', '!=', 'Cancellation')->sum('amount');
-        $actualPaid = $reservation->payments->where('payment_alias', '!=', 'Cancellation')->sum('amount');
+        $cancellationFee = $reservation->payments->where('payment_alias', 'Cancellation')->first()?->amount ?? 0;
+        $totalPaid = $reservation->payments->where('status', 2)->where('payment_alias', '!=', 'Cancellation')->sum('amount'); // only approved sum wihtout cancellation record
+        $actualPaid = $reservation->payments->where('payment_alias', '!=', 'Cancellation')->sum('amount'); // total sum wihtout cancellation record
+        $paybackAmount = max(0, $actualPaid - $cancellationFee); // cancellation fee should be subtracted.
       } else {
         $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
         $actualPaid = $reservation->payments->sum('amount');
+        $paybackAmount = $actualPaid;
       }
       $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
       $advancePaidStatus = $reservation->advancePaid ? 'Yes' : 'No';
@@ -1071,15 +1073,17 @@
                   <dd class="col-sm-8 fw-bold">Rs. {{ number_format($reservation->deposit, 2) }}</dd>
 
                   @if ($reservation->status == 5)
-                    <dt class="col-sm-4">Total Paid:</dt>
-                    <dd class="col-sm-8 fw-bold text-success">Rs. {{ number_format($totalPaid, 2) }}</dd>
+                    <dt class="col-sm-4">Cancellation fee:</dt>
+                    <dd class="col-sm-8 fw-bold text-success">Rs. {{ number_format($cancellationFee, 2) }}</dd>
+                    <dt class="col-sm-4">Payback Amount:</dt>
+                    <dd class="col-sm-8 fw-bold text-success">Rs. {{ number_format($paybackAmount, 2) }}</dd>
                   @elseif($reservation->status == 6)
+                    <dt class="col-sm-4">Payback Amount:</dt>
+                    <dd class="col-sm-8 fw-bold text-success">Rs. {{ number_format($paybackAmount, 2) }}</dd>
                   @else
                     <dt class="col-sm-4">Total Paid:</dt>
                     <dd class="col-sm-8 fw-bold text-success">Rs. {{ number_format($totalPaid, 2) }}</dd>
                   @endif
-
-
 
                   @if(!in_array($reservation->status, [1, 5, 6, 7]))
                     <dt class="col-sm-4">Remaining to be paid:</dt>
@@ -1154,12 +1158,12 @@
                             @endif
                           </form>
                           <!--<form action="{{ route('admin.payment.reject', $payment) }}" method="POST" class="d-inline slip-action-form">
-                                                                                                            @csrf
-                                                                                                            @method('PATCH')
-                                                                                                            <button type="submit" class="btn btn-danger" title="Reject payment">
-                                                                                                              <i class="fas fa-times me-2"></i> Reject
-                                                                                                            </button>
-                                                                                                          </form>-->
+                                                                                                                                                            @csrf
+                                                                                                                                                            @method('PATCH')
+                                                                                                                                                            <button type="submit" class="btn btn-danger" title="Reject payment">
+                                                                                                                                                              <i class="fas fa-times me-2"></i> Reject
+                                                                                                                                                            </button>
+                                                                                                                                                          </form>-->
                         @else
                           @if($payment->status == 2)
                             <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Accepted</span>
