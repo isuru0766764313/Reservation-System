@@ -50,38 +50,50 @@ class ReservationRejectedEmail extends Notification implements ShouldQueue
         $reservation = $this->reservation;
         $hall = HallModel::find($reservation->hall_id);
         $customer = CustomerModel::find($reservation->customer_id);
-        //$admin = $hall->admin;
         $admin = AdminModel::find($hall->admin_id);
 
+        $actualStart = date('H:i', strtotime($reservation->start_time) - ($reservation->pre_arrange_time * 3600));
+        $actualEnd = date('H:i', strtotime($reservation->end_time) + ($reservation->post_arrange_time * 3600));
+
+        //$totalPaid = $reservation->payments()->where('status', 2)->sum('amount');
+        $totalPaid = $reservation->payments->sum('amount'); // all paid so far
+        $remaining = max(0, (($reservation->charge - $reservation->discount_custom) + $reservation->deposit) - $totalPaid);
+        $payment = $reservation->payments->last();
+        $balanceAmount = $payment ? $payment->amount : 0;
+
         return (new MailMessage)
-            ->subject('Reservation Rejected - ' . $hall->name)
-            ->greeting('Dear ' . trim(($reservation->customer->profile_title ?? '') . ' ' . $reservation->customer->first_name . ' ' . $reservation->customer->last_name) . ',')
+            ->subject('Reservation Rejected - ' . ($reservation->ref_code ?? $reservation->id))
+            ->greeting('Dear ' . trim(($customer->profile_title ?? '') . ' ' . $customer->first_name . ' ' . $customer->last_name) . ',')
             ->line('We sincerely regret to inform you that your reservation request has been **rejected** due to unforeseen and unavoidable circumstances.')
             ->line('---')
-            ->line('**REJECTED RESERVATION DETAILS**')
-            ->line('Reservation ID: **#' . ($reservation->ref_code ?? $reservation->id) . '**')
-            ->line('Reservation Type: **' . ucfirst($reservation->reservation_type) . '**')
-            ->line('Venue: **' . $hall->name . '**')
-            ->line('Venue Capacity: **' . number_format($hall->capacity) . ' people**')
-            ->line('Requested Date: **' . \Carbon\Carbon::parse($reservation->reservation_date)->format('l, d M Y') . '**')
-            ->line('Requested Time: **' . $reservation->start_time . ' - ' . $reservation->end_time . '**')
-            ->line('Total Charge: **Rs. ' . number_format($reservation->charge, 2) . '**')
+            ->line('**RESERVATION DETAILS**')
+            ->line('Reservation Ref Code: **#' . ($reservation->ref_code ?? $reservation->id) . '**')
+            ->line('Hall Name: **' . $hall->name . '**')
+            ->line('Reservation Type: **' . ucfirst($reservation->reservation_type) . '**');
+        if ($reservation->reservation_type === 'package' && $reservation->package) {
+            $mail
+                ->line('Package Name: **' . ucfirst($reservation->package->name) . '**');
+        }
+        $mail
+            ->line('Reservation Date: **' . \Carbon\Carbon::parse($reservation->reservation_date)->format('l, d M Y') . '**')
+            ->line('Event Time Period: **' . date('h:i A', strtotime($actualStart)) . ' - ' . date('h:i A', strtotime($actualEnd)) . '**')
+            ->line('Re-schedule Due Date: **' . \Carbon\Carbon::parse($reservation->rescheduledExpiryDate)->format('l, d M Y') . '**')
+            ->line('Cancellation Due Date: **' . \Carbon\Carbon::parse($reservation->cancellationExpiryDate)->format('l, d M Y') . '**')
+            ->line('Charge: **Rs. ' . number_format($reservation->charge, 2) . '**');
+        if ($reservation->discount_custom > 0) {
+            $mail
+                ->line('Discount: **Rs. ' . number_format($reservation->discount_custom ?? 0, 2) . '**');
+        }
+        $mail
+            ->line('Final Charge: **Rs. ' . number_format((($reservation->charge) - ($reservation->discount_custom ?? 0)), 2) . '**');
+        if ($reservation->deposit > 0) {
+            $mail->line('Refundable Deposit: **Rs. ' . number_format($reservation->deposit, 2) . '**');
+        }
+        $mail
             ->line('---')
-            ->line('**VENUE LOCATION**')
-            ->line('Address: **' . ($hall->address ?? 'N/A') . '**')
-            ->line('Location: **' . ($hall->area ?? 'N/A') . ', ' . ($hall->district ?? 'N/A') . '**')
+            ->line('Total amount paid so far: **Rs. ' . number_format($totalPaid, 2) . '**'.'will be refunded as soon as possible.')
             ->line('---')
-            ->line('**NEXT STEP**')
-            ->line('Your reservation has been **rejected**. You may browse other venues and make a new reservation.')
-            ->line('---')
-            ->line('**VENUE CONTACT**')
-            ->line('Admin Email: **' . $admin->email . '**')
-            ->line('Admin Telephone: **' . $admin->telephone_number . '**')
-            ->line('---')            
-            ->action('Browse Other Venues', route('load_venues_page'))
-            ->line('We apologize for any inconvenience this may cause and appreciate your understanding.')
-            ->line('---')
-            ->salutation("Best regards,\nAdmin,\nPrime Minister's Office.");
+            ->salutation("Best regards,\nPublic Facilities Reservation System.");
     }
 
     /**
