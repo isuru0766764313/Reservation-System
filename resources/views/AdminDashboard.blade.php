@@ -926,7 +926,7 @@
     </div>
   </div>
 
-  <!-- Reservation request Detail Modal -->
+  <!-- Reservation Detail Modal -->
   @foreach($reservations as $reservation)
     @php
   // Calculate total amount paid for this reservation
