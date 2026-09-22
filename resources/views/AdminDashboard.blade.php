@@ -1154,9 +1154,6 @@
                             @endif
                           </div>
                         </div>
-                        @if(!$loop->last)
-                        <hr>hvhgvjhvjhv
-                        @endif
                       @endforeach
                     @else
                       <div class="alert alert-warning mb-0">
