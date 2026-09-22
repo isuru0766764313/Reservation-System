@@ -1153,7 +1153,8 @@
                       </div>
                     </div>
                     @if(!$loop->last)
-                    <hr>@endif
+                    <hr>hvhgvjhvjhv
+                    @endif
                   @endforeach
                 @else
                   <div class="alert alert-warning mb-0">
@@ -1167,7 +1168,7 @@
 
           <div class="modal-footer">
 
-            @if ((int) $reservation->status !== 6)
+            @if ((int) $reservation->status !== 6 &&  (int) $reservation->status !== 5)
               <div class="w-100">
                 <form id="reject-reservation-form-{{ $reservation->id }}" class="text-end"
                   action="{{ route('admin.reservation.reject', $reservation) }}" method="POST">
