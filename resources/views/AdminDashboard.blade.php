@@ -1063,10 +1063,11 @@
 
                       <dt class="col-sm-4">Refundable Deposit:</dt>
                       <dd class="col-sm-8 fw-bold">Rs. {{ number_format($reservation->deposit, 2) }}</dd>
+
                       <dt class="col-sm-4">Total Paid:</dt>
                       <dd class="col-sm-8 fw-bold text-success">Rs. {{ number_format($totalPaid, 2) }}</dd>
 
-                      @if(!in_array($reservation->status, [5, 6, 7]))
+                      @if(!in_array($reservation->status, [1,5,6,7]))
                         <dt class="col-sm-4">Remaining to be paid:</dt>
                         <dd class="col-sm-8 fw-bold text-danger">Rs. {{ number_format($remainingAmount, 2) }}</dd>
                       @endif
