@@ -1076,10 +1076,10 @@
                     <dt class="col-sm-4">Cancellation fee:</dt>
                     <dd class="col-sm-8 fw-bold text-success">Rs. {{ number_format($cancellationFee, 2) }}</dd>
                     <dt class="col-sm-4">Payback Amount:</dt>
-                    <dd class="col-sm-8 fw-bold text-success">Rs. {{ number_format($paybackAmount, 2) }}</dd>
+                    <dd class="col-sm-8 fw-bold text-danger">Rs. {{ number_format($paybackAmount, 2) }}</dd>
                   @elseif($reservation->status == 6)
                     <dt class="col-sm-4">Payback Amount:</dt>
-                    <dd class="col-sm-8 fw-bold text-success">Rs. {{ number_format($paybackAmount, 2) }}</dd>
+                    <dd class="col-sm-8 fw-bold text-danger">Rs. {{ number_format($paybackAmount, 2) }}</dd>
                   @else
                     <dt class="col-sm-4">Total Paid:</dt>
                     <dd class="col-sm-8 fw-bold text-success">Rs. {{ number_format($totalPaid, 2) }}</dd>
@@ -1158,12 +1158,12 @@
                             @endif
                           </form>
                           <!--<form action="{{ route('admin.payment.reject', $payment) }}" method="POST" class="d-inline slip-action-form">
-                                                                                                                                                            @csrf
-                                                                                                                                                            @method('PATCH')
-                                                                                                                                                            <button type="submit" class="btn btn-danger" title="Reject payment">
-                                                                                                                                                              <i class="fas fa-times me-2"></i> Reject
-                                                                                                                                                            </button>
-                                                                                                                                                          </form>-->
+                                                                                                                                                                      @csrf
+                                                                                                                                                                      @method('PATCH')
+                                                                                                                                                                      <button type="submit" class="btn btn-danger" title="Reject payment">
+                                                                                                                                                                        <i class="fas fa-times me-2"></i> Reject
+                                                                                                                                                                      </button>
+                                                                                                                                                                    </form>-->
                         @else
                           @if($payment->status == 2)
                             <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Accepted</span>
