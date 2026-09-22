@@ -1739,8 +1739,13 @@
                                                     @php
                                                         $totalPaidDisplay = $totalPaid;
                                                         if ((int) $reservation->status === 5) {
-                                                            $approvedExceptCancellation = $reservation->payments->where('status', 2)->where('payment_alias', '!=', 'Cancellation')->sum('amount');
-                                                            $totalPaidDisplay = max(0, $approvedExceptCancellation - ($reservation->hall->cancellation_fee ?? 0));
+                                                            // Cancelled: show the actual amount the customer paid (including
+                                                            // pending payments) minus the cancellation fee, matching admin payback.
+                                                            $cancellationFee = $reservation->payments->where('payment_alias', 'Cancellation')->first()?->amount ?? 0;
+                                                            $totalPaidDisplay = max(0, $reservation->payments->where('payment_alias', '!=', 'Cancellation')->sum('amount') - $cancellationFee);
+                                                        } elseif ((int) $reservation->status === 6) {
+                                                            // Rejected: show the actual amount paid (including pending payments).
+                                                            $totalPaidDisplay = $reservation->payments->where('payment_alias', '!=', 'Cancellation')->sum('amount');
                                                         }
                                                     @endphp
                                                     <dt class="col-sm-4">Total Paid:</dt>
