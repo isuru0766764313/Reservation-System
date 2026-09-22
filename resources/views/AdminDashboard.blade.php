@@ -934,6 +934,7 @@
       $preliminaryPayment = $reservation->advanceAmount;
 
       if ((int) $reservation->status === 5) {
+        // Cancelled: exclude the cancellation fee record from both totals
         $totalPaid = $reservation->payments->where('status', 2)->where('payment_alias', '!=', 'Cancellation')->sum('amount');
         $actualPaid = $reservation->payments->where('payment_alias', '!=', 'Cancellation')->sum('amount');
       } else {
