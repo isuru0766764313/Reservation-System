@@ -159,39 +159,49 @@
             font-size: 1.3rem;
         }
 
-        .stat-icon.pending {
-            background: var(--warning-light);
-            color: var(--warning);
-        }
-
-        .stat-icon.confirmed {
-            background: var(--info-light);
-            color: var(--info);
-        }
-
-        .stat-icon.closed {
-            background: var(--danger-light);
-            color: var(--danger);
-        }
-
-        .stat-icon.success {
-            background: var(--success-light);
-            color: var(--success);
-        }
-
-        .stat-icon.rejected {
-            background: var(--danger-light);
-            color: var(--danger);
-        }
-
-        .stat-icon.payment-rejected {
-            background: var(--warning-light);
-            color: var(--warning);
-        }
-
         .stat-icon.total {
             background: var(--primary-light);
             color: var(--primary);
+        }
+
+        .stat-icon.pending {
+            background: #fcd80b;
+            color: #000;
+        }
+
+        .stat-icon.accepted {
+            background: #bcfc81;
+            color: #000;
+        }
+
+        .stat-icon.confirmed {
+            background: #8be200;
+            color: #000;
+        }
+
+        .stat-icon.reserved {
+            background: #7bff86;
+            color: #000;
+        }
+
+        .stat-icon.cancelled {
+            background: #ff91ed;
+            color: #000;
+        }
+
+        .stat-icon.rejected {
+            background: #ff8383;
+            color: #000;
+        }
+
+        .stat-icon.rescheduled {
+            background: #f8a808;
+            color: #000;
+        }
+
+        .stat-icon.user-cancelled {
+            background: #212529;
+            color: #fff;
         }
 
         .stat-content {
@@ -1016,28 +1026,35 @@
             <div class="stat-card">
                 <div class="stat-icon pending"><i class="fas fa-hourglass-half"></i></div>
                 <div class="stat-content">
-                    <div class="stat-number">{{ $pendingRequest }}</div>
-                    <div class="stat-label">Pending Requests</div>
+                    <div class="stat-number">{{ $pending }}</div>
+                    <div class="stat-label">Pending</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon confirmed"><i class="fas fa-spinner"></i></div>
+                <div class="stat-icon accepted"><i class="fas fa-check"></i></div>
                 <div class="stat-content">
-                    <div class="stat-number">{{ $paymentInProgress }}</div>
-                    <div class="stat-label">Payment in Progress</div>
+                    <div class="stat-number">{{ $accepted }}</div>
+                    <div class="stat-label">Accepted</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon success"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-icon confirmed"><i class="fas fa-thumbs-up"></i></div>
                 <div class="stat-content">
-                    <div class="stat-number">{{ $successful }}</div>
-                    <div class="stat-label">Successful Reservations</div>
+                    <div class="stat-number">{{ $confirmed }}</div>
+                    <div class="stat-label">Confirmed</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon closed"><i class="fas fa-times-circle"></i></div>
+                <div class="stat-icon reserved"><i class="fas fa-check-circle"></i></div>
                 <div class="stat-content">
-                    <div class="stat-number">{{ $closed }}</div>
+                    <div class="stat-number">{{ $reserved }}</div>
+                    <div class="stat-label">Reserved</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon cancelled"><i class="fas fa-times-circle"></i></div>
+                <div class="stat-content">
+                    <div class="stat-number">{{ $cancelled }}</div>
                     <div class="stat-label">Cancelled</div>
                 </div>
             </div>
@@ -1045,14 +1062,21 @@
                 <div class="stat-icon rejected"><i class="fas fa-ban"></i></div>
                 <div class="stat-content">
                     <div class="stat-number">{{ $rejected }}</div>
-                    <div class="stat-label">Reservation Rejected</div>
+                    <div class="stat-label">Rejected</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon payment-rejected"><i class="fas fa-money-bill-wave"></i></div>
+                <div class="stat-icon rescheduled"><i class="fas fa-calendar-alt"></i></div>
                 <div class="stat-content">
-                    <div class="stat-number">{{ $paymentRejected }}</div>
-                    <div class="stat-label">Payment Rejected</div>
+                    <div class="stat-number">{{ $rescheduled }}</div>
+                    <div class="stat-label">Rescheduled</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon user-cancelled"><i class="fas fa-user-times"></i></div>
+                <div class="stat-content">
+                    <div class="stat-number">{{ $userCancelled }}</div>
+                    <div class="stat-label">User-cancelled</div>
                 </div>
             </div>
         </div>

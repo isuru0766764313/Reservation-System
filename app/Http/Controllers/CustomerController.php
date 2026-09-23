@@ -43,7 +43,8 @@ class CustomerController extends Controller
                 'password' => 'required',
                 'confirm_password' => 'required',
                 'type' => 'required|string|in:private,government',
-            ]);
+            ]
+        );
 
         $email_otp = Str::random(6); // generate randome otp for email
         $mobile_otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);// generate randome otp for mobile
@@ -364,8 +365,10 @@ class CustomerController extends Controller
         if ($request->filled('search')) {
             $searchTerm = $request->search;
             $query->where('name', 'LIKE', '%' . $searchTerm . '%')
-                  ->orderByRaw("CASE WHEN name LIKE ? THEN 1 WHEN name LIKE ? THEN 2 ELSE 3 END", 
-                               [$searchTerm . '%', '% ' . $searchTerm . '%']);
+                ->orderByRaw(
+                    "CASE WHEN name LIKE ? THEN 1 WHEN name LIKE ? THEN 2 ELSE 3 END",
+                    [$searchTerm . '%', '% ' . $searchTerm . '%']
+                );
         }
 
         // Price Filter
@@ -458,8 +461,7 @@ class CustomerController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        $reservations->getCollection()->transform(function ($reservation) 
-        {
+        $reservations->getCollection()->transform(function ($reservation) {
             $totalPaid = $reservation->payments->sum('amount');
             $reservation->total_paid = $totalPaid;
             $reservation->remaining = $reservation->charge - $totalPaid;
@@ -469,41 +471,31 @@ class CustomerController extends Controller
             return $reservation;
         });
 
-        // Calculate reservation statistics matching the actual workflow
-        $total = (ReservationModel::where('customer_id', $customer->id))->count();
+        // Calculate reservation statistics, one count per reservation status.
+        $baseQuery = ReservationModel::where('customer_id', $customer->id);
 
-        // Pending Requests: reservations awaiting admin's approval only (status = 1)
-        $pendingRequest = ReservationModel::where('customer_id', $customer->id)
-            ->where('status', 1)->count();
-
-        // Payment in Progress: all pending payment slips for the customer (payments.status = 1),
-        // regardless of payment stage (Preliminary / Remainings / Cancellation)
-        $paymentInProgress = Payments::whereHas('reservation', function ($query) use ($customer) {
-            $query->where('customer_id', $customer->id);
-        })->where('status', 1)->count();
-
-        // Successful Reservations: reservation completed (status = 4), not cancelled
-        $successful = ReservationModel::where('customer_id', $customer->id)
-            ->where('status', 4)->count();
-
-        // Cancelled: reservation cancelled (status = 5)
-        $closed = ReservationModel::where('customer_id', $customer->id)
-            ->where('status', 5)->count();
-
-        // Reservation Rejected: reservation itself rejected by admin (status 6)
-        $rejected = ReservationModel::where('customer_id', $customer->id)
-            ->where('status', 6)->count();
-
-        // Payment Rejected: any payment slip for the customer's reservations was rejected
-        $paymentRejected = ReservationModel::where('customer_id', $customer->id)
-            ->whereHas('payments', function ($query) {
-                $query->where('status', 3);
-            })->count();
+        $total = (clone $baseQuery)->count();
+        $pending = (clone $baseQuery)->where('status', 1)->count();
+        $accepted = (clone $baseQuery)->where('status', 2)->count();
+        $confirmed = (clone $baseQuery)->where('status', 3)->count();
+        $reserved = (clone $baseQuery)->where('status', 4)->count();
+        $cancelled = (clone $baseQuery)->where('status', 5)->count();
+        $rejected = (clone $baseQuery)->where('status', 6)->count();
+        $rescheduled = (clone $baseQuery)->where('status', 7)->count();
+        $userCancelled = (clone $baseQuery)->where('status', 8)->count();
 
         return view('CustomerDashboardPage', compact(
-            'customer', 'reservations',
-            'total', 'pendingRequest', 'paymentInProgress', 'successful', 'closed',
-            'rejected', 'paymentRejected'
+            'customer',
+            'reservations',
+            'total',
+            'pending',
+            'accepted',
+            'confirmed',
+            'reserved',
+            'cancelled',
+            'rejected',
+            'rescheduled',
+            'userCancelled'
         ));
     }
 
@@ -768,25 +760,25 @@ class CustomerController extends Controller
     {
         try {
             Log::info("Starting forgot password request.");
-            
+
             // Validate input
             $request->validate([
                 'email' => 'required|email|exists:customers_table,email',
                 'telephone_number' => 'required|string',
             ]);
-            
+
             Log::info('Forgot password request validated successfully.');
-            
+
             // Find customer by email
             $customer = CustomerModel::where('email', $request->email)->first();
-            
+
             if (!$customer) {
                 return response()->json([
                     'success' => false,
                     'message' => 'No account found with this email address.'
                 ], 404);
             }
-            
+
             // Verify phone number matches
             if ($customer->telephone_number !== $request->telephone_number) {
                 return response()->json([
@@ -794,40 +786,40 @@ class CustomerController extends Controller
                     'message' => 'The phone number does not match our records.'
                 ], 422);
             }
-            
+
             Log::info("Customer found for forgot password: ID = {$customer->id}, Email = {$customer->email}");
-            
+
             // Generate OTPs
             $email_otp = Str::random(6);
             $mobile_otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-            
+
             // Store OTPs and session info
             $customer->email_verification_otp = $email_otp;
             $customer->mobile_verification_otp = $mobile_otp;
             $customer->otp_expires_at = Carbon::now()->addMinutes(10);
             $customer->password_reset_expiry = Carbon::now()->addMinutes(30);
             $customer->save();
-            
+
             // Store customer ID in session for verification
             $request->session()->put('forgot_password_customer_id', $customer->id);
-            
+
             Log::info("OTPs generated for forgot password. Customer ID: {$customer->id}");
-            
+
             // Send OTPs
             try {
                 // Send email OTP
                 $customer->notify(new SendCustomerOTP($email_otp));
-                
+
                 // Send SMS OTP
-                $message = 'Password Reset Request for Public Facilities Reservation Portal.' . PHP_EOL . 
-                          'Email OTP: ' . $email_otp . PHP_EOL . 
-                          'Phone OTP: ' . $mobile_otp . PHP_EOL . 
-                          'Valid for 10 minutes. Do not share.';
+                $message = 'Password Reset Request for Public Facilities Reservation Portal.' . PHP_EOL .
+                    'Email OTP: ' . $email_otp . PHP_EOL .
+                    'Phone OTP: ' . $mobile_otp . PHP_EOL .
+                    'Valid for 10 minutes. Do not share.';
                 $smsService = new SmsServiceController($message, $customer->telephone_number);
                 $smsService->sendSms();
-                
+
                 Log::info("OTPs sent for forgot password. Customer ID: {$customer->id}");
-                
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Verification codes sent to your email and phone.',
@@ -835,7 +827,7 @@ class CustomerController extends Controller
                     'masked_email' => $this->maskEmail($customer->email),
                     'masked_phone' => $this->maskPhone($customer->telephone_number)
                 ]);
-                
+
             } catch (\Exception $e) {
                 Log::error("Failed to send OTPs for forgot password: " . $e->getMessage());
                 return response()->json([
@@ -843,7 +835,7 @@ class CustomerController extends Controller
                     'message' => 'Failed to send verification codes. Please try again.'
                 ], 500);
             }
-            
+
         } catch (\Exception $e) {
             Log::error("Forgot password request error: " . $e->getMessage());
             return response()->json([
@@ -860,7 +852,7 @@ class CustomerController extends Controller
     {
         try {
             Log::info("Starting forgot password OTP verification.");
-            
+
             // Validate input
             $request->validate([
                 'email_otp' => 'required|string|size:6',
@@ -871,7 +863,7 @@ class CustomerController extends Controller
                 'otp5' => 'required|digits:1',
                 'otp6' => 'required|digits:1',
             ]);
-            
+
             // Get customer from session
             $customer_id = session('forgot_password_customer_id');
             if (!$customer_id) {
@@ -880,7 +872,7 @@ class CustomerController extends Controller
                     'message' => 'Session expired. Please start the process again.'
                 ], 422);
             }
-            
+
             $customer = CustomerModel::find($customer_id);
             if (!$customer) {
                 return response()->json([
@@ -888,7 +880,7 @@ class CustomerController extends Controller
                     'message' => 'Invalid session. Please start the process again.'
                 ], 422);
             }
-            
+
             // Check if reset window expired
             if (Carbon::now()->gt($customer->password_reset_expiry)) {
                 $request->session()->forget('forgot_password_customer_id');
@@ -897,21 +889,23 @@ class CustomerController extends Controller
                     'message' => 'Reset session expired. Please start over.'
                 ], 422);
             }
-            
+
             // Concatenate mobile OTP
             $mobile_otp = $request->otp1 . $request->otp2 . $request->otp3 . $request->otp4 . $request->otp5 . $request->otp6;
-            
+
             Log::info("Verifying OTPs for forgot password. Customer ID: {$customer->id}");
-            
+
             // Verify both OTPs
-            if ($customer->email_verification_otp !== $request->email_otp || 
-                $customer->mobile_verification_otp !== $mobile_otp) {
+            if (
+                $customer->email_verification_otp !== $request->email_otp ||
+                $customer->mobile_verification_otp !== $mobile_otp
+            ) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Invalid verification codes. Please check and try again.'
                 ], 422);
             }
-            
+
             // Check OTP expiration
             if (Carbon::now()->gt($customer->otp_expires_at)) {
                 return response()->json([
@@ -919,22 +913,22 @@ class CustomerController extends Controller
                     'message' => 'Verification codes have expired.'
                 ], 422);
             }
-            
+
             // Mark OTP as verified by clearing them and using temp_password as verification flag
             $customer->email_verification_otp = null;
             $customer->mobile_verification_otp = null;
             $customer->otp_expires_at = null;
             $customer->temp_password = 'VERIFIED'; // Use existing temp_password field as verification flag
             $customer->save();
-            
+
             Log::info("OTPs verified successfully for forgot password. Customer ID: {$customer->id}");
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Verification successful. You can now set a new password.',
                 'customer_id' => $customer->id
             ]);
-            
+
         } catch (\Exception $e) {
             Log::error("Forgot password OTP verification error: " . $e->getMessage());
             return response()->json([
@@ -951,12 +945,12 @@ class CustomerController extends Controller
     {
         try {
             Log::info("Starting forgot password reset.");
-            
+
             // Validate input
             $request->validate([
                 'password' => 'required|confirmed|min:8|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/',
             ]);
-            
+
             // Get customer from session
             $customer_id = session('forgot_password_customer_id');
             if (!$customer_id) {
@@ -965,7 +959,7 @@ class CustomerController extends Controller
                     'message' => 'Session expired. Please start the process again.'
                 ], 422);
             }
-            
+
             $customer = CustomerModel::find($customer_id);
             if (!$customer) {
                 return response()->json([
@@ -973,7 +967,7 @@ class CustomerController extends Controller
                     'message' => 'Invalid session. Please start the process again.'
                 ], 422);
             }
-            
+
             // Check if reset window expired
             if (Carbon::now()->gt($customer->password_reset_expiry)) {
                 $request->session()->forget('forgot_password_customer_id');
@@ -982,7 +976,7 @@ class CustomerController extends Controller
                     'message' => 'Reset session expired. Please start over.'
                 ], 422);
             }
-            
+
             // Check if OTP was verified (using temp_password as verification flag)
             if ($customer->temp_password !== 'VERIFIED') {
                 return response()->json([
@@ -990,33 +984,33 @@ class CustomerController extends Controller
                     'message' => 'Please verify your OTP first.'
                 ], 422);
             }
-            
+
             Log::info("Resetting password for customer ID: {$customer->id}");
-            
+
             // Update password
             $customer->password = Hash::make($request->password);
             $customer->temp_password = null; // Clear verification flag
             $customer->password_reset_expiry = null;
             $customer->save();
-            
+
             // Clear session
             $request->session()->forget('forgot_password_customer_id');
-            
+
             Log::info("Password reset successfully for customer ID: {$customer->id}");
-            
+
             // Send confirmation email
             try {
                 $customer->notify(new SendCustomerOTP('Your password has been successfully reset.'));
             } catch (\Exception $e) {
                 Log::warning("Failed to send password reset confirmation email: " . $e->getMessage());
             }
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Password reset successfully! You can now login with your new password.',
                 'redirect' => route('login_get_route')
             ]);
-            
+
         } catch (\Exception $e) {
             Log::error("Forgot password reset error: " . $e->getMessage());
             return response()->json([
@@ -1033,7 +1027,7 @@ class CustomerController extends Controller
     {
         try {
             Log::info("Starting forgot password OTP resend.");
-            
+
             // Get customer from session
             $customer_id = session('forgot_password_customer_id');
             if (!$customer_id) {
@@ -1042,7 +1036,7 @@ class CustomerController extends Controller
                     'message' => 'Session expired. Please start the process again.'
                 ], 422);
             }
-            
+
             $customer = CustomerModel::find($customer_id);
             if (!$customer) {
                 return response()->json([
@@ -1050,7 +1044,7 @@ class CustomerController extends Controller
                     'message' => 'Invalid session. Please start the process again.'
                 ], 422);
             }
-            
+
             // Check if reset window expired
             if (Carbon::now()->gt($customer->password_reset_expiry)) {
                 $request->session()->forget('forgot_password_customer_id');
@@ -1059,39 +1053,39 @@ class CustomerController extends Controller
                     'message' => 'Reset session expired. Please start over.'
                 ], 422);
             }
-            
+
             // Generate new OTPs
             $email_otp = Str::random(6);
             $mobile_otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-            
+
             // Update customer with new OTPs
             $customer->email_verification_otp = $email_otp;
             $customer->mobile_verification_otp = $mobile_otp;
             $customer->otp_expires_at = Carbon::now()->addMinutes(10);
             $customer->save();
-            
+
             Log::info("New OTPs generated for forgot password resend. Customer ID: {$customer->id}");
-            
+
             // Send new OTPs
             try {
                 // Send email OTP
                 $customer->notify(new SendCustomerOTP($email_otp));
-                
+
                 // Send SMS OTP
-                $message = 'New Password Reset Codes for Public Facilities Reservation Portal.' . PHP_EOL . 
-                          'Email OTP: ' . $email_otp . PHP_EOL . 
-                          'Phone OTP: ' . $mobile_otp . PHP_EOL . 
-                          'Valid for 10 minutes. Do not share.';
+                $message = 'New Password Reset Codes for Public Facilities Reservation Portal.' . PHP_EOL .
+                    'Email OTP: ' . $email_otp . PHP_EOL .
+                    'Phone OTP: ' . $mobile_otp . PHP_EOL .
+                    'Valid for 10 minutes. Do not share.';
                 $smsService = new SmsServiceController($message, $customer->telephone_number);
                 $smsService->sendSms();
-                
+
                 Log::info("New OTPs sent for forgot password. Customer ID: {$customer->id}");
-                
+
                 return response()->json([
                     'success' => true,
                     'message' => 'New verification codes sent successfully.'
                 ]);
-                
+
             } catch (\Exception $e) {
                 Log::error("Failed to resend OTPs for forgot password: " . $e->getMessage());
                 return response()->json([
@@ -1099,7 +1093,7 @@ class CustomerController extends Controller
                     'message' => 'Failed to send new verification codes. Please try again.'
                 ], 500);
             }
-            
+
         } catch (\Exception $e) {
             Log::error("Forgot password OTP resend error: " . $e->getMessage());
             return response()->json([
@@ -1117,7 +1111,7 @@ class CustomerController extends Controller
         $parts = explode('@', $email);
         $name = $parts[0];
         $domain = $parts[1];
-        
+
         $maskedName = substr($name, 0, 2) . str_repeat('*', max(0, strlen($name) - 4)) . substr($name, -2);
         return $maskedName . '@' . $domain;
     }
