@@ -425,11 +425,10 @@
                     <div class="alert-icon">
                         <i class="fas fa-check-circle"></i>
                     </div>
-                    <h3>Reservation Submitted</h3>
-                    <p>Your Reservation is forwarded for admin approval</p>
-                    <button class="alert-close-btn" onclick="closeSuccessAlert()">OK</button>
+                    <h3>Reservation Request Submitted</h3>
+                        <button class="alert-close-btn" onclick="closeSuccessAlert()">OK</button>
+                    </div>
                 </div>
-            </div>
         @endif
 
         <!-- Image Slider Section -->
