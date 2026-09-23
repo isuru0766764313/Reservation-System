@@ -1743,7 +1743,7 @@
                 <strong>Customer:</strong> ${props.customer_name || 'N/A'}<br>
                 <strong>Hall:</strong> ${props.hall_name}<br>
                 <strong>Time:</strong> ${props.time_slot}<br>
-                <strong>Status:</strong> ${props.status}
+                <strong>Status:</strong> <span class="badge" style="background-color:${props.status_color}; color:${props.status_text_color};">${props.status}</span>
               </div>
             `;
 

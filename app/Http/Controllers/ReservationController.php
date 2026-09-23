@@ -875,19 +875,30 @@ class ReservationController extends Controller
         }
     }
 
-    public static function getReservationStatusLabel(int $status): string
+    /**
+     * Get centralized metadata (label + display colors) for a reservation status.
+     * Colors must stay in sync with the `.bg-custom-*` classes used in the dashboard views.
+     *
+     * @return array{label: string, color: string, text_color: string}
+     */
+    public static function getReservationStatusMeta(int $status): array
     {
         return match ($status) {
-            1 => 'Pending',
-            2 => 'Accepted',
-            3 => 'Confirmed',
-            4 => 'Reserved',
-            5 => 'Cancelled',
-            6 => 'Rejected',
-            7 => 'Rescheduled',
-            8 => 'User-cancelled',
-            default => 'Unknown',
+            1 => ['label' => 'Pending', 'color' => '#fcd80b', 'text_color' => '#000000'],
+            2 => ['label' => 'Accepted', 'color' => '#bcfc81', 'text_color' => '#000000'],
+            3 => ['label' => 'Confirmed', 'color' => '#8be200', 'text_color' => '#000000'],
+            4 => ['label' => 'Reserved', 'color' => '#7bff86', 'text_color' => '#000000'],
+            5 => ['label' => 'Cancelled', 'color' => '#ff91ed', 'text_color' => '#000000'],
+            6 => ['label' => 'Rejected', 'color' => '#ff8383', 'text_color' => '#000000'],
+            7 => ['label' => 'Rescheduled', 'color' => '#f8a808', 'text_color' => '#000000'],
+            8 => ['label' => 'User-cancelled', 'color' => '#212529', 'text_color' => '#ffffff'],
+            default => ['label' => 'Unknown', 'color' => '#ABA9A9', 'text_color' => '#000000'],
         };
+    }
+
+    public static function getReservationStatusLabel(int $status): string
+    {
+        return self::getReservationStatusMeta($status)['label'];
     }
 
     public static function getPaymentStatusLabel(int $status): string
