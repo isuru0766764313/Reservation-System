@@ -24,7 +24,7 @@ class AdminDashboardController extends Controller
         // get all halls
         $halls = HallModel::all();
         // Fetch halls only for this admin using admin-id
-        $halls = HallModel::where('admin_id', $admin->id)->with(['availability','fixedfacilities','unitfacilities','packages'])->get();
+        $halls = HallModel::where('admin_id', $admin->id)->with(['availability', 'fixedfacilities', 'unitfacilities', 'packages'])->get();
         //$period = $hall->availability;
 
         // reservation part
@@ -57,7 +57,7 @@ class AdminDashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->withQueryString();
-            
+
         return view('AdminDashboard', compact('halls', 'reservations', 'admin'));
     }
 
@@ -152,18 +152,14 @@ class AdminDashboardController extends Controller
             return redirect()->back()->with('success', 'Hall updated successfully!');
         }
     }*/
-    
+
     public function DeactivateHall(HallModel $hall)
     {
         // Verify ownership
-        if ($hall->admin_id !== Auth::guard('admin')->user()->id)
-        {
+        if ($hall->admin_id !== Auth::guard('admin')->user()->id) {
             return response()->json(['error' => 'Unauthorized action'], 403);
-        }
-        else
-        {
-            if($hall->available)
-            {
+        } else {
+            if ($hall->available) {
                 // Block deactivation if the hall has ongoing reservations
                 $hasOngoingReservation = $hall->reservations()
                     ->where('status', '!=', 5)
@@ -171,23 +167,17 @@ class AdminDashboardController extends Controller
                     ->whereDate('reservation_date', '>=', now()->toDateString())
                     ->exists();
 
-                if ($hasOngoingReservation)
-                {
+                if ($hasOngoingReservation) {
                     return back()->with('error', 'Cannot make this hall unavailable because it has ongoing reservations.');
                 }
 
-                try
-                {
+                try {
                     $hall->update(['available' => false]);
                     return back()->with('success', 'Hall is now unavailable!');
-                }
-                catch (\Exception $e)
-                {
+                } catch (\Exception $e) {
                     return back()->with('error', 'Failed to make hall unavailable!');
                 }
-            }
-            else
-            {
+            } else {
                 try {
                     $hall->update(['available' => true]);
                     return back()->with('success', 'Hall is now available!');
@@ -195,15 +185,14 @@ class AdminDashboardController extends Controller
                     return back()->with('error', 'Failed to make hall available!');
                 }
             }
-            
+
         }
     }
 
     public function checkOngoingReservations(HallModel $hall)
     {
         // Verify ownership
-        if ($hall->admin_id !== Auth::guard('admin')->user()->id)
-        {
+        if ($hall->admin_id !== Auth::guard('admin')->user()->id) {
             return response()->json(['error' => 'Unauthorized action'], 403);
         }
 
@@ -238,8 +227,7 @@ class AdminDashboardController extends Controller
         //dump($reservation);
 
         // Prevent processing if already accepted
-        if ($reservation->accepted == null)
-        {
+        if ($reservation->accepted == null) {
             // Get discount_custom from request, default to current value if not provided
             $discountCustom = $request->input('discount_custom', $reservation->discount_custom);
             // Get advanceAmount from request, default to current value if not provided
@@ -248,10 +236,10 @@ class AdminDashboardController extends Controller
             $advancePaymentDate = $request->input('advancePaymentDate', $reservation->advancePaymentDate);
             $cancellationExpiryDate = $request->input('cancellationExpiryDate', $reservation->cancellationExpiryDate);
             $rescheduledExpiryDate = $request->input('rescheduledExpiryDate', $reservation->rescheduledExpiryDate);
-            
+
             // Get customer to check type
             $customer = CustomerModel::find($reservation->customer_id);
-            
+
             // Update reservation status and discount_custom
             // NOTE: charge is NOT modified - original charge is kept in the database.
             // The discount is stored separately in discount_custom and deducted at display/calculation time.
@@ -265,7 +253,7 @@ class AdminDashboardController extends Controller
                 'cancellationExpiryDate' => $cancellationExpiryDate,
                 'rescheduledExpiryDate' => $rescheduledExpiryDate,
             ]);
-            
+
             // Get related hall
             $hall = HallModel::find($reservation->hall_id);
             $customer = CustomerModel::find($reservation->customer_id);
@@ -274,17 +262,13 @@ class AdminDashboardController extends Controller
             //send sms notifying reservation request was accepted.
             $message = 'Your reservation has been accepted by admin for ' . $hall->name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . '.' . PHP_EOL . 'Your reservation ID is : ' . $reservation->id;
             $recipients = ($customer->telephone_number);
-            $smsService = new SmsServiceController($message,$recipients);
+            $smsService = new SmsServiceController($message, $recipients);
             $smsService->sendSms();
-            return back()->with('success', 'Reservation accepted! Email sent to customer.');
+            return back()->with('success', 'Reservation accepted!');
             //return back()->withErrors(['Test error message']);
-        }
-        elseif ($reservation->accepted)
-        {
+        } elseif ($reservation->accepted) {
             return back()->with('error', 'Reservation already accepted!');
-        }
-        else
-        {
+        } else {
             return back()->with('error', 'Reservation already rejected!');
         }
     }
@@ -292,8 +276,7 @@ class AdminDashboardController extends Controller
     public function reject_reservation_request(ReservationModel $reservation)
     {
         // Prevent processing if already rejected
-        if ($reservation->accepted == null)
-        {
+        if ($reservation->accepted == null) {
             $reservation->update(['accepted' => false, 'reserved' => null]);
             // Get related hall
             $hall = HallModel::find($reservation->hall_id);
@@ -302,39 +285,32 @@ class AdminDashboardController extends Controller
             $customer->notify(new ReservationRejectedEmail($reservation));
             // Delete the unavailability record associated with this reservation
             HallUnAvailability::where('hall_id', $reservation->hall_id)
-            ->where('date', $reservation->reservation_date)
-            ->where('start_time', $reservation->start_time)
-            ->where('end_time', $reservation->end_time)
-            ->delete();
+                ->where('date', $reservation->reservation_date)
+                ->where('start_time', $reservation->start_time)
+                ->where('end_time', $reservation->end_time)
+                ->delete();
             // send sms notifying reservation request was rejected.
-            $message = 'We regret to inform you that your reservation request ('.$hall->name.' on '.$reservation->reservation_date.' from '.$reservation->start_time.' to '.$reservation->end_time.' ) could not be approved due to unavoidable circumstances. Your reservation ID is : ' . $reservation->id;
+            $message = 'We regret to inform you that your reservation request (' . $hall->name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . ' ) could not be approved due to unavoidable circumstances. Your reservation ID is : ' . $reservation->id;
             $recipients = ($customer->telephone_number);
-            $smsService = new SmsServiceController($message,$recipients);
+            $smsService = new SmsServiceController($message, $recipients);
             $smsService->sendSms();
-            return back()->with('success', 'Reservation rejected! Time slot freed and email sent to customer.');            
-        }
-        elseif($reservation->accepted)
-        {
+            return back()->with('success', 'Reservation rejected!');
+        } elseif ($reservation->accepted) {
             return back()->with('error', 'Reservation already accepted!');
-        }
-        else
-        {
+        } else {
             return back()->with('error', 'Reservation already rejected!');
         }
-        
+
     }
 
     public function viewSlip(ReservationModel $reservation)
     {
         // Verify admin owns this hall
-        if(auth('admin')->id() !== $reservation->hall->admin_id)
-        {
+        if (auth('admin')->id() !== $reservation->hall->admin_id) {
             abort(403, 'Unauthorized action');
-        }
-        else
-        {
+        } else {
             return view('admin-view-slip', compact('reservation'));
-        }        
+        }
     }
 
 
