@@ -875,74 +875,6 @@
                 grid-template-columns: 1fr;
             }
         }
-
-        /* Success Alert Overlay */
-        .alert-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
-
-        .alert-box {
-            background: white;
-            padding: 2.5rem;
-            border-radius: var(--radius);
-            text-align: center;
-            box-shadow: var(--shadow-lg);
-            max-width: 400px;
-            animation: alertSlideIn 0.3s ease;
-        }
-
-        @keyframes alertSlideIn {
-            from {
-                transform: translateY(-50px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .alert-icon {
-            font-size: 4rem;
-            color: var(--success);
-            margin-bottom: 1rem;
-        }
-
-        .alert-box h3 {
-            color: var(--dark);
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-
-        .alert-box p {
-            color: var(--gray);
-            margin-bottom: 1.5rem;
-        }
-
-        .alert-close-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 0.6rem 2rem;
-            border-radius: var(--radius-xs);
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .alert-close-btn:hover {
-            background: var(--primary-dark);
-        }
     </style>
 </head>
 
@@ -995,21 +927,15 @@
         </div>
     </div>
 
-    <!-- Success Alert Modal -->
-    @if(session('success'))
-        <div id="successAlert" class="alert-overlay" style="display: none;">
-            <div class="alert-box">
-                <div class="alert-icon">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-                <h3>Reservation Request Submitted.</h3>
-                <button class="alert-close-btn" onclick="closeSuccessAlert()">OK</button>
-            </div>
-        </div>
-    @endif
-
     <!-- Content Area -->
     <div class="content-area">
+
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
         <div class="stats-container">
             <div class="stat-card">
                 <div class="stat-icon total"><i class="fas fa-calendar"></i></div>
@@ -1960,17 +1886,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        function closeSuccessAlert() {
-            document.getElementById('successAlert').style.display = 'none';
-        }
-
-        // Auto-show alert on page load if success session exists
-        @if(session('success'))
-            document.addEventListener('DOMContentLoaded', function () {
-                document.getElementById('successAlert').style.display = 'flex';
-            });
-        @endif
-
         function setupCancellationPayment(reservationId, cancellationFee, cancellationExpiryDate, currentStatus, cancelUrl) {
             // Check cancellation expiry date
             if (cancellationExpiryDate) {
