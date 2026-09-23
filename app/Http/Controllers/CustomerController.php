@@ -482,7 +482,6 @@ class CustomerController extends Controller
         $cancelled = (clone $baseQuery)->where('status', 5)->count();
         $rejected = (clone $baseQuery)->where('status', 6)->count();
         $rescheduled = (clone $baseQuery)->where('status', 7)->count();
-        $userCancelled = (clone $baseQuery)->where('status', 8)->count();
 
         return view('CustomerDashboardPage', compact(
             'customer',
@@ -494,8 +493,7 @@ class CustomerController extends Controller
             'reserved',
             'cancelled',
             'rejected',
-            'rescheduled',
-            'userCancelled'
+            'rescheduled'
         ));
     }
 

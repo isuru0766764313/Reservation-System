@@ -199,11 +199,6 @@
             color: #000;
         }
 
-        .stat-icon.user-cancelled {
-            background: #212529;
-            color: #fff;
-        }
-
         .stat-content {
             flex: 1;
         }
@@ -1070,13 +1065,6 @@
                 <div class="stat-content">
                     <div class="stat-number">{{ $rescheduled }}</div>
                     <div class="stat-label">Rescheduled</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon user-cancelled"><i class="fas fa-user-times"></i></div>
-                <div class="stat-content">
-                    <div class="stat-number">{{ $userCancelled }}</div>
-                    <div class="stat-label">User-cancelled</div>
                 </div>
             </div>
         </div>
