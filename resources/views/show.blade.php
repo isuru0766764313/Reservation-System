@@ -419,16 +419,16 @@
     </nav>
     <div class="container py-4">
         <!-- Success Alert Modal -->
-        @if(session('success'))
+        @if(session('reservation_success'))
             <div id="successAlert" class="alert-overlay" style="display: none;">
                 <div class="alert-box">
                     <div class="alert-icon">
                         <i class="fas fa-check-circle"></i>
                     </div>
                     <h3>Reservation Request Submitted</h3>
-                        <button class="alert-close-btn" onclick="closeSuccessAlert()">OK</button>
-                    </div>
+                    <button class="alert-close-btn" onclick="closeSuccessAlert()">OK</button>
                 </div>
+            </div>
         @endif
 
         <!-- Image Slider Section -->
@@ -901,7 +901,8 @@
                                                 </div>
                                                 <div class="card-footer text-center">
                                                     <h3 class="card-subtitle mb-1">Rs.
-                                                        {{ number_format($package->price, 2) }}</h3>
+                                                        {{ number_format($package->price, 2) }}
+                                                    </h3>
                                                     @if ($package->discount > 0)
                                                         <small class="text-muted">Discount: Rs.
                                                             {{ number_format($package->discount, 2) }}</small>
@@ -1336,13 +1337,13 @@
                 //const agreeTerms = document.getElementById('agreeTermsRegular').checked;
 
                 /* Check if terms are agreed
-                if (!agreeTerms)
-                {
-                    statusElement.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i> You must agree to the terms and conditions';
-                    statusElement.className = 'alert alert-danger';
-                    submitButton.disabled = true;
-                    return false;
-                }*/
+               if (!agreeTerms)
+               {
+                   statusElement.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i> You must agree to the terms and conditions';
+                   statusElement.className = 'alert alert-danger';
+                   submitButton.disabled = true;
+                   return false;
+               }*/
 
                 // Step 1: Check if time slot was selected first
                 if (!selectedRegularTimeSlot) {
@@ -2190,8 +2191,8 @@
             document.getElementById('successAlert').style.display = 'none';
         }
 
-        // Auto-show alert on page load if success session exists
-        @if(session('success'))
+        // Auto-show alert on page load if reservation success session exists
+        @if(session('reservation_success'))
             document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('successAlert').style.display = 'flex';
             });

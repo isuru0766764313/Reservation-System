@@ -176,7 +176,7 @@ class ReservationController extends Controller
         $smsService = new SmsServiceController($message, $recipients);
         $smsService->sendSms();
 
-        return redirect()->back()->with('success', 'Regular reservation request sent successfully!');
+        return redirect()->back()->with('reservation_success', 'Regular reservation request sent successfully!');
     }
 
 
@@ -292,7 +292,7 @@ class ReservationController extends Controller
         $smsService = new SmsServiceController($message, $recipients);
         $smsService->sendSms();
 
-        return redirect()->back()->with('success', 'Package reservation request sent successfully!');
+        return redirect()->back()->with('reservation_success', 'Package reservation request sent successfully!');
     }
 
     private function generateRefCode(): string
