@@ -7,6 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Notifications\Messages\MailMessage;
+use App\Models\HallModel;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -32,10 +33,15 @@ class AppServiceProvider extends ServiceProvider
          * I could acess this value by its key name from test blade
          * */
 
-        View::share("date",Date::now()->format("Y-m-d"));
+        View::share("date", Date::now()->format("Y-m-d"));
 
-        VerifyEmail::toMailUsing(function (object $notifiable, string $url) 
-        {
+        // Always provide available halls to the home view so the hall cards
+        // render consistently regardless of which route returns the home view.
+        View::composer('home', function ($view) {
+            $view->with('halls', HallModel::where('available', true)->get());
+        });
+
+        VerifyEmail::toMailUsing(function (object $notifiable, string $url) {
             return (new MailMessage)
                 ->subject('Public Hall Resevation System - Verify Email Address')
                 ->line('Please click the button below to verify your email address.')

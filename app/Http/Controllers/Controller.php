@@ -8,7 +8,6 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Contracts\Encryption\DecryptException;
-use App\Models\HallModel;
 
 class Controller extends BaseController
 {
@@ -36,11 +35,10 @@ class Controller extends BaseController
 
 
 
-    function ShowHomePage(HallModel $hall)
+    function ShowHomePage()
     {
-        // Get only available halls with their data
-        $halls = HallModel::where('available', true)->get();
-        // Pass the halls data to the view
-        return view('home', ['halls' => $halls]);
+        // Available halls are shared with the home view via a view composer
+        // in AppServiceProvider.
+        return view('home');
     }
 }
