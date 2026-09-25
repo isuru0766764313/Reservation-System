@@ -1762,7 +1762,7 @@
                                                     @endphp
                                                     <dt class="col-sm-4">Total Paid:</dt>
                                                     <dd class="col-sm-8">Rs. {{ number_format($totalPaidDisplay, 2) }}</dd>
-                                                    @if(!in_array($reservation->status, [5, 6, 7]))
+                                                    @if(!in_array($reservation->status, [5, 6, 7]) && max(0, (($reservation->charge - $reservation->discount_custom) + $reservation->deposit) - $totalPaid) > 0)
                                                         <dt class="col-sm-4">Balance Amount:</dt>
                                                         <dd class="col-sm-8">Rs. {{ number_format(max(0, (($reservation->charge - $reservation->discount_custom) + $reservation->deposit) - $totalPaid), 2) }}</dd>
                                                     @endif
