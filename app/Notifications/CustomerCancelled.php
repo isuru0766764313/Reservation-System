@@ -58,6 +58,7 @@ class CustomerCancelled extends Notification
             $actualPaid = $reservation->payments->where('payment_alias', '!=', 'Cancellation')->sum('amount'); // total sum wihtout cancellation record
             $paybackAmount = max(0, $actualPaid - $cancellationFee); // cancellation fee should be subtracted.
         } else {
+            $cancellationFee = 0;
             $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
             $actualPaid = $reservation->payments->sum('amount');
             $paybackAmount = $actualPaid;
@@ -78,7 +79,7 @@ class CustomerCancelled extends Notification
             ->line('Customer Name: **' . $reservation->customer_name . '**')
             ->line('Customer Email: **' . $reservation->customer_email . '**')
             ->line('Customer Telephone: **' . $reservation->customer_tel . '**')
-            ->line('Customer Type: **' . ucfirst($reservation->customer->type ?? 'N/A') . '**')            
+            ->line('Customer Type: **' . ucfirst($reservation->customer->type ?? 'N/A') . '**')
             ->line('Reservation Type: **' . ucfirst($reservation->reservation_type) . '**');
 
         if ($reservation->reservation_type === 'package' && $reservation->package) {
@@ -102,8 +103,9 @@ class CustomerCancelled extends Notification
             ->line('Final Charge: **Rs. ' . number_format((($reservation->charge) - ($reservation->discount_custom ?? 0)), 2) . '**');
         if ($reservation->deposit > 0) {
             $mail
-            ->line('Refundable Deposit: **Rs. ' . number_format($reservation->deposit, 2) . '**')
-            ->line('Advance Payment: **Rs. ' . number_format($reservation->advanceAmount, 2));
+                ->line('Refundable Deposit: **Rs. ' . number_format($reservation->deposit, 2) . '**')
+                ->line('Advance Payment: **Rs. ' . number_format($reservation->advanceAmount, 2) . '**')
+                ->line('Deducted Cancellation Fee: **Rs. ' . number_format($cancellationFee ?? 0, 2) . '**');
         }
         $mail
             ->line('---')
