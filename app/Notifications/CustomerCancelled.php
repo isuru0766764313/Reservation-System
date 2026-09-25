@@ -109,7 +109,7 @@ class CustomerCancelled extends Notification
         }
         $mail
             ->line('---')
-            ->line('Total amount paid so far: **Rs. ' . number_format($paybackAmount, 2) . '**' . ' should be refunded as soon as possible.')
+            ->line('Total amount paid so far: **Rs. ' . number_format($paybackAmount, 2) . '**' . ', should be refunded as soon as possible.')
             ->line('---')
             ->salutation("Best regards,\nPublic Facilities Reservation System.");
         return $mail;
