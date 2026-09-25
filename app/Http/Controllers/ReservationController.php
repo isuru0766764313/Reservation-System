@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Ramsey\Uuid\Type\Decimal;
 use App\Notifications\ReservationRejectedEmail;
+use App\Notifications\CustomerCancelled;
 use App\Models\CustomerModel;
 
 class ReservationController extends Controller
@@ -740,6 +741,9 @@ class ReservationController extends Controller
                     ->where('start_time', $actualStartTime)
                     ->where('end_time', $actualEndTime)
                     ->delete();
+
+                $admin = AdminModel::find($reservation->hall->admin_id);
+                $admin->notify(new CustomerCancelled($reservation));
 
                 if (request()->ajax() || request()->expectsJson()) {
                     return response()->json(['success' => true, 'message' => 'Reservation cancelled successfully!']);
