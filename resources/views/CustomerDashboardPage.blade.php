@@ -1933,7 +1933,7 @@
                                                 value="{{ $totalPaid >= $preliminaryPayment ? number_format($remainingAmount, 2) : number_format($preliminaryPayment, 2) }}">
 
                                             <div class="d-grid mt-3">
-                                                <button type="submit" class="btn btn-success btn-lg" id="paySubmitBtn-{{ $reservation->id }}" @if(in_array($reservation->status, [1, 4, 5]) || $hasPendingPayment) disabled @endif>
+                                                <button type="submit" class="btn btn-primary btn-lg" id="paySubmitBtn-{{ $reservation->id }}" @if(in_array($reservation->status, [1, 4, 5]) || $hasPendingPayment) disabled @endif>
                                                     <i class="fas fa-file-upload me-2"></i>
                                                     Submit Payment Slip
                                                 </button>
