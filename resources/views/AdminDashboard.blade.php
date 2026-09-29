@@ -1177,7 +1177,7 @@
                 @else
                   <div class="alert alert-warning mb-0">
                     <i class="fas fa-exclamation-circle me-2"></i>
-                    No payment is done yet for this reservation. May be it is pending or rejected.
+                    Reservation has been already  accepted. Awaiting Advance payment Slip.
                   </div>
                 @endif
               </div>
