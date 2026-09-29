@@ -1912,7 +1912,7 @@
                                                     </span>
 
                                                     <span class="receipt-upload-subtitle">
-                                                        PDF, JPG, JPEG, or PNG
+                                                        JPG, JPEG, or PNG
                                                     </span>
 
                                                     <span class="receipt-file-name"
