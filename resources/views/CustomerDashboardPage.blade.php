@@ -1884,7 +1884,7 @@
                                     </div>
                                     <div class="payment-upload modern-upload-card pt-3 mt-3 border-top">
                                         <h4 class="mb-3">
-                                            <i class="fas fa-receipt me-2"></i>Upload Payment Receipt
+                                            <i class="fas fa-receipt me-2"></i>Upload Payment Slip
                                         </h4>
 
                                         <form action="{{ route('payment.submit', $reservation->id) }}" method="POST"
@@ -1935,7 +1935,7 @@
                                             <div class="d-grid mt-3">
                                                 <button type="submit" class="btn btn-success btn-lg" id="paySubmitBtn-{{ $reservation->id }}" @if(in_array($reservation->status, [1, 4, 5]) || $hasPendingPayment) disabled @endif>
                                                     <i class="fas fa-paper-plane me-2"></i>
-                                                    Submit Payment Receipt
+                                                    Submit Payment Slip
                                                 </button>
                                             </div>
                                             <!--<div class="d-grid">
