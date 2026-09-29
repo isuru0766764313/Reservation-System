@@ -875,6 +875,82 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* ===== Modern Payment Receipt Upload ===== */
+        .modern-upload-card {
+            background: #ffffff;
+            border-radius: 16px;
+        }
+
+        .receipt-upload-zone {
+            position: relative;
+            border: 2px dashed #b8c2d1;
+            border-radius: 14px;
+            background: #f8fafc;
+            transition: all 0.25s ease;
+        }
+
+        .receipt-upload-zone:hover,
+        .receipt-upload-zone.drag-active {
+            border-color: #198754;
+            background: #f0fff7;
+        }
+
+        .receipt-file-input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .receipt-upload-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 190px;
+            padding: 28px 20px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .receipt-upload-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 58px;
+            height: 58px;
+            margin-bottom: 14px;
+            border-radius: 50%;
+            background: #dff6e9;
+            color: #198754;
+            font-size: 25px;
+        }
+
+        .receipt-upload-title {
+            color: #1f2937;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .receipt-upload-subtitle {
+            margin-top: 6px;
+            color: #6b7280;
+            font-size: 0.85rem;
+        }
+
+        .receipt-file-name {
+            display: block;
+            max-width: 100%;
+            margin-top: 12px;
+            overflow: hidden;
+            color: #198754;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
     </style>
 </head>
 
@@ -1806,24 +1882,60 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="payment-upload pt-3 mt-3 border-top">
+                                    <div class="payment-upload modern-upload-card pt-3 mt-3 border-top">
+                                        <h4 class="mb-3">
+                                            <i class="fas fa-receipt me-2"></i>Upload Payment Receipt
+                                        </h4>
+
                                         <form action="{{ route('payment.submit', $reservation->id) }}" method="POST"
                                             enctype="multipart/form-data">
                                             @csrf
-                                            <div class="mb-3">
-                                                <label for="receipt" class="form-label">Upload Bank Receipt (PDF or Image)</label>
-                                                <input type="file" class="form-control" id="receipt" name="receipt"
-                                                    accept=".pdf,.jpg,.jpeg,.png" required>
-                                                <div class="form-text">Max file size: 5MB</div>
+
+                                            <div class="receipt-upload-zone"
+                                                 id="receiptUploadZone-{{ $reservation->id }}">
+
+                                                <input type="file"
+                                                       class="receipt-file-input"
+                                                       id="receipt-{{ $reservation->id }}"
+                                                       name="receipt"
+                                                       accept=".pdf,.jpg,.jpeg,.png"
+                                                       required>
+
+                                                <label for="receipt-{{ $reservation->id }}"
+                                                       class="receipt-upload-label">
+                                                    <span class="receipt-upload-icon">
+                                                        <i class="fas fa-cloud-upload-alt"></i>
+                                                    </span>
+
+                                                    <span class="receipt-upload-title">
+                                                        Click to upload or drag and drop
+                                                    </span>
+
+                                                    <span class="receipt-upload-subtitle">
+                                                        PDF, JPG, JPEG, or PNG
+                                                    </span>
+
+                                                    <span class="receipt-file-name"
+                                                          id="receiptFileName-{{ $reservation->id }}">
+                                                        No file selected
+                                                    </span>
+                                                </label>
                                             </div>
+
+                                            <div class="form-text mt-2">
+                                                Maximum file size: 5MB
+                                            </div>
+
                                             {{-- Payment type inputs (values set by JS for cancellation, Blade for regular) --}}
                                             <input type="hidden" name="payment_alias" id="paymentAlias-{{ $reservation->id }}"
                                                 value="{{ $totalPaid >= $preliminaryPayment ? 'Remainings' : 'Preliminary' }}">
                                             <input type="hidden" name="amount" id="paymentAmount-{{ $reservation->id }}"
                                                 value="{{ $totalPaid >= $preliminaryPayment ? number_format($remainingAmount, 2) : number_format($preliminaryPayment, 2) }}">
-                                            <div class="d-grid">
+
+                                            <div class="d-grid mt-3">
                                                 <button type="submit" class="btn btn-success btn-lg" id="paySubmitBtn-{{ $reservation->id }}" @if(in_array($reservation->status, [1, 4, 5]) || $hasPendingPayment) disabled @endif>
-                                                    Submit Payment Slip
+                                                    <i class="fas fa-paper-plane me-2"></i>
+                                                    Submit Payment Receipt
                                                 </button>
                                             </div>
                                             <!--<div class="d-grid">
@@ -2307,6 +2419,60 @@
                     .then(response => response.json())
                     .then(data => { if (data.success) { alert('Reservation rescheduled successfully!'); location.reload(); } else throw new Error(data.message || 'Error rescheduling'); })
                     .catch(error => { alert(error.message); submitBtn.disabled = false; submitBtn.innerHTML = originalBtnHtml; });
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.receipt-file-input').forEach(function (input) {
+                const reservationId = input.id.replace('receipt-', '');
+                const uploadZone = document.getElementById(
+                    'receiptUploadZone-' + reservationId
+                );
+                const fileName = document.getElementById(
+                    'receiptFileName-' + reservationId
+                );
+
+                if (!uploadZone || !fileName) {
+                    return;
+                }
+
+                function updateFileName(file) {
+                    if (file) {
+                        fileName.textContent = file.name;
+                        uploadZone.classList.add('drag-active');
+                    } else {
+                        fileName.textContent = 'No file selected';
+                        uploadZone.classList.remove('drag-active');
+                    }
+                }
+
+                input.addEventListener('change', function () {
+                    updateFileName(this.files[0]);
+                });
+
+                ['dragenter', 'dragover'].forEach(function (eventName) {
+                    uploadZone.addEventListener(eventName, function (event) {
+                        event.preventDefault();
+                        uploadZone.classList.add('drag-active');
+                    });
+                });
+
+                ['dragleave', 'drop'].forEach(function (eventName) {
+                    uploadZone.addEventListener(eventName, function (event) {
+                        event.preventDefault();
+
+                        if (eventName === 'drop' && event.dataTransfer.files.length) {
+                            input.files = event.dataTransfer.files;
+                            updateFileName(input.files[0]);
+                        }
+
+                        if (eventName === 'dragleave') {
+                            uploadZone.classList.remove('drag-active');
+                        }
+                    });
+                });
             });
         });
     </script>
