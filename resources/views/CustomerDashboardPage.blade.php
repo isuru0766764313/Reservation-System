@@ -892,8 +892,8 @@
 
         .receipt-upload-zone:hover,
         .receipt-upload-zone.drag-active {
-            border-color: #198754;
-            background: #f0fff7;
+            border-color: var(--primary);
+            background: var(--primary-light);
         }
 
         .receipt-file-input {
@@ -923,8 +923,8 @@
             height: 58px;
             margin-bottom: 14px;
             border-radius: 50%;
-            background: #dff6e9;
-            color: #198754;
+            background: var(--primary-light);
+            color: var(--primary);
             font-size: 25px;
         }
 
@@ -945,7 +945,7 @@
             max-width: 100%;
             margin-top: 12px;
             overflow: hidden;
-            color: #198754;
+            color: var(--primary);
             font-size: 0.85rem;
             font-weight: 600;
             text-overflow: ellipsis;
