@@ -1850,7 +1850,7 @@
                                     @if($showPaymentSection)
                                     <div class="mb-4">
                                         <h4 class="mb-3"><i class="fas fa-university me-2"></i>Bank Transfer Details</h4>
-                                        <div class="alert alert-info">                                            
+                                        <div class="alert alert-purple">
                                                 @if($reservation->status == 1)
                                                     <p class="mb-3 text-dark" style="font-size: 1.1rem;">Wait for admin acept the reservation. Once Done You could proceed.</p>
                                                 @elseif($reservation->status == 2)
