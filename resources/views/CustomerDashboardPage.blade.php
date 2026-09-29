@@ -1934,7 +1934,7 @@
 
                                             <div class="d-grid mt-3">
                                                 <button type="submit" class="btn btn-success btn-lg" id="paySubmitBtn-{{ $reservation->id }}" @if(in_array($reservation->status, [1, 4, 5]) || $hasPendingPayment) disabled @endif>
-                                                    <i class="fas fa-paper-plane me-2"></i>
+                                                    <i class="fas fa-file-upload me-2"></i>
                                                     Submit Payment Slip
                                                 </button>
                                             </div>
