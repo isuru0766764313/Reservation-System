@@ -30,9 +30,12 @@ class Authenticate extends Middleware
             // For customer guard
             elseif ($request->is('customer/*'))
             {
+                // Flag the home page so it can auto-slide-in the sign-in panel
+                $request->session()->put('auth_redirected', true);
                 return route('login_get_route');
             }
             // Fallback to customer login
+            $request->session()->put('auth_redirected', true);
             return route('login_get_route');
         }
         else
