@@ -182,6 +182,9 @@
         window.hallData = @json(isset($halls) ? $halls : []);
         window.hasLoginError = @json(session()->has('error_key_2'));
         window.hasAdminLoginError = @json(session()->has('admin_error_key_2'));
+        // Set when an unauthenticated visitor tried to open a hall page and was
+        // bounced back here by the auth middleware -> auto-slide-in the sign-in panel
+        window.authRedirected = @json($auth_redirected ?? session('auth_redirected', false));
         console.log('Hall Data Loaded:', window.hallData);
     </script>
 
@@ -286,6 +289,15 @@
             <div id="customer-login-form" class="form-container space-y-6">
                 <h2 class="text-3xl font-bold text-center text-gray-800">Customer Log In</h2>
                 <p class="text-center text-gray-600">Please sign in to make a reservation.</p>
+                <!-- Contextual hint shown when the visitor was redirected here after clicking a hall -->
+                <div id="auth-redirect-hint" class="hidden bg-indigo-50 border border-indigo-200 text-indigo-700 px-4 py-3 rounded-lg relative" role="alert">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-indigo-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </span>
+                    <p class="pl-8 text-sm font-medium">Please sign in to view the hall details you requested. We'll take you right back after you sign in.</p>
+                </div>
                 @if ($errors->any())
                     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
                         <ul class="list-disc list-inside">
@@ -302,10 +314,11 @@
                 @endif
                 <form action="{{route('login_post_route')}}" method="post" class="space-y-4">
                     @csrf
-                    <input type="email" name="email" placeholder="Email Address"
+                    <input type="email" name="email" id="customer-login-email" placeholder="Email Address"
                         class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$"
-                        title="Valid email format required (e.g. user@example.com)" maxlength="255" required>
+                        title="Valid email format required (e.g. user@example.com)" maxlength="255" required
+                        value="{{ old('email', '') }}">
                     <div class="relative">
                         <input type="password" name="password" id="customer-login-password" placeholder="Password"
                             class="w-full p-3 pr-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -717,6 +730,33 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Auto-slide-in the customer sign-in panel when the visitor was bounced
+            // back here after clicking a hall while not signed in
+            if (window.authRedirected) {
+                const customerAuthContainer = document.getElementById('customer-auth-container');
+                const adminAuthContainer = document.getElementById('admin-auth-container');
+                const customerLoginForm = document.getElementById('customer-login-form');
+                const customerSignupForm = document.getElementById('customer-signup-form');
+                if (customerAuthContainer && adminAuthContainer && customerLoginForm && customerSignupForm) {
+                    adminAuthContainer.classList.remove('active');
+                    customerSignupForm.classList.add('hidden');
+                    customerLoginForm.classList.remove('hidden');
+                    customerAuthContainer.classList.add('active');
+
+                    // Show a contextual hint inside the panel
+                    const hint = document.getElementById('auth-redirect-hint');
+                    if (hint) {
+                        hint.classList.remove('hidden');
+                    }
+
+                    // Pre-fill the email the user typed previously, if any
+                    const emailInput = document.getElementById('customer-login-email');
+                    if (emailInput && !emailInput.value) {
+                        emailInput.value = @json(old('email', ''));
+                    }
+                }
+            }
+
             // Auto-open customer login card if there's a login error from redirect-back
             if (window.hasLoginError) {
                 const customerAuthContainer = document.getElementById('customer-auth-container');

@@ -169,7 +169,11 @@ class CustomerController extends Controller
 
     function ShowLoginPage()
     {
-        return view('home');
+        // Read the auth-redirect flag now and remove it from the session so the
+        // sign-in panel auto-slides in exactly once, on this page render only.
+        $authRedirected = session()->pull('auth_redirected', false);
+
+        return view('home')->with('auth_redirected', $authRedirected);
     }
 
     function Login(Request $request)
