@@ -456,6 +456,11 @@ class CustomerController extends Controller
             });
         }
 
+        // Filter reservations by status when a stat card is clicked.
+        if ($request->filled('status') && in_array((int) $request->input('status'), [1, 2, 3, 4, 5, 6, 7], true)) {
+            $reservationQuery->where('status', (int) $request->input('status'));
+        }
+
         $reservations = $reservationQuery
             ->orderBy('created_at', 'desc')
             ->paginate(10)

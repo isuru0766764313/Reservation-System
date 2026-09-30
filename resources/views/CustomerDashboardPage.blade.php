@@ -142,11 +142,19 @@
             gap: 16px;
             transition: var(--transition);
             border: 1px solid #e2e8f0;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
         }
 
         .stat-card:hover {
             transform: translateY(-3px);
             box-shadow: var(--shadow-lg);
+        }
+
+        .stat-card.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
         }
 
         .stat-icon {
@@ -1012,63 +1020,75 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
+        @php
+            $activeStatus = (int) request('status', 0);
+            $searchParam = request('search');
+        @endphp
         <div class="stats-container">
-            <div class="stat-card">
+            <a href="{{ route('load_customer_dashboard', array_filter(['search' => $searchParam])) }}"
+                class="stat-card {{ !$activeStatus ? 'active' : '' }}">
                 <div class="stat-icon total"><i class="fas fa-calendar"></i></div>
                 <div class="stat-content">
                     <div class="stat-number">{{ $total }}</div>
                     <div class="stat-label">Total Reservations</div>
                 </div>
-            </div>
-            <div class="stat-card">
+            </a>
+            <a href="{{ route('load_customer_dashboard', array_filter(['status' => 1, 'search' => $searchParam])) }}"
+                class="stat-card {{ $activeStatus === 1 ? 'active' : '' }}">
                 <div class="stat-icon pending"><i class="fas fa-hourglass-half"></i></div>
                 <div class="stat-content">
                     <div class="stat-number">{{ $pending }}</div>
                     <div class="stat-label">Pending</div>
                 </div>
-            </div>
-            <div class="stat-card">
+            </a>
+            <a href="{{ route('load_customer_dashboard', array_filter(['status' => 2, 'search' => $searchParam])) }}"
+                class="stat-card {{ $activeStatus === 2 ? 'active' : '' }}">
                 <div class="stat-icon accepted"><i class="fas fa-check"></i></div>
                 <div class="stat-content">
                     <div class="stat-number">{{ $accepted }}</div>
                     <div class="stat-label">Accepted</div>
                 </div>
-            </div>
-            <div class="stat-card">
+            </a>
+            <a href="{{ route('load_customer_dashboard', array_filter(['status' => 3, 'search' => $searchParam])) }}"
+                class="stat-card {{ $activeStatus === 3 ? 'active' : '' }}">
                 <div class="stat-icon confirmed"><i class="fas fa-thumbs-up"></i></div>
                 <div class="stat-content">
                     <div class="stat-number">{{ $confirmed }}</div>
                     <div class="stat-label">Confirmed</div>
                 </div>
-            </div>
-            <div class="stat-card">
+            </a>
+            <a href="{{ route('load_customer_dashboard', array_filter(['status' => 4, 'search' => $searchParam])) }}"
+                class="stat-card {{ $activeStatus === 4 ? 'active' : '' }}">
                 <div class="stat-icon reserved"><i class="fas fa-check-circle"></i></div>
                 <div class="stat-content">
                     <div class="stat-number">{{ $reserved }}</div>
                     <div class="stat-label">Reserved</div>
                 </div>
-            </div>
-            <div class="stat-card">
+            </a>
+            <a href="{{ route('load_customer_dashboard', array_filter(['status' => 5, 'search' => $searchParam])) }}"
+                class="stat-card {{ $activeStatus === 5 ? 'active' : '' }}">
                 <div class="stat-icon cancelled"><i class="fas fa-times-circle"></i></div>
                 <div class="stat-content">
                     <div class="stat-number">{{ $cancelled }}</div>
                     <div class="stat-label">Cancelled</div>
                 </div>
-            </div>
-            <div class="stat-card">
+            </a>
+            <a href="{{ route('load_customer_dashboard', array_filter(['status' => 6, 'search' => $searchParam])) }}"
+                class="stat-card {{ $activeStatus === 6 ? 'active' : '' }}">
                 <div class="stat-icon rejected"><i class="fas fa-ban"></i></div>
                 <div class="stat-content">
                     <div class="stat-number">{{ $rejected }}</div>
                     <div class="stat-label">Rejected</div>
                 </div>
-            </div>
-            <div class="stat-card">
+            </a>
+            <a href="{{ route('load_customer_dashboard', array_filter(['status' => 7, 'search' => $searchParam])) }}"
+                class="stat-card {{ $activeStatus === 7 ? 'active' : '' }}">
                 <div class="stat-icon rescheduled"><i class="fas fa-calendar-alt"></i></div>
                 <div class="stat-content">
                     <div class="stat-number">{{ $rescheduled }}</div>
                     <div class="stat-label">Rescheduled</div>
                 </div>
-            </div>
+            </a>
         </div>
 
         <!-- Search bar to find reservation record easily -->
