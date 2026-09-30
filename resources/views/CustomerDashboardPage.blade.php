@@ -959,6 +959,69 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
+
+        /* ===== Desktop fixed layout: only the table body scrolls ===== */
+        @media (min-width: 768px) {
+            html,
+            body {
+                height: 100%;
+            }
+
+            body {
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+
+            .top-nav {
+                flex-shrink: 0;
+            }
+
+            .content-area {
+                flex: 1 1 auto;
+                min-height: 0;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+
+            .content-area > .alert,
+            .stats-container,
+            .content-area > form {
+                flex-shrink: 0;
+            }
+
+            .reservations-card {
+                flex: 1 1 auto;
+                min-height: 0;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+
+            .reservations-card .card-header {
+                flex-shrink: 0;
+            }
+
+            .table-responsive.reservations-table {
+                flex: 1 1 auto;
+                min-height: 0;
+                overflow: auto;
+            }
+
+            .reservations-table thead th {
+                position: sticky;
+                top: 0;
+                z-index: 5;
+            }
+
+            .pagination-wrap {
+                flex-shrink: 0;
+                padding: 0.75rem 1.25rem;
+                border-top: 1px solid #e2e8f0;
+                background: var(--white);
+            }
+        }
     </style>
 </head>
 
@@ -1252,9 +1315,10 @@
                                                         @endforeach
                                                     </tbody>
                                                 </table>
-                                                <div class="mt-4 d-flex justify-content-center">
-                                                {{ $reservations->links('pagination::bootstrap-4') }}
-                                            </div>
+                                        </div>
+
+                                        <div class="pagination-wrap d-none d-md-flex justify-content-center">
+                                            {{ $reservations->links('pagination::bootstrap-4') }}
                                         </div>
 
             <!-- Mobile Reservations -->
