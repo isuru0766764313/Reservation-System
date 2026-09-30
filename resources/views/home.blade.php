@@ -82,15 +82,21 @@
         }
 
         /* Mobile navigation menu styles */
+        /* NOTE: We animate with `transform` instead of the `right` property.
+           Position-property (right) transitions are unreliable on some Android
+           browsers/WebView engines (e.g. Huawei Y9 prime's browser): the class
+           gets added but the panel never slides in. transform is GPU-composited
+           and animates consistently across iOS Safari, Chrome and Android WebView. */
         #mobile-menu {
-            transition: right 0.3s ease-in-out;
-            right: -100%;
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out, visibility 0.3s;
+            visibility: hidden;
             z-index: 60;
-            visibility: visible;
         }
 
         #mobile-menu.open {
-            right: 0;
+            transform: translateX(0);
+            visibility: visible;
         }
 
         /* Mobile menu backdrop overlay */
