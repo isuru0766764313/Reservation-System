@@ -1133,8 +1133,8 @@
                     document.querySelectorAll('.view-details-btn').forEach(button => {
                         button.addEventListener('click', () => {
                             const hallId = button.getAttribute('data-hall-id');
-                            // Redirect to hall details page
-                            window.location.href = `customer/halls/${hallId}`;
+                            // Redirect to hall details page (absolute path from site root)
+                            window.location.href = `/customer/halls/${hallId}`;
                         });
                     });
                 } else {
@@ -1341,7 +1341,9 @@
                 document.querySelectorAll('.search-result-item').forEach(item => {
                     item.addEventListener('click', function () {
                         const hallId = this.getAttribute('data-hall-id');
-                        window.location.href = `customer/halls/${hallId}`;
+                        // Absolute path (leading slash) so it always resolves against
+                        // the site root, matching GET /customer/halls/{hall} -> show.blade.php
+                        window.location.href = `/customer/halls/${hallId}`;
                     });
                 });
             }
