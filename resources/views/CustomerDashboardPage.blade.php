@@ -625,6 +625,16 @@
             color: var(--primary);
         }
 
+        .mobile-payment-list {
+            font-size: 0.85rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .mobile-payment-list li {
+            margin-bottom: 0.25rem;
+        }
+
         /* ===== Mobile Action Buttons Wrapping ===== */
         .action-btn-group {
             display: flex;
@@ -1261,27 +1271,16 @@
             <div class="mobile-reservations">
                 @foreach($reservations as $reservation)
                     @php
-    $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
-    $preliminaryPayment = $reservation->advanceAmount;
-    $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
-                                        @endphp
-                                        <!-- Desktop table payment details -->
+                        // Same source of truth as the desktop table
+                        $Rbadge = \App\Http\Controllers\ReservationController::getCustomerStatusBadge($reservation);
+                        $cancelRecord = $reservation->payments->where('payment_alias', 'Cancellation')->first();
+                        $cancelAvail = empty($reservation->cancellationExpiryDate) || \Carbon\Carbon::parse($reservation->cancellationExpiryDate)->isFuture();
+                        $rescheduleAvail = empty($reservation->rescheduledExpiryDate) || \Carbon\Carbon::parse($reservation->rescheduledExpiryDate)->isFuture();
+                    @endphp
                     <div class="reservation-mobile-card">
                         <div class="reservation-mobile-header">
-                            <span class="reservation-mobile-id">ID : {{ $reservation->id }}</span>
-                            @if($reservation->accepted === null)
-                                <span class="badge badge-pending">Pending Request</span>
-                            @elseif(!$reservation->accepted)
-                                <span class="badge badge-closed">Reservation Cancelled</span>
-                            @else
-                                @if($reservation->reserved === null)
-                                    <span class="badge badge-confirmed">Payment to be verified</span>
-                                @elseif($reservation->reserved)
-                                    <span class="badge badge-confirmed">Reserved</span>
-                                @else
-                                    <span class="badge badge-closed">Payment Rejected</span>
-                                @endif
-                            @endif
+                            <span class="reservation-mobile-id">{{ $reservation->ref_code ?? $reservation->id }}</span>
+                            <span class="badge {{ $Rbadge['class'] }}">{{ $Rbadge['label'] }}</span>
                         </div>
                         <div class="reservation-mobile-content">
                             <div class="reservation-mobile-row"><span class="reservation-mobile-label">Property
@@ -1291,30 +1290,24 @@
                                     Date:</span><span
                                     class="reservation-mobile-value">{{ $reservation->reservation_date }}</span></div>
                             <div class="reservation-mobile-row"><span class="reservation-mobile-label">Call
-                                    Time:</span><span class="reservation-mobile-value">{{ $reservation->start_time }} -
-                                    {{ $reservation->end_time }}</span></div>
+                                    Time:</span><span class="reservation-mobile-value">{{ date('h.i A', strtotime($reservation->start_time)) }}
+                                    to {{ date('h.i A', strtotime($reservation->end_time)) }}</span></div>
                             <div class="reservation-mobile-row"><span class="reservation-mobile-label">Charge:</span><span
                                     class="reservation-mobile-charge">Rs.
                                     {{ number_format($reservation->charge, 2) }}</span></div>
                         </div>
                         <div class="reservation-mobile-actions">
-                            @if($reservation->logged && !in_array($reservation->status, [5, 6, 7]))
-                                @if($reservation->logged && (!$reservation->advancePaid || $preliminaryPayment > $totalPaid))
-                                    <button class="btn btn-success btn-sm btn-mobile-pay" data-bs-toggle="modal"
-                                        data-bs-target="#PayNowModel-{{ $reservation->id }}">
-                                        <i class="fas fa-credit-card me-1"></i>Pay Advance Rs.
-                                        {{ number_format($preliminaryPayment, 2) }}
+                            <button class="btn btn-primary btn-sm view-btn" data-bs-toggle="modal"
+                                data-bs-target="#PayNowModel-{{ $reservation->id }}"><i class="fas fa-eye me-1"></i>
+                                Payment Details</button>
+                            @if (in_array($Rbadge['status_id'], [3, 4]) && !$cancelRecord && ($cancelAvail || $rescheduleAvail))
+                                @if($cancelAvail)
+                                    <button type="button" class="btn btn-danger btn-sm" title="Cancel"
+                                        onclick="setupCancellationPayment('{{ $reservation->id }}', '{{ number_format($reservation->hall->cancellation_fee, 2) }}', '{{ $reservation->cancellationExpiryDate ?? '' }}', '{{ $reservation->status }}', '{{ route('customer.reservation.cancel', $reservation->id) }}')">
+                                        <i class="fas fa-times me-1"></i>Cancel
                                     </button>
-                                @elseif($reservation->logged && $reservation->advancePaid && $totalPaid < $reservation->charge)
-                                    <button class="btn btn-danger btn-sm btn-mobile-pay" data-bs-toggle="modal"
-                                        data-bs-target="#PayNowModel-{{ $reservation->id }}">
-                                        <i class="fas fa-credit-card me-1"></i>Pay Remaining Rs.
-                                        {{ number_format($remainingAmount, 2) }}
-                                    </button>
-                                @else
-                                    <span class="badge bg-success w-100 text-center py-2">Fully Paid</span>
                                 @endif
-                                @if ($reservation->user_cancelled && !$reservation->re_scheduled)
+                                @if($rescheduleAvail)
                                     <button type="button" class="btn btn-warning btn-sm reschedule-btn" title="Re-schedule"
                                         data-reservation-id="{{ $reservation->id }}" data-hall-id="{{ $reservation->hall_id }}"
                                         data-hall-name="{{ $reservation->hall_name }}"
@@ -1324,24 +1317,41 @@
                                         data-pre-arrange="{{ $reservation->pre_arrange_time }}"
                                         data-post-arrange="{{ $reservation->post_arrange_time }}"
                                         data-rescheduled-expiry="{{ $reservation->rescheduledExpiryDate ?? '' }}">
-                                        <i class="fas fa-calendar-alt"></i>
-                                    </button>
-                                @else
-                                    <button type="button" class="btn btn-warning btn-sm" title="Cancel"
-                                        onclick="setupCancellationPayment('{{ $reservation->id }}', '{{ number_format($reservation->hall->cancellation_fee, 2) }}', '{{ $reservation->cancellationExpiryDate ?? '' }}', '{{ $reservation->status }}', '{{ route('customer.reservation.cancel', $reservation->id) }}')">
-                                        <i class="fas fa-times"></i>
+                                        <i class="fas fa-calendar-alt me-1"></i>Re-schedule
                                     </button>
                                 @endif
-                            @elseif(in_array($reservation->status, [5, 6, 7]))
-                                <span class="badge bg-danger w-100 text-center py-2">{{ \App\Http\Controllers\ReservationController::getReservationStatusLabel($reservation->status) }}</span>
                             @endif
                             <button class="btn btn-view btn-custom" data-bs-toggle="modal"
                                 data-bs-target="#PropertyDetailsModel-{{ $reservation->id }}"><i class="fas fa-eye"></i>
-                                View Details</button>
-                            <button class="btn btn-view btn-custom" data-bs-toggle="modal"
-                                data-bs-target="#contactUsModel-{{ $reservation->id }}"><i class="fas fa-phone"></i>
-                                Contact</button>
+                                Property Details</button>
                         </div>
+                        @php
+                            $mPayments = $reservation->payments;
+                        @endphp
+                        @if($mPayments->count() > 0)
+                            <ul class="list-unstyled mb-0 mt-2 mobile-payment-list">
+                                @foreach($mPayments as $payment)
+                                    @php
+                                        $stageLabel = match ($payment->payment_alias)
+                                        {
+                                            'Preliminary' => 'Advance Payment',
+                                            'Remainings' => 'Balance Payment',
+                                            'Cancellation' => 'Cancellation Fee',
+                                            default => $payment->payment_alias,
+                                        };
+                                        $statusIcon = match ((int) $payment->status) {
+                                            2 => '<i class="fas fa-check-circle text-success"></i>',
+                                            3 => '<i class="fas fa-times-circle text-danger"></i>',
+                                            default => '<i class="fas fa-hourglass-half text-warning"></i>',
+                                        };
+                                    @endphp
+                                    <li class="d-flex align-items-center gap-2">
+                                        <span>{!! $statusIcon !!}</span>
+                                        <span class="text-muted">{{ $stageLabel }} : Rs. {{ number_format($payment->amount, 2) }}</span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @endif
                     </div>
                 @endforeach
                 <div class="mt-4 d-flex justify-content-center">
