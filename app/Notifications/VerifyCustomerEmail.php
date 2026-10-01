@@ -58,7 +58,7 @@ class VerifyCustomerEmail extends Notification implements ShouldQueue
             ->line('⏰ **This verification link will expire in 60 minutes.**')
             ->action('Verify Email Address', $url)
             ->line('If you did not create an account, no further action is required.')
-            ->salutation("Best regards,\nAdmin,\nPrime Minister's Office.");
+            ->salutation("Best regards,\nPublic Facilities Reservation System.");
     }
 
     /**
