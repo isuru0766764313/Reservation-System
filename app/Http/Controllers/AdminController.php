@@ -101,7 +101,6 @@ class AdminController extends Controller
                 'mobile_verified_at' => now(),
                 'email_verification_otp' => null,
                 'mobile_verification_otp' => null,
-                'verification_otp' => null,
                 'otp_expires_at' => null
             ]);
 
