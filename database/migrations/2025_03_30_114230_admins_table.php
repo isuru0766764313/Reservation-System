@@ -24,7 +24,10 @@ class AdminsTable extends Migration
             $table->string('account_name')->nullable();
             $table->string('account_number')->nullable();
             $table->timestamp('email_verified_at')->nullable();
+            $table->timestamp('mobile_verified_at')->nullable();
+            $table->string('email_verification_otp')->nullable();
             $table->string('verification_otp')->nullable();
+            $table->string('mobile_verification_otp')->nullable();
             $table->timestamp('otp_expires_at')->nullable();
             $table->rememberToken();
             $table->timestamps(); // created_at & updated_at timestamps
