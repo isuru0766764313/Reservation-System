@@ -51,7 +51,7 @@ class VerifyAdminEmail extends Notification implements ShouldQueue
         );
 
         return (new MailMessage)
-            ->subject('Verify Your Admin Email - Public Facilities Reservation Portal')
+            ->subject('Verify Your Admin Email - Public Facilities Reservation System')
             ->greeting('Dear Admin,')
             ->line('Welcome to the **Public Facilities Reservation Portal** (Prime Minister\'s Office).')
             ->line('Please click the button below to verify your email address and activate your admin account.')
