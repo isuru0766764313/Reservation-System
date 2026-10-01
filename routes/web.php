@@ -120,7 +120,13 @@ Route::prefix('admin')->group(function()
             return redirect()->route('admin.login.get.route');
         }
         $admin = AdminModel::find(session('verify_admin_id'));
-        return view('AdminVerifyEmail',['email' => session('email', $admin->email)]);})->name('admin.verification.notice');
+        return view('AdminVerifyEmail',
+            [
+                'email' => session('email', $admin->email),
+                // Fall back to the DB record so login-triggered redirects (which
+                // don't flash telephone_number) still show the mobile OTP section
+                'telephone_number' => session('telephone_number', $admin->telephone_number ?? '')
+            ]);})->name('admin.verification.notice');
     
     Route::post('/verify-otp', [AdminController::class, 'verifyOTP'])->name('admin.verification.verify');
     Route::post('/resend-otp', [AdminController::class, 'resendOTP'])->name('admin.verification.resend');

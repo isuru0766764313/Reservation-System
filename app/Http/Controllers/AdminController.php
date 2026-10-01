@@ -27,43 +27,62 @@ class AdminController extends Controller
     function Register(Request $request)
     {
         $request->validate(['company_name' => 'required|max:50', 'telephone_number' => 'required', 'email' => 'required|email|unique:admins_table', 'password' => 'required', 'confirm_password' => 'required']);
-        $otp = Str::random(6); // generate randome otp
+
+        $email_otp = Str::random(6); // generate randome otp for email
+        $mobile_otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);// generate randome otp for mobile
         // add row of data
         $data['company_name'] = $request->company_name;
         $data['telephone_number'] = $request->telephone_number;
         $data['email'] = $request->email;
         $data['password'] = Hash::make($request->password);// Hash::make for encryption
-        $data['verification_otp'] = $otp;
+        $data['email_verification_otp'] = $email_otp;
+        $data['mobile_verification_otp'] = $mobile_otp;
         $data['otp_expires_at'] = Carbon::now()->addMinutes(10);
 
         $admin = AdminModel::create($data); // add raw of data to table
 
-        // lets check creation of $customer is successfull or not
+        // lets check creation of $admin is successfull or not
         if (!$admin) {
-            //if  there is no $customer redirects to "home_route" with a error massage.
+            //if  there is no $admin redirects to "home_route" with a error massage.
             return redirect(route('admin.registration.get.route'))->with('error_key_1', 'Registration is failed. Pls try again');
         } else {
-            // send sms otp to customer at registration..
-            $message = 'Welcome to Public Facilities Reservation Portal.' . PHP_EOL . '"' . $otp . '" is your one-time entry otp code. Do not share with others.';
+            // send sms otp to admin at registration..
+            $message = 'Welcome to Public Facilities Reservation Portal.' . PHP_EOL . '"' . $mobile_otp . '" is your one-time entry otp code. Do not share with others.';
             $recipients = ($request->telephone_number);
             $smsService = new SmsServiceController($message, $recipients);
             $smsService->sendSms();
 
             // Send OTP via email
-            $admin->notify(new SendAdminOTP($data['verification_otp']));
+            $admin->notify(new SendAdminOTP($data['email_verification_otp']));
 
-            // Store customer ID in session for verification
+            // Store admin ID in session for verification
             $request->session()->put('verify_admin_id', $admin->id);
 
             // Redirect to verification notice route
-            return redirect()->route('admin.verification.notice')->with('email', $admin->email);
+            return redirect()->route('admin.verification.notice')
+                ->with([
+                    'email' => $admin->email,
+                    'telephone_number' => $admin->telephone_number
+                ]);
         }
     }
 
 
     public function verifyOTP(Request $request)
     {
-        $request->validate(['otp' => 'required|string|size:6']);
+        $request->validate([
+            'otp' => 'required|string|size:6',
+            'otp1' => 'required|digits:1',
+            'otp2' => 'required|digits:1',
+            'otp3' => 'required|digits:1',
+            'otp4' => 'required|digits:1',
+            'otp5' => 'required|digits:1',
+            'otp6' => 'required|digits:1',
+        ]);
+        // Get email otp to another variable
+        $email_otp = $request->otp;
+        // Concatenate mobile OTP parts
+        $mobile_otp = $request->otp1 . $request->otp2 . $request->otp3 . $request->otp4 . $request->otp5 . $request->otp6;
 
         $admin = AdminModel::find(session('verify_admin_id'));
 
@@ -75,10 +94,13 @@ class AdminController extends Controller
             return redirect()->route('admin.registration.get.route')->with('error', 'Session expired. Please register again.');
         }
 
-        if ($admin->verification_otp === $request->otp && Carbon::now()->lt($admin->otp_expires_at)) {
+        if ($admin->email_verification_otp === $email_otp && $admin->mobile_verification_otp === $mobile_otp && Carbon::now()->lt($admin->otp_expires_at)) {
 
             $admin->update([
                 'email_verified_at' => now(),
+                'mobile_verified_at' => now(),
+                'email_verification_otp' => null,
+                'mobile_verification_otp' => null,
                 'verification_otp' => null,
                 'otp_expires_at' => null
             ]);
@@ -102,21 +124,24 @@ class AdminController extends Controller
             return redirect()->route('admin.registration.get.route')->with('error', 'Session expired. Please register again.');
         }
 
-        $newOtp = Str::random(6);
+        $new_email_otp = Str::random(6); // generate randome otp for email
+        $new_mobile_otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);// generate randome otp for mobile
+
         $admin->update([
-            'verification_otp' => $newOtp,
+            'email_verification_otp' => $new_email_otp,
+            'mobile_verification_otp' => $new_mobile_otp,
             'otp_expires_at' => Carbon::now()->addMinutes(10)
         ]);
 
-        //  re-send sms otp to customer at registration..
-        $message = 'Welcome back to Public Facilities Reservation Portal. Please verify your account before sign in' . PHP_EOL . '"' . $newOtp . '" is your one-time entry code. Do not share with others.';
-        $recipients = ($request->telephone_number);
+        //  re-send sms otp to admin at registration..
+        $message = 'Welcome back to Public Facilities Reservation Portal. Please verify your account before sign in' . PHP_EOL . '"' . $new_mobile_otp . '" is your one-time entry code. Do not share with others.';
+        $recipients = ($admin->telephone_number);
         $smsService = new SmsServiceController($message, $recipients);
         $smsService->sendSms();
 
-        $admin->notify(new SendAdminOTP($newOtp));
+        $admin->notify(new SendAdminOTP($new_email_otp));
 
-        return back()->with('status', 'New OTP has been sent to your email!');
+        return back()->with('status', 'New OTP has been sent to your email and telephone number!');
     }
 
 
@@ -193,7 +218,11 @@ class AdminController extends Controller
                     $admin->notify(new SendAdminOTP($new_email_otp));
 
                     // Redirect to verification notice
-                    return redirect()->route('admin.verification.notice');
+                    return redirect()->route('admin.verification.notice')
+                        ->with([
+                            'email' => $admin->email,
+                            'telephone_number' => $admin->telephone_number
+                        ]);
                 } else {
                     return redirect()->intended(route('admin.dashboard.route'))
                         ->with('success', 'Login successful!');

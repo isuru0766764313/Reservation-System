@@ -28,7 +28,10 @@ class AdminModel extends Authenticatable
         'account_name',
         'account_number',
         'email_verified_at',
+        'mobile_verified_at',
         'verification_otp',
+        'email_verification_otp',
+        'mobile_verification_otp',
         'otp_expires_at',
     ];
 
