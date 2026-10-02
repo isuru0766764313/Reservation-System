@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Public Facilities Reservation System</title>
+    <title>Reservation System</title>
     <!-- Inter Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -189,6 +189,7 @@
         window.hasLoginError = @json(session()->has('error_key_2'));
         window.hasAdminLoginError = @json(session()->has('admin_error_key_2'));
         window.hasRegisterEmailError = @json(session()->has('registration_email_exists'));
+        window.hasAdminRegisterEmailError = @json(session()->has('admin_registration_email_exists'));
         // Set when an unauthenticated visitor tried to open a hall page and was
         // bounced back here by the auth middleware -> auto-slide-in the sign-in panel
         window.authRedirected = @json($auth_redirected ?? session('auth_redirected', false));
@@ -468,9 +469,14 @@
                         {{ session('admin_error_key_2') }}
                     </div>
                 @endif
+                @if (session('admin_registration_email_exists'))
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                        You are already registered. Please sign in.
+                    </div>
+                @endif
                 <form action="{{route('admin.login.post.route')}}" method="post" class="space-y-4">
                     @csrf
-                    <input type="email" name="email" placeholder="Email Address"
+                    <input type="email" name="email" placeholder="Email Address" value="{{ old('email', '') }}"
                         class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     <div class="relative">
                         <input type="password" name="password" id="admin-login-password" placeholder="Password"
@@ -907,6 +913,20 @@
 
             // Auto-open admin login card if there's an admin login error
             if (window.hasAdminLoginError) {
+                const adminAuthContainer = document.getElementById('admin-auth-container');
+                const customerAuthContainer = document.getElementById('customer-auth-container');
+                const adminLoginForm = document.getElementById('admin-login-form');
+                const adminSignupForm = document.getElementById('admin-signup-form');
+                if (adminAuthContainer && customerAuthContainer && adminLoginForm && adminSignupForm) {
+                    customerAuthContainer.classList.remove('active');
+                    adminAuthContainer.classList.add('active');
+                    adminSignupForm.classList.add('hidden');
+                    adminLoginForm.classList.remove('hidden');
+                }
+            }
+
+            // Auto-open admin sign-in card when the email is already registered
+            if (window.hasAdminRegisterEmailError) {
                 const adminAuthContainer = document.getElementById('admin-auth-container');
                 const customerAuthContainer = document.getElementById('customer-auth-container');
                 const adminLoginForm = document.getElementById('admin-login-form');

@@ -26,6 +26,15 @@ class AdminController extends Controller
 
     function Register(Request $request)
     {
+        // If this email is already registered, bounce the visitor to the sign-in
+        // panel with a friendly prompt instead of a generic validation redirect.
+        if ($request->filled('email') && AdminModel::where('email', $request->email)->exists()) {
+            return redirect()
+                ->route('home_route')
+                ->with('admin_registration_email_exists', true)
+                ->withInput($request->only('email'));
+        }
+
         $request->validate(['company_name' => 'required|max:50', 'telephone_number' => 'required', 'email' => 'required|email|unique:admins_table', 'password' => 'required', 'confirm_password' => 'required']);
 
         $email_otp = Str::random(6); // generate randome otp for email
