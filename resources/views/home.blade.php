@@ -236,7 +236,7 @@
             class="container mx-auto flex flex-col-reverse lg:flex-row items-center justify-between space-y-8 lg:space-y-0 lg:space-x-12 relative z-10">
             <!-- Left side text and search -->
             <div class="w-full lg:w-1/2 text-center lg:text-left text-white space-y-6">
-                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">Book Your Perfect Event Venue Today
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">Book Your Event Venue Today
                 </h1>
                 <p class="text-base sm:text-lg lg:text-xl text-gray-200 leading-relaxed">
                     Find and reserve the ideal space for your meeting, party, or concert with ease. Our system makes
