@@ -174,8 +174,7 @@
             class="w-full text-lg hover:bg-gray-700 rounded-lg p-2 transition-colors">Customer Register</a>
         <a href="#" id="mobile-nav-admin-login"
             class="w-full text-lg hover:bg-gray-700 rounded-lg p-2 transition-colors">Admin Login</a>
-        <a href="#" id="mobile-nav-admin-register"
-            class="w-full text-lg hover:bg-gray-700 rounded-lg p-2 transition-colors">Admin Register</a>
+        <!--<a href="#" id="mobile-nav-admin-register" class="w-full text-lg hover:bg-gray-700 rounded-lg p-2 transition-colors">Admin Register</a>-->
         <a href="#" class="w-full text-lg hover:bg-gray-700 rounded-lg p-2 transition-colors">About Us</a>
         <a href="#" class="w-full text-lg hover:bg-gray-700 rounded-lg p-2 transition-colors">Contact Us</a>
     </div>
