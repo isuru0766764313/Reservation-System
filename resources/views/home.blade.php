@@ -167,7 +167,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
         </button>
-        <a href="#" class="w-full text-lg hover:bg-gray-700 rounded-lg p-2 transition-colors">Home</a>
+        <!--<a href="#" class="w-full text-lg hover:bg-gray-700 rounded-lg p-2 transition-colors">Home</a>-->
         <a href="#" id="mobile-nav-customer-signin"
             class="w-full text-lg hover:bg-gray-700 rounded-lg p-2 transition-colors">Customer Sign In</a>
         <a href="#" id="mobile-nav-customer-register"
@@ -821,7 +821,7 @@
                         </li>
                     </ul>
                 </div>
-                
+
                 <div class="flex flex-col items-center justify-center space-y-4">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Emblem_of_Sri_Lanka.svg"
                         alt="PM Office Logo" class="h-32 w-auto max-h-[130px] rounded-lg">
