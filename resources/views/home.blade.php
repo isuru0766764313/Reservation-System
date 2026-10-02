@@ -773,8 +773,8 @@
     <!-- Footer -->
     <footer class="bg-gray-900 text-gray-300 py-10 md:py-16">
         <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <!-- Footer Contact Info -->
+            <!--<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+
                 <div class="space-y-4">
                     <p class="text-xl font-bold text-white">Prime Minister's Office</p>
                     <p class="text-sm">
@@ -793,7 +793,6 @@
                     </p>
                 </div>
 
-                <!-- Footer Links 1 -->
                 <div class="space-y-2">
                     <h4 class="text-lg font-semibold text-white mb-2">Useful Links</h4>
                     <ul class="space-y-1">
@@ -808,7 +807,6 @@
                     </ul>
                 </div>
 
-                <!-- Footer Links 2 -->
                 <div class="space-y-2">
                     <h4 class="text-lg font-semibold text-white mb-2">More Links</h4>
                     <ul class="space-y-1">
@@ -823,15 +821,14 @@
                         </li>
                     </ul>
                 </div>
-
-                <!-- Footer Logos -->
+                
                 <div class="flex flex-col items-center justify-center space-y-4">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Emblem_of_Sri_Lanka.svg"
                         alt="PM Office Logo" class="h-32 w-auto max-h-[130px] rounded-lg">
                     <img src="https://www.pmoffice.gov.lk/images/emblem.png" alt="GIC Logo"
                         class="h-24 w-auto max-h-[100px] rounded-lg">
                 </div>
-            </div>
+            </div>-->
 
             <div
                 class="mt-8 pt-6 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center text-center md:text-left space-y-4 md:space-y-0">
