@@ -836,7 +836,7 @@
             <div
                 class="mt-8 pt-6 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center text-center md:text-left space-y-4 md:space-y-0">
                 <div class="text-sm">
-                    © <span>Prime Minister's Office | 2025</span><br>
+                    © <span>Prime Minister's Office | 2026</span><br>
                     <a href="#" class="hover:text-white transition-colors">Developed by ICT Division</a>
                 </div>
                 <!--<div class="flex space-x-4">
