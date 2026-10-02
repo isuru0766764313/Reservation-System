@@ -346,4 +346,375 @@ class AdminController extends Controller
         }
     }
 
+    // ========== FORGOT PASSWORD FUNCTIONALITY FOR NON-LOGGED-IN ADMINS ==========
+
+    /**
+     * Handle forgot password request - Step 1: Validate email and phone
+     */
+    public function forgotPasswordRequest(Request $request)
+    {
+        try {
+            Log::info("Starting admin forgot password request.");
+
+            // Validate input
+            $request->validate([
+                'email' => 'required|email|exists:admins_table,email',
+                'telephone_number' => 'required|string',
+            ]);
+
+            // Find admin by email
+            $admin = AdminModel::where('email', $request->email)->first();
+
+            if (!$admin) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No account found with this email address.'
+                ], 404);
+            }
+
+            // Verify phone number matches
+            if ($admin->telephone_number !== $request->telephone_number) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'The phone number does not match our records.'
+                ], 422);
+            }
+
+            Log::info("Admin found for forgot password: ID = {$admin->id}, Email = {$admin->email}");
+
+            // Generate OTPs
+            $email_otp = Str::random(6);
+            $mobile_otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+
+            // Store OTPs and session info
+            $admin->email_verification_otp = $email_otp;
+            $admin->mobile_verification_otp = $mobile_otp;
+            $admin->otp_expires_at = Carbon::now()->addMinutes(10);
+            $admin->password_reset_expiry = Carbon::now()->addMinutes(30);
+            $admin->save();
+
+            // Store admin ID in session for verification
+            $request->session()->put('forgot_password_admin_id', $admin->id);
+
+            Log::info("OTPs generated for admin forgot password. Admin ID: {$admin->id}");
+
+            // Send OTPs
+            try {
+                // Send email OTP
+                $admin->notify(new SendAdminOTP($email_otp));
+
+                // Send SMS OTP
+                $message = 'Password Reset Request for Public Facilities Reservation Portal.' . PHP_EOL .
+                    'Email OTP: ' . $email_otp . PHP_EOL .
+                    'Phone OTP: ' . $mobile_otp . PHP_EOL .
+                    'Valid for 10 minutes. Do not share.';
+                $smsService = new SmsServiceController($message, $admin->telephone_number);
+                $smsService->sendSms();
+
+                Log::info("OTPs sent for admin forgot password. Admin ID: {$admin->id}");
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Verification codes sent to your email and phone.',
+                    'admin_id' => $admin->id,
+                    'masked_email' => $this->maskEmail($admin->email),
+                    'masked_phone' => $this->maskPhone($admin->telephone_number)
+                ]);
+
+            } catch (\Exception $e) {
+                Log::error("Failed to send OTPs for admin forgot password: " . $e->getMessage());
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to send verification codes. Please try again.'
+                ], 500);
+            }
+
+        } catch (\Exception $e) {
+            Log::error("Admin forgot password request error: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred. Please try again.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Verify OTP for admin forgot password - Step 2: Verify both OTPs
+     */
+    public function forgotPasswordVerifyOTP(Request $request)
+    {
+        try {
+            Log::info("Starting admin forgot password OTP verification.");
+
+            // Validate input
+            $request->validate([
+                'email_otp' => 'required|string|size:6',
+                'otp1' => 'required|digits:1',
+                'otp2' => 'required|digits:1',
+                'otp3' => 'required|digits:1',
+                'otp4' => 'required|digits:1',
+                'otp5' => 'required|digits:1',
+                'otp6' => 'required|digits:1',
+            ]);
+
+            // Get admin from session
+            $admin_id = session('forgot_password_admin_id');
+            if (!$admin_id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Session expired. Please start the process again.'
+                ], 422);
+            }
+
+            $admin = AdminModel::find($admin_id);
+            if (!$admin) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid session. Please start the process again.'
+                ], 422);
+            }
+
+            // Check if reset window expired
+            if (Carbon::now()->gt($admin->password_reset_expiry)) {
+                $request->session()->forget('forgot_password_admin_id');
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Reset session expired. Please start over.'
+                ], 422);
+            }
+
+            // Concatenate mobile OTP
+            $mobile_otp = $request->otp1 . $request->otp2 . $request->otp3 . $request->otp4 . $request->otp5 . $request->otp6;
+
+            Log::info("Verifying OTPs for admin forgot password. Admin ID: {$admin->id}");
+
+            // Verify both OTPs
+            if (
+                $admin->email_verification_otp !== $request->email_otp ||
+                $admin->mobile_verification_otp !== $mobile_otp
+            ) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid verification codes. Please check and try again.'
+                ], 422);
+            }
+
+            // Check OTP expiration
+            if (Carbon::now()->gt($admin->otp_expires_at)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Verification codes have expired.'
+                ], 422);
+            }
+
+            // Mark OTP as verified by clearing them and using temp_password as verification flag
+            $admin->email_verification_otp = null;
+            $admin->mobile_verification_otp = null;
+            $admin->otp_expires_at = null;
+            $admin->temp_password = 'VERIFIED'; // Use temp_password field as verification flag
+            $admin->save();
+
+            Log::info("OTPs verified successfully for admin forgot password. Admin ID: {$admin->id}");
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Verification successful. You can now set a new password.',
+                'admin_id' => $admin->id
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error("Admin forgot password OTP verification error: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred during verification.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Reset admin password - Step 3: Set new password
+     */
+    public function forgotPasswordReset(Request $request)
+    {
+        try {
+            Log::info("Starting admin forgot password reset.");
+
+            // Validate input
+            $request->validate([
+                'password' => 'required|confirmed|min:8|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/',
+            ]);
+
+            // Get admin from session
+            $admin_id = session('forgot_password_admin_id');
+            if (!$admin_id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Session expired. Please start the process again.'
+                ], 422);
+            }
+
+            $admin = AdminModel::find($admin_id);
+            if (!$admin) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid session. Please start the process again.'
+                ], 422);
+            }
+
+            // Check if reset window expired
+            if (Carbon::now()->gt($admin->password_reset_expiry)) {
+                $request->session()->forget('forgot_password_admin_id');
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Reset session expired. Please start over.'
+                ], 422);
+            }
+
+            // Check if OTP was verified (using temp_password as verification flag)
+            if ($admin->temp_password !== 'VERIFIED') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please verify your OTP first.'
+                ], 422);
+            }
+
+            Log::info("Resetting password for admin ID: {$admin->id}");
+
+            // Update password
+            $admin->password = Hash::make($request->password);
+            $admin->temp_password = null; // Clear verification flag
+            $admin->password_reset_expiry = null;
+            $admin->save();
+
+            // Clear session
+            $request->session()->forget('forgot_password_admin_id');
+
+            Log::info("Password reset successfully for admin ID: {$admin->id}");
+
+            // Send confirmation email
+            try {
+                $admin->notify(new SendAdminOTP('Your admin password has been successfully reset.'));
+            } catch (\Exception $e) {
+                Log::warning("Failed to send admin password reset confirmation email: " . $e->getMessage());
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Password reset successfully! You can now login with your new password.',
+                'redirect' => route('home_route')
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error("Admin forgot password reset error: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while resetting password.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Resend OTP for admin forgot password
+     */
+    public function forgotPasswordResendOTP(Request $request)
+    {
+        try {
+            Log::info("Starting admin forgot password OTP resend.");
+
+            // Get admin from session
+            $admin_id = session('forgot_password_admin_id');
+            if (!$admin_id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Session expired. Please start the process again.'
+                ], 422);
+            }
+
+            $admin = AdminModel::find($admin_id);
+            if (!$admin) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid session. Please start the process again.'
+                ], 422);
+            }
+
+            // Check if reset window expired
+            if (Carbon::now()->gt($admin->password_reset_expiry)) {
+                $request->session()->forget('forgot_password_admin_id');
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Reset session expired. Please start over.'
+                ], 422);
+            }
+
+            // Generate new OTPs
+            $email_otp = Str::random(6);
+            $mobile_otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+
+            // Update admin with new OTPs
+            $admin->email_verification_otp = $email_otp;
+            $admin->mobile_verification_otp = $mobile_otp;
+            $admin->otp_expires_at = Carbon::now()->addMinutes(10);
+            $admin->save();
+
+            Log::info("New OTPs generated for admin forgot password resend. Admin ID: {$admin->id}");
+
+            // Send new OTPs
+            try {
+                // Send email OTP
+                $admin->notify(new SendAdminOTP($email_otp));
+
+                // Send SMS OTP
+                $message = 'New Password Reset Codes for Public Facilities Reservation Portal.' . PHP_EOL .
+                    'Email OTP: ' . $email_otp . PHP_EOL .
+                    'Phone OTP: ' . $mobile_otp . PHP_EOL .
+                    'Valid for 10 minutes. Do not share.';
+                $smsService = new SmsServiceController($message, $admin->telephone_number);
+                $smsService->sendSms();
+
+                Log::info("New OTPs sent for admin forgot password. Admin ID: {$admin->id}");
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'New verification codes sent successfully.'
+                ]);
+
+            } catch (\Exception $e) {
+                Log::error("Failed to resend OTPs for admin forgot password: " . $e->getMessage());
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to send new verification codes. Please try again.'
+                ], 500);
+            }
+
+        } catch (\Exception $e) {
+            Log::error("Admin forgot password OTP resend error: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while resending codes.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Helper method to mask email for privacy
+     */
+    private function maskEmail($email)
+    {
+        $parts = explode('@', $email);
+        $name = $parts[0];
+        $domain = $parts[1];
+
+        $maskedName = substr($name, 0, 2) . str_repeat('*', max(0, strlen($name) - 4)) . substr($name, -2);
+        return $maskedName . '@' . $domain;
+    }
+
+    /**
+     * Helper method to mask phone number for privacy
+     */
+    private function maskPhone($phone)
+    {
+        return substr($phone, 0, 3) . str_repeat('*', max(0, strlen($phone) - 6)) . substr($phone, -3);
+    }
+
 }

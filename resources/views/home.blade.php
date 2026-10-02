@@ -576,7 +576,7 @@
     <!-- Admin Password Reset Modal -->
     <div id="admin-password-reset-modal"
         class="password-reset-modal fixed inset-0 bg-gray-900 bg-opacity-50 flex items-start justify-center p-4 pt-20 hidden">
-        <div class="bg-white rounded-xl shadow-2xl p-6 sm:p-8 w-full max-w-sm relative">
+        <div class="bg-white rounded-xl shadow-2xl p-6 sm:p-8 w-full max-w-md relative">
             <!-- Close Button -->
             <button id="close-admin-reset-btn"
                 class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 transition-colors">
@@ -586,20 +586,74 @@
                 </svg>
             </button>
 
-            <h3 class="text-2xl font-bold text-center text-gray-800 mb-2">Admin Password Reset</h3>
-            <p class="text-center text-gray-600 mb-6 text-sm">Enter your email and phone number to receive a reset OTP.
-            </p>
+            <h3 class="text-2xl font-bold text-center text-gray-800 mb-2" id="admin-reset-modal-title">Admin Password Reset</h3>
 
-            <form action="#" method="post" class="space-y-4">
-                <input type="email" name="admin-reset-email" placeholder="Email Address"
-                    class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <input type="tel" name="admin-reset-phone" placeholder="Telephone Number"
-                    class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <button type="submit"
-                    class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition-colors">
-                    Send Reset OTP
-                </button>
-            </form>
+            <!-- Step 1: Email & Phone -->
+            <div id="admin-reset-step1" class="admin-reset-step">
+                <p class="text-center text-gray-600 mb-6 text-sm">Enter your email and phone number to receive a reset OTP.</p>
+                <form id="adminForgotPasswordForm" class="space-y-4">
+                    <input type="email" id="adminResetEmail" placeholder="Email Address"
+                        class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    <input type="tel" id="adminResetPhone" placeholder="Telephone Number"
+                        class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    <button type="button" id="adminSendResetOtpBtn"
+                        class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition-colors">
+                        Send Reset OTP
+                    </button>
+                </form>
+            </div>
+
+            <!-- Step 2: OTP Verification -->
+            <div id="admin-reset-step2" class="admin-reset-step hidden">
+                <p class="text-center text-gray-600 mb-3 text-sm">Enter the verification codes sent to:</p>
+                <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-3 mb-4 text-sm text-gray-700">
+                    <span><i class="fa-solid fa-envelope text-indigo-500 mr-1"></i>Email: <strong id="adminMaskedEmail"></strong></span><br>
+                    <span><i class="fa-solid fa-mobile-alt text-indigo-500 mr-1"></i>Phone: <strong id="adminMaskedPhone"></strong></span>
+                </div>
+                <form id="adminVerifyOtpForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email OTP</label>
+                        <input type="text" id="adminEmailOtp" maxlength="6" placeholder="••••••"
+                            class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-center font-bold tracking-widest" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Phone OTP</label>
+                        <div class="flex gap-2 justify-center">
+                            <input type="text" class="admin-phone-otp w-10 h-12 text-center text-lg font-bold rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" maxlength="1" data-index="0" required>
+                            <input type="text" class="admin-phone-otp w-10 h-12 text-center text-lg font-bold rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" maxlength="1" data-index="1" required>
+                            <input type="text" class="admin-phone-otp w-10 h-12 text-center text-lg font-bold rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" maxlength="1" data-index="2" required>
+                            <input type="text" class="admin-phone-otp w-10 h-12 text-center text-lg font-bold rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" maxlength="1" data-index="3" required>
+                            <input type="text" class="admin-phone-otp w-10 h-12 text-center text-lg font-bold rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" maxlength="1" data-index="4" required>
+                            <input type="text" class="admin-phone-otp w-10 h-12 text-center text-lg font-bold rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" maxlength="1" data-index="5" required>
+                        </div>
+                    </div>
+                    <button type="submit" id="adminVerifyOtpBtn"
+                        class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition-colors">Verify OTP</button>
+                    <button type="button" id="adminResendOtpBtn"
+                        class="w-full bg-gray-100 text-gray-700 font-semibold py-2 rounded-lg hover:bg-gray-200 transition-colors">Resend OTP</button>
+                </form>
+            </div>
+
+            <!-- Step 3: New Password -->
+            <div id="admin-reset-step3" class="admin-reset-step hidden">
+                <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4 text-sm">Verification successful! Set your new password below.</div>
+                <form id="adminNewPasswordForm" class="space-y-4">
+                    <input type="password" id="adminNewPassword" placeholder="New Password"
+                        class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    <input type="password" id="adminConfirmNewPassword" placeholder="Confirm New Password"
+                        class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    <button type="submit" id="adminResetPasswordBtn"
+                        class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition-colors">Reset Password</button>
+                </form>
+            </div>
+
+            <!-- Loading / Error / Success states -->
+            <div id="admin-reset-loading" class="text-center py-4 hidden">
+                <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent"></div>
+                <p class="mt-3 text-gray-500 text-sm">Processing your request...</p>
+            </div>
+            <div id="admin-reset-error" class="hidden mt-3 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-sm"></div>
+            <div id="admin-reset-success" class="hidden mt-3 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg text-sm"></div>
         </div>
     </div>
 
@@ -1445,6 +1499,270 @@
 
 
 
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // ============ ADMIN FORGOT PASSWORD FUNCTIONALITY ============
+
+            const adminResetModal = document.getElementById('admin-password-reset-modal');
+            if (!adminResetModal) return;
+
+            const steps = ['admin-reset-step1', 'admin-reset-step2', 'admin-reset-step3'];
+            const titles = {
+                1: 'Admin Password Reset',
+                2: 'Verify Your Identity',
+                3: 'Set New Password'
+            };
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+            function showAdminResetStep(n) {
+                steps.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.add('hidden');
+                });
+                const target = document.getElementById('admin-reset-step' + n);
+                if (target) target.classList.remove('hidden');
+                const titleEl = document.getElementById('admin-reset-modal-title');
+                if (titleEl) titleEl.textContent = titles[n];
+            }
+
+            function adminResetShowLoading() {
+                steps.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.add('hidden');
+                });
+                document.getElementById('admin-reset-loading').classList.remove('hidden');
+                adminResetHideMessages();
+            }
+
+            function adminResetHideLoading() {
+                document.getElementById('admin-reset-loading').classList.add('hidden');
+            }
+
+            function adminResetShowError(msg) {
+                const el = document.getElementById('admin-reset-error');
+                el.textContent = msg;
+                el.classList.remove('hidden');
+                document.getElementById('admin-reset-success').classList.add('hidden');
+            }
+
+            function adminResetShowSuccess(msg) {
+                const el = document.getElementById('admin-reset-success');
+                el.textContent = msg;
+                el.classList.remove('hidden');
+                document.getElementById('admin-reset-error').classList.add('hidden');
+            }
+
+            function adminResetHideMessages() {
+                document.getElementById('admin-reset-error').classList.add('hidden');
+                document.getElementById('admin-reset-success').classList.add('hidden');
+            }
+
+            function resetAdminForgotPasswordModal() {
+                showAdminResetStep(1);
+                adminResetHideMessages();
+                adminResetHideLoading();
+                ['adminResetEmail', 'adminResetPhone', 'adminEmailOtp', 'adminNewPassword', 'adminConfirmNewPassword'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = '';
+                });
+                document.querySelectorAll('.admin-phone-otp').forEach(inp => { inp.value = ''; });
+            }
+
+            // Reset to step 1 whenever the modal is opened or closed
+            const forgotAdminBtn = document.getElementById('forgot-password-admin-btn');
+            if (forgotAdminBtn) {
+                forgotAdminBtn.addEventListener('click', resetAdminForgotPasswordModal);
+            }
+            const closeAdminResetBtn = document.getElementById('close-admin-reset-btn');
+            if (closeAdminResetBtn) {
+                closeAdminResetBtn.addEventListener('click', resetAdminForgotPasswordModal);
+            }
+
+            // Step 1: send reset OTP
+            const sendBtn = document.getElementById('adminSendResetOtpBtn');
+            if (sendBtn) {
+                sendBtn.addEventListener('click', async function () {
+                    const email = document.getElementById('adminResetEmail').value.trim();
+                    const phone = document.getElementById('adminResetPhone').value.trim();
+
+                    if (!email || !phone) {
+                        adminResetShowError('Please fill in both email and phone number.');
+                        return;
+                    }
+
+                    this.disabled = true;
+                    const original = this.innerHTML;
+                    this.innerHTML = 'Sending...';
+                    adminResetShowLoading();
+
+                    try {
+                        const response = await fetch('/admin/forgot-password/request', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+                            body: JSON.stringify({ email: email, telephone_number: phone })
+                        });
+                        const data = await response.json();
+                        adminResetHideLoading();
+
+                        if (data.success) {
+                            document.getElementById('adminMaskedEmail').textContent = data.masked_email;
+                            document.getElementById('adminMaskedPhone').textContent = data.masked_phone;
+                            adminResetShowSuccess(data.message);
+                            setTimeout(() => { adminResetHideMessages(); showAdminResetStep(2); }, 2000);
+                        } else {
+                            adminResetShowError(data.message || 'Failed to send reset code. Please try again.');
+                            showAdminResetStep(1);
+                        }
+                    } catch (error) {
+                        adminResetHideLoading();
+                        adminResetShowError('An error occurred. Please check your connection and try again.');
+                        showAdminResetStep(1);
+                    } finally {
+                        this.disabled = false;
+                        this.innerHTML = original;
+                    }
+                });
+            }
+
+            // Phone OTP auto-advance
+            document.querySelectorAll('.admin-phone-otp').forEach((input, index) => {
+                input.addEventListener('input', function () {
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                    if (this.value && index < 5) {
+                        const next = document.querySelector('.admin-phone-otp[data-index="' + (index + 1) + '"]');
+                        if (next) next.focus();
+                    }
+                });
+                input.addEventListener('keydown', function (e) {
+                    if (e.key === 'Backspace' && !this.value && index > 0) {
+                        const prev = document.querySelector('.admin-phone-otp[data-index="' + (index - 1) + '"]');
+                        if (prev) prev.focus();
+                    }
+                });
+            });
+
+            // Step 2: verify OTP
+            const verifyForm = document.getElementById('adminVerifyOtpForm');
+            if (verifyForm) {
+                verifyForm.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+                    const emailOtp = document.getElementById('adminEmailOtp').value.trim();
+                    const phoneInputs = document.querySelectorAll('.admin-phone-otp');
+                    let phoneOtp = '';
+                    phoneInputs.forEach(inp => { phoneOtp += inp.value; });
+
+                    if (emailOtp.length !== 6 || phoneOtp.length !== 6) {
+                        adminResetShowError('Please enter both 6-digit codes.');
+                        return;
+                    }
+
+                    adminResetShowLoading();
+                    try {
+                        const response = await fetch('/admin/forgot-password/verify-otp', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+                            body: JSON.stringify({
+                                email_otp: emailOtp,
+                                otp1: phoneOtp[0], otp2: phoneOtp[1], otp3: phoneOtp[2],
+                                otp4: phoneOtp[3], otp5: phoneOtp[4], otp6: phoneOtp[5]
+                            })
+                        });
+                        const data = await response.json();
+                        adminResetHideLoading();
+
+                        if (data.success) {
+                            adminResetShowSuccess(data.message);
+                            setTimeout(() => { adminResetHideMessages(); showAdminResetStep(3); }, 2000);
+                        } else {
+                            adminResetShowError(data.message || 'Invalid verification codes. Please try again.');
+                            showAdminResetStep(2);
+                        }
+                    } catch (error) {
+                        adminResetHideLoading();
+                        adminResetShowError('An error occurred during verification. Please try again.');
+                        showAdminResetStep(2);
+                    }
+                });
+            }
+
+            // Resend OTP
+            const resendBtn = document.getElementById('adminResendOtpBtn');
+            if (resendBtn) {
+                resendBtn.addEventListener('click', async function () {
+                    this.disabled = true;
+                    const original = this.innerHTML;
+                    this.innerHTML = 'Sending...';
+                    try {
+                        const response = await fetch('/admin/forgot-password/resend-otp', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+                            body: JSON.stringify({})
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            adminResetShowSuccess('New verification codes sent successfully.');
+                            document.getElementById('adminEmailOtp').value = '';
+                            document.querySelectorAll('.admin-phone-otp').forEach(inp => inp.value = '');
+                        } else {
+                            adminResetShowError(data.message || 'Failed to resend codes. Please try again.');
+                        }
+                    } catch (error) {
+                        adminResetShowError('Failed to resend codes. Please check your connection.');
+                    } finally {
+                        setTimeout(() => { this.disabled = false; this.innerHTML = original; }, 3000);
+                    }
+                });
+            }
+
+            // Step 3: reset password
+            const newPasswordForm = document.getElementById('adminNewPasswordForm');
+            if (newPasswordForm) {
+                newPasswordForm.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+                    const newPassword = document.getElementById('adminNewPassword').value;
+                    const confirmPassword = document.getElementById('adminConfirmNewPassword').value;
+
+                    if (newPassword !== confirmPassword) {
+                        adminResetShowError('Passwords do not match.');
+                        return;
+                    }
+                    if (newPassword.length < 8 || !/[A-Z]/.test(newPassword) || !/[a-z]/.test(newPassword) || !/\d/.test(newPassword)) {
+                        adminResetShowError('Password must contain 8+ chars with uppercase, lowercase and number.');
+                        return;
+                    }
+
+                    adminResetShowLoading();
+                    try {
+                        const response = await fetch('/admin/forgot-password/reset', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+                            body: JSON.stringify({ password: newPassword, password_confirmation: confirmPassword })
+                        });
+                        const data = await response.json();
+                        adminResetHideLoading();
+
+                        if (data.success) {
+                            adminResetShowSuccess(data.message);
+                            setTimeout(() => {
+                                window.location.href = data.redirect || '/';
+                            }, 2000);
+                        } else {
+                            adminResetShowError(data.message || 'Failed to reset password. Please try again.');
+                            showAdminResetStep(3);
+                        }
+                    } catch (error) {
+                        adminResetHideLoading();
+                        adminResetShowError('An error occurred while resetting password. Please try again.');
+                        showAdminResetStep(3);
+                    }
+                });
+            }
+        });
     </script>
 </body>
 

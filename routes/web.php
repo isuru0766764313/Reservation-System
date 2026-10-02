@@ -130,6 +130,12 @@ Route::prefix('admin')->group(function()
     
     Route::post('/verify-otp', [AdminController::class, 'verifyOTP'])->name('admin.verification.verify');
     Route::post('/resend-otp', [AdminController::class, 'resendOTP'])->name('admin.verification.resend');
+
+    // Forgot Password Routes (for non-logged in admins)
+    Route::post('/forgot-password/request', [AdminController::class, 'forgotPasswordRequest'])->name('admin.forgot.password.request');
+    Route::post('/forgot-password/verify-otp', [AdminController::class, 'forgotPasswordVerifyOTP'])->name('admin.forgot.password.verify.otp');
+    Route::post('/forgot-password/reset', [AdminController::class, 'forgotPasswordReset'])->name('admin.forgot.password.reset');
+    Route::post('/forgot-password/resend-otp', [AdminController::class, 'forgotPasswordResendOTP'])->name('admin.forgot.password.resend.otp');
 });
 
 // Protected Routes (Verified Admins Only)

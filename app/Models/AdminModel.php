@@ -33,17 +33,22 @@ class AdminModel extends Authenticatable
         'email_verification_otp',
         'mobile_verification_otp',
         'otp_expires_at',
+        'temp_password',
+        'password_reset_expiry',
     ];
 
-    protected $hidden = 
+    protected $hidden =
     [
         'password',
         'remember_token',
     ];
 
-    protected $casts = 
+    protected $casts =
     [
         'email_verified_at' => 'datetime',
+        'mobile_verified_at' => 'datetime',
+        'otp_expires_at' => 'datetime',
+        'password_reset_expiry' => 'datetime',
     ];
     
 
