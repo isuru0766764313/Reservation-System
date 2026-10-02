@@ -239,8 +239,7 @@
                 <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">Book Your Event Venue Today
                 </h1>
                 <p class="text-base sm:text-lg lg:text-xl text-gray-200 leading-relaxed">
-                    Find and reserve the ideal space for your meeting, party, or concert with ease. Our system makes
-                    booking halls, playgrounds, and arenas simple and secure.
+                    Find and reserve the ideal space for your meeting, party, or concert with ease.
                 </p>
 
                 <!-- Search Bar -->
