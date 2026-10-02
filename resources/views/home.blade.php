@@ -214,7 +214,7 @@
             <a href="#" id="nav-customer-signin" class="hover:text-gray-200">Customer Login</a>
             <a href="#" id="nav-customer-register" class="hover:text-gray-200">Customer Register</a>
             <a href="#" id="nav-admin-login" class="hover:text-gray-200">Admin Login</a>
-            <a href="#" id="nav-admin-register" class="hover:text-gray-200">Admin Register</a>
+            <!--<a href="#" id="nav-admin-register" class="hover:text-gray-200">Admin Register</a>-->
             <!--<a href="#" class="hover:text-gray-200">About Us</a>-->
             <!--<a href="#" class="hover:text-gray-200">Contact Us</a>-->
         </div>
