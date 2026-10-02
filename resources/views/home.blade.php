@@ -199,12 +199,8 @@
     <nav class="absolute top-0 left-0 w-full z-10 p-4 sm:p-6 lg:p-8 flex justify-between items-center text-white">
         <!-- Logo and Company Name -->
         <div class="flex items-center space-x-2">
-            <!-- A simple SVG for the logo -->
-            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
-                    clip-rule="evenodd"></path>
-            </svg>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Emblem_of_Sri_Lanka.svg"
+                alt="PM Office Logo" class="h-8 w-auto md:h-10">
             <span class="text-xl md:text-2xl font-bold">Public Facilities Reservation System</span>
         </div>
         <!-- Right side menu links for desktop -->
@@ -834,6 +830,10 @@
                 <div class="text-sm">
                     © <span>Prime Minister's Office | 2026</span><br>
                     <a href="#" class="hover:text-white transition-colors">Developed by ICT Division</a>
+                </div>
+                <div class="flex flex-col items-center justify-center space-y-4">
+                    <img src="https://www.pmoffice.gov.lk/images/emblem.png" alt="GIC Logo"
+                        class="h-24 w-auto max-h-[100px] rounded-lg">
                 </div>
                 <!--<div class="flex space-x-4">
                     <a href="https://www.facebook.com/profile.php?id=61566266050143"
