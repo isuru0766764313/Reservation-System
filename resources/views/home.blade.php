@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reservation System</title>
+    <title>Public Facilities Reservation System</title>
     <!-- Inter Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -206,7 +206,7 @@
                     d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
                     clip-rule="evenodd"></path>
             </svg>
-            <span class="text-xl md:text-2xl font-bold">Reservation System</span>
+            <span class="text-xl md:text-2xl font-bold">Public Facilities Reservation System</span>
         </div>
         <!-- Right side menu links for desktop -->
         <div class="hidden md:flex items-center space-x-6 lg:space-x-10">
