@@ -32,6 +32,15 @@ class CustomerController extends Controller
 
     function Register(Request $request)
     {
+        // If this email is already registered, bounce the visitor to the sign-in
+        // panel with a friendly prompt instead of a generic validation redirect.
+        if ($request->filled('email') && CustomerModel::where('email', $request->email)->exists()) {
+            return redirect()
+                ->route('home_route')
+                ->with('registration_email_exists', true)
+                ->withInput($request->only('email'));
+        }
+
         $request->validate(
             [
                 'profile_title' => 'required|string|in:Mr.,Mrs.,Miss.,Doc.,Rev.,Prof.',

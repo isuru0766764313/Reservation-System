@@ -188,6 +188,7 @@
         window.hallData = @json(isset($halls) ? $halls : []);
         window.hasLoginError = @json(session()->has('error_key_2'));
         window.hasAdminLoginError = @json(session()->has('admin_error_key_2'));
+        window.hasRegisterEmailError = @json(session()->has('registration_email_exists'));
         // Set when an unauthenticated visitor tried to open a hall page and was
         // bounced back here by the auth middleware -> auto-slide-in the sign-in panel
         window.authRedirected = @json($auth_redirected ?? session('auth_redirected', false));
@@ -316,6 +317,11 @@
                 @if (session('error_key_2'))
                     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
                         {{ session('error_key_2') }}
+                    </div>
+                @endif
+                @if (session('registration_email_exists'))
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                        You are already registered. Please sign in.
                     </div>
                 @endif
                 <form action="{{route('login_post_route')}}" method="post" class="space-y-4">
@@ -873,6 +879,20 @@
 
             // Auto-open customer login card if there's a login error from redirect-back
             if (window.hasLoginError) {
+                const customerAuthContainer = document.getElementById('customer-auth-container');
+                const adminAuthContainer = document.getElementById('admin-auth-container');
+                const customerLoginForm = document.getElementById('customer-login-form');
+                const customerSignupForm = document.getElementById('customer-signup-form');
+                if (customerAuthContainer && adminAuthContainer && customerLoginForm && customerSignupForm) {
+                    adminAuthContainer.classList.remove('active');
+                    customerAuthContainer.classList.add('active');
+                    customerSignupForm.classList.add('hidden');
+                    customerLoginForm.classList.remove('hidden');
+                }
+            }
+
+            // Auto-open customer sign-in card when the email is already registered
+            if (window.hasRegisterEmailError) {
                 const customerAuthContainer = document.getElementById('customer-auth-container');
                 const adminAuthContainer = document.getElementById('admin-auth-container');
                 const customerLoginForm = document.getElementById('customer-login-form');
