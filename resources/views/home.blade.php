@@ -210,7 +210,7 @@
         </div>
         <!-- Right side menu links for desktop -->
         <div class="hidden md:flex items-center space-x-6 lg:space-x-10">
-            <a href="#" class="hover:text-gray-200">Home</a>
+            <!--<a href="#" class="hover:text-gray-200">Home</a>-->
             <a href="#" id="nav-customer-signin" class="hover:text-gray-200">Customer Login</a>
             <a href="#" id="nav-customer-register" class="hover:text-gray-200">Customer Register</a>
             <a href="#" id="nav-admin-login" class="hover:text-gray-200">Admin Login</a>
