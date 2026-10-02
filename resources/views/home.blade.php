@@ -216,7 +216,7 @@
             <a href="#" id="nav-admin-login" class="hover:text-gray-200">Admin Login</a>
             <a href="#" id="nav-admin-register" class="hover:text-gray-200">Admin Register</a>
             <a href="#" class="hover:text-gray-200">About Us</a>
-            <a href="#" class="hover:text-gray-200">Contact Us</a>
+            <!--<a href="#" class="hover:text-gray-200">Contact Us</a>-->
         </div>
         <!-- Hamburger menu icon for mobile -->
         <div class="md:hidden">
