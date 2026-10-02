@@ -546,7 +546,7 @@
     <!-- Customer Password Reset Modal -->
     <div id="customer-password-reset-modal"
         class="password-reset-modal fixed inset-0 bg-gray-900 bg-opacity-50 flex items-start justify-center p-4 pt-20 hidden">
-        <div class="bg-white rounded-xl shadow-2xl p-6 sm:p-8 w-full max-w-sm relative">
+        <div class="bg-white rounded-xl shadow-2xl p-6 sm:p-8 w-full max-w-md relative">
             <!-- Close Button -->
             <button id="close-customer-reset-btn"
                 class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 transition-colors">
@@ -556,20 +556,74 @@
                 </svg>
             </button>
 
-            <h3 class="text-2xl font-bold text-center text-gray-800 mb-2">Customer Password Reset</h3>
-            <p class="text-center text-gray-600 mb-6 text-sm">Enter your email and phone number to receive a reset OTP.
-            </p>
+            <h3 class="text-2xl font-bold text-center text-gray-800 mb-2" id="customer-reset-modal-title">Customer Password Reset</h3>
 
-            <form action="#" method="post" class="space-y-4">
-                <input type="email" name="customer-reset-email" placeholder="Email Address"
-                    class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <input type="tel" name="customer-reset-phone" placeholder="Telephone Number"
-                    class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <button type="submit"
-                    class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition-colors">
-                    Send Reset OTP
-                </button>
-            </form>
+            <!-- Step 1: Email & Phone -->
+            <div id="customer-reset-step1" class="customer-reset-step">
+                <p class="text-center text-gray-600 mb-6 text-sm">Enter your email and phone number to receive a reset OTP.</p>
+                <form id="customerForgotPasswordForm" class="space-y-4">
+                    <input type="email" id="customerResetEmail" placeholder="Email Address"
+                        class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    <input type="tel" id="customerResetPhone" placeholder="Telephone Number"
+                        class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    <button type="button" id="customerSendResetOtpBtn"
+                        class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition-colors">
+                        Send Reset OTP
+                    </button>
+                </form>
+            </div>
+
+            <!-- Step 2: OTP Verification -->
+            <div id="customer-reset-step2" class="customer-reset-step hidden">
+                <p class="text-center text-gray-600 mb-3 text-sm">Enter the verification codes sent to:</p>
+                <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-3 mb-4 text-sm text-gray-700">
+                    <span><i class="fa-solid fa-envelope text-indigo-500 mr-1"></i>Email: <strong id="customerMaskedEmail"></strong></span><br>
+                    <span><i class="fa-solid fa-mobile-alt text-indigo-500 mr-1"></i>Phone: <strong id="customerMaskedPhone"></strong></span>
+                </div>
+                <form id="customerVerifyOtpForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email OTP</label>
+                        <input type="text" id="customerEmailOtp" maxlength="6" placeholder="••••••"
+                            class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-center font-bold tracking-widest" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Phone OTP</label>
+                        <div class="flex gap-2 justify-center">
+                            <input type="text" class="customer-phone-otp w-10 h-12 text-center text-lg font-bold rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" maxlength="1" data-index="0" required>
+                            <input type="text" class="customer-phone-otp w-10 h-12 text-center text-lg font-bold rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" maxlength="1" data-index="1" required>
+                            <input type="text" class="customer-phone-otp w-10 h-12 text-center text-lg font-bold rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" maxlength="1" data-index="2" required>
+                            <input type="text" class="customer-phone-otp w-10 h-12 text-center text-lg font-bold rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" maxlength="1" data-index="3" required>
+                            <input type="text" class="customer-phone-otp w-10 h-12 text-center text-lg font-bold rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" maxlength="1" data-index="4" required>
+                            <input type="text" class="customer-phone-otp w-10 h-12 text-center text-lg font-bold rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" maxlength="1" data-index="5" required>
+                        </div>
+                    </div>
+                    <button type="submit" id="customerVerifyOtpBtn"
+                        class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition-colors">Verify OTP</button>
+                    <button type="button" id="customerResendOtpBtn"
+                        class="w-full bg-gray-100 text-gray-700 font-semibold py-2 rounded-lg hover:bg-gray-200 transition-colors">Resend OTP</button>
+                </form>
+            </div>
+
+            <!-- Step 3: New Password -->
+            <div id="customer-reset-step3" class="customer-reset-step hidden">
+                <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4 text-sm">Verification successful! Set your new password below.</div>
+                <form id="customerNewPasswordForm" class="space-y-4">
+                    <input type="password" id="customerNewPassword" placeholder="New Password"
+                        class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    <input type="password" id="customerConfirmNewPassword" placeholder="Confirm New Password"
+                        class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    <button type="submit" id="customerResetPasswordBtn"
+                        class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition-colors">Reset Password</button>
+                </form>
+            </div>
+
+            <!-- Loading / Error / Success states -->
+            <div id="customer-reset-loading" class="text-center py-4 hidden">
+                <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent"></div>
+                <p class="mt-3 text-gray-500 text-sm">Processing your request...</p>
+            </div>
+            <div id="customer-reset-error" class="hidden mt-3 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-sm"></div>
+            <div id="customer-reset-success" class="hidden mt-3 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg text-sm"></div>
         </div>
     </div>
 
@@ -1088,8 +1142,7 @@
             // Event listeners for opening password reset modals
             if (forgotPasswordCustomerBtn) {
                 forgotPasswordCustomerBtn.addEventListener('click', () => {
-                    // Redirect to dedicated customer login page with full functionality
-                    window.location.href = '/customer/login';
+                    showPasswordResetModal(customerPasswordResetModal);
                 });
             }
             if (forgotPasswordAdminBtn) {
@@ -1759,6 +1812,270 @@
                         adminResetHideLoading();
                         adminResetShowError('An error occurred while resetting password. Please try again.');
                         showAdminResetStep(3);
+                    }
+                });
+            }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // ============ CUSTOMER FORGOT PASSWORD FUNCTIONALITY ============
+
+            const customerResetModal = document.getElementById('customer-password-reset-modal');
+            if (!customerResetModal) return;
+
+            const steps = ['customer-reset-step1', 'customer-reset-step2', 'customer-reset-step3'];
+            const titles = {
+                1: 'Customer Password Reset',
+                2: 'Verify Your Identity',
+                3: 'Set New Password'
+            };
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+            function showCustomerResetStep(n) {
+                steps.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.add('hidden');
+                });
+                const target = document.getElementById('customer-reset-step' + n);
+                if (target) target.classList.remove('hidden');
+                const titleEl = document.getElementById('customer-reset-modal-title');
+                if (titleEl) titleEl.textContent = titles[n];
+            }
+
+            function customerResetShowLoading() {
+                steps.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.add('hidden');
+                });
+                document.getElementById('customer-reset-loading').classList.remove('hidden');
+                customerResetHideMessages();
+            }
+
+            function customerResetHideLoading() {
+                document.getElementById('customer-reset-loading').classList.add('hidden');
+            }
+
+            function customerResetShowError(msg) {
+                const el = document.getElementById('customer-reset-error');
+                el.textContent = msg;
+                el.classList.remove('hidden');
+                document.getElementById('customer-reset-success').classList.add('hidden');
+            }
+
+            function customerResetShowSuccess(msg) {
+                const el = document.getElementById('customer-reset-success');
+                el.textContent = msg;
+                el.classList.remove('hidden');
+                document.getElementById('customer-reset-error').classList.add('hidden');
+            }
+
+            function customerResetHideMessages() {
+                document.getElementById('customer-reset-error').classList.add('hidden');
+                document.getElementById('customer-reset-success').classList.add('hidden');
+            }
+
+            function resetCustomerForgotPasswordModal() {
+                showCustomerResetStep(1);
+                customerResetHideMessages();
+                customerResetHideLoading();
+                ['customerResetEmail', 'customerResetPhone', 'customerEmailOtp', 'customerNewPassword', 'customerConfirmNewPassword'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = '';
+                });
+                document.querySelectorAll('.customer-phone-otp').forEach(inp => { inp.value = ''; });
+            }
+
+            // Reset to step 1 whenever the modal is opened or closed
+            const forgotCustomerBtn = document.getElementById('forgot-password-customer-btn');
+            if (forgotCustomerBtn) {
+                forgotCustomerBtn.addEventListener('click', resetCustomerForgotPasswordModal);
+            }
+            const closeCustomerResetBtn = document.getElementById('close-customer-reset-btn');
+            if (closeCustomerResetBtn) {
+                closeCustomerResetBtn.addEventListener('click', resetCustomerForgotPasswordModal);
+            }
+
+            // Step 1: send reset OTP
+            const sendBtn = document.getElementById('customerSendResetOtpBtn');
+            if (sendBtn) {
+                sendBtn.addEventListener('click', async function () {
+                    const email = document.getElementById('customerResetEmail').value.trim();
+                    const phone = document.getElementById('customerResetPhone').value.trim();
+
+                    if (!email || !phone) {
+                        customerResetShowError('Please fill in both email and phone number.');
+                        return;
+                    }
+
+                    this.disabled = true;
+                    const original = this.innerHTML;
+                    this.innerHTML = 'Sending...';
+                    customerResetShowLoading();
+
+                    try {
+                        const response = await fetch('/customer/forgot-password/request', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+                            body: JSON.stringify({ email: email, telephone_number: phone })
+                        });
+                        const data = await response.json();
+                        customerResetHideLoading();
+
+                        if (data.success) {
+                            document.getElementById('customerMaskedEmail').textContent = data.masked_email;
+                            document.getElementById('customerMaskedPhone').textContent = data.masked_phone;
+                            customerResetShowSuccess(data.message);
+                            setTimeout(() => { customerResetHideMessages(); showCustomerResetStep(2); }, 2000);
+                        } else {
+                            customerResetShowError(data.message || 'Failed to send reset code. Please try again.');
+                            showCustomerResetStep(1);
+                        }
+                    } catch (error) {
+                        customerResetHideLoading();
+                        customerResetShowError('An error occurred. Please check your connection and try again.');
+                        showCustomerResetStep(1);
+                    } finally {
+                        this.disabled = false;
+                        this.innerHTML = original;
+                    }
+                });
+            }
+
+            // Phone OTP auto-advance
+            document.querySelectorAll('.customer-phone-otp').forEach((input, index) => {
+                input.addEventListener('input', function () {
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                    if (this.value && index < 5) {
+                        const next = document.querySelector('.customer-phone-otp[data-index="' + (index + 1) + '"]');
+                        if (next) next.focus();
+                    }
+                });
+                input.addEventListener('keydown', function (e) {
+                    if (e.key === 'Backspace' && !this.value && index > 0) {
+                        const prev = document.querySelector('.customer-phone-otp[data-index="' + (index - 1) + '"]');
+                        if (prev) prev.focus();
+                    }
+                });
+            });
+
+            // Step 2: verify OTP
+            const verifyForm = document.getElementById('customerVerifyOtpForm');
+            if (verifyForm) {
+                verifyForm.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+                    const emailOtp = document.getElementById('customerEmailOtp').value.trim();
+                    const phoneInputs = document.querySelectorAll('.customer-phone-otp');
+                    let phoneOtp = '';
+                    phoneInputs.forEach(inp => { phoneOtp += inp.value; });
+
+                    if (emailOtp.length !== 6 || phoneOtp.length !== 6) {
+                        customerResetShowError('Please enter both 6-digit codes.');
+                        return;
+                    }
+
+                    customerResetShowLoading();
+                    try {
+                        const response = await fetch('/customer/forgot-password/verify-otp', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+                            body: JSON.stringify({
+                                email_otp: emailOtp,
+                                otp1: phoneOtp[0], otp2: phoneOtp[1], otp3: phoneOtp[2],
+                                otp4: phoneOtp[3], otp5: phoneOtp[4], otp6: phoneOtp[5]
+                            })
+                        });
+                        const data = await response.json();
+                        customerResetHideLoading();
+
+                        if (data.success) {
+                            customerResetShowSuccess(data.message);
+                            setTimeout(() => { customerResetHideMessages(); showCustomerResetStep(3); }, 2000);
+                        } else {
+                            customerResetShowError(data.message || 'Invalid verification codes. Please try again.');
+                            showCustomerResetStep(2);
+                        }
+                    } catch (error) {
+                        customerResetHideLoading();
+                        customerResetShowError('An error occurred during verification. Please try again.');
+                        showCustomerResetStep(2);
+                    }
+                });
+            }
+
+            // Resend OTP
+            const resendBtn = document.getElementById('customerResendOtpBtn');
+            if (resendBtn) {
+                resendBtn.addEventListener('click', async function () {
+                    this.disabled = true;
+                    const original = this.innerHTML;
+                    this.innerHTML = 'Sending...';
+                    try {
+                        const response = await fetch('/customer/forgot-password/resend-otp', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+                            body: JSON.stringify({})
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            customerResetShowSuccess('New verification codes sent successfully.');
+                            document.getElementById('customerEmailOtp').value = '';
+                            document.querySelectorAll('.customer-phone-otp').forEach(inp => inp.value = '');
+                        } else {
+                            customerResetShowError(data.message || 'Failed to resend codes. Please try again.');
+                        }
+                    } catch (error) {
+                        customerResetShowError('Failed to resend codes. Please check your connection.');
+                    } finally {
+                        setTimeout(() => { this.disabled = false; this.innerHTML = original; }, 3000);
+                    }
+                });
+            }
+
+            // Step 3: reset password
+            const newPasswordForm = document.getElementById('customerNewPasswordForm');
+            if (newPasswordForm) {
+                newPasswordForm.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+                    const newPassword = document.getElementById('customerNewPassword').value;
+                    const confirmPassword = document.getElementById('customerConfirmNewPassword').value;
+
+                    if (newPassword !== confirmPassword) {
+                        customerResetShowError('Passwords do not match.');
+                        return;
+                    }
+                    if (newPassword.length < 8 || !/[A-Z]/.test(newPassword) || !/[a-z]/.test(newPassword) || !/\d/.test(newPassword)) {
+                        customerResetShowError('Password must contain 8+ chars with uppercase, lowercase and number.');
+                        return;
+                    }
+
+                    customerResetShowLoading();
+                    try {
+                        const response = await fetch('/customer/forgot-password/reset', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+                            body: JSON.stringify({ password: newPassword, password_confirmation: confirmPassword })
+                        });
+                        const data = await response.json();
+                        customerResetHideLoading();
+
+                        if (data.success) {
+                            customerResetShowSuccess(data.message);
+                            setTimeout(() => {
+                                window.location.href = data.redirect || '/';
+                            }, 2000);
+                        } else {
+                            customerResetShowError(data.message || 'Failed to reset password. Please try again.');
+                            showCustomerResetStep(3);
+                        }
+                    } catch (error) {
+                        customerResetHideLoading();
+                        customerResetShowError('An error occurred while resetting password. Please try again.');
+                        showCustomerResetStep(3);
                     }
                 });
             }
