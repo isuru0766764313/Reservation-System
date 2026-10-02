@@ -839,7 +839,7 @@
                     © <span>Prime Minister's Office | 2025</span><br>
                     <a href="#" class="hover:text-white transition-colors">Developed by ICT Division</a>
                 </div>
-                <div class="flex space-x-4">
+                <!--<div class="flex space-x-4">
                     <a href="https://www.facebook.com/profile.php?id=61566266050143"
                         class="text-gray-400 hover:text-white transition-colors" target="_blank"><i
                             class="fa-brands fa-facebook-f fa-lg"></i></a>
@@ -848,7 +848,7 @@
                             class="fa-brands fa-youtube fa-lg"></i></a>
                     <a href="https://wa.me/+94719997722" class="text-gray-400 hover:text-white transition-colors"
                         target="_blank"><i class="fa-brands fa-whatsapp fa-lg"></i></a>
-                </div>
+                </div>-->
             </div>
         </div>
     </footer>
