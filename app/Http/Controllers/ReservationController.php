@@ -603,7 +603,7 @@ class ReservationController extends Controller
         if ($payment->payment_alias === 'Preliminary') {
             $reservation->update(['status' => 3]);
             $reservation->customer->notify(new AdvancePaymentAccepted($reservation));
-            $message = 'Your advance payment for the reservation (' . $reservation->hall_name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . ' ) has been accepted. Please proceed with the remaining payment to finalize your booking. Your reservation ID is : ' . $reservation->id;
+            $message = 'Your advance payment for the reservation (' . $reservation->hall_name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . ' ) has been accepted. Please proceed with the balance payment to finalize your booking. Your reservation Ref Code is : ' . $reservation->id;
             $recipients = ($reservation->customer_tel);
             $smsService = new SmsServiceController($message, $recipients);
             $smsService->sendSms();
