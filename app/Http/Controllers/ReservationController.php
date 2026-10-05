@@ -572,7 +572,7 @@ class ReservationController extends Controller
                     ->where('end_time', $actualEndTime)
                     ->delete();
                 // send sms notifying reservation payment was rejected.
-                $message = 'We regret to inform you that your payment for your reservation (' . $reservation->hall_name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . ' ) could not be accepted. Pls contact the admin.Your reservation ID is : ' . $reservation->id;
+                $message = 'We regret to inform you that your payment for your reservation (' . $reservation->hall_name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . ' ) could not be accepted. Pls contact the admin.Your reservation Ref Code is : ' . $reservation->id;
                 $recipients = ($reservation->customer_tel);
                 $smsService = new SmsServiceController($message, $recipients);
                 $smsService->sendSms();
