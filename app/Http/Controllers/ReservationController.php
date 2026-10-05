@@ -172,7 +172,7 @@ class ReservationController extends Controller
         }
 
         // Send SMS
-        $message = 'Your Regular reservation request has been submitted for ' . $hall->name . ' on ' . $request->selected_date . ' from ' . $request->start_time . ' to ' . $request->end_time . '.' . PHP_EOL . 'Your reservation ID is : ' . $reservation->id;
+        $message = 'Your reservation (Regular type) request has been submitted for ' . $hall->name . ' on ' . $request->selected_date . ' from ' . $request->start_time . ' to ' . $request->end_time . '.' . PHP_EOL . 'Your reservation ID is : ' . $reservation->id;
         $recipients = ($customer->telephone_number . ',' . $admin->telephone_number);
         $smsService = new SmsServiceController($message, $recipients);
         $smsService->sendSms();
