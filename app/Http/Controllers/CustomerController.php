@@ -78,7 +78,7 @@ class CustomerController extends Controller
             return redirect(route('registration_get_route'))->with('error_key_1', 'Registration is failed. Pls try again');
         } else {
             // send sms otp to customer at registration..
-            $message = 'Welcome to Public Facilities Reservation Portal.' . PHP_EOL . '"' . $mobile_otp . '" is your one-time entry otp code for registration. Do not share with others.';
+            $message = 'Welcome to Public Facilities Reservation System.' . PHP_EOL . '"' . $mobile_otp . '" is your one-time entry otp code for registration. Do not share with others.';
             $recipients = ($request->telephone_number);
             $smsService = new SmsServiceController($message, $recipients);
             $smsService->sendSms();
