@@ -506,7 +506,7 @@ class ReservationController extends Controller
                 // Send confirmation to customer
                 $reservation->customer->notify(new PaymentAccepted($reservation));
                 // send sms notifying reservation payment was accepted.
-                $message = 'Your reservation has been Scheduled for ' . $reservation->hall_name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . '.' . PHP_EOL . 'Your reservation ID is : ' . $reservation->id;
+                $message = 'Your reservation has been reserved for ' . $reservation->hall_name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . '.' . PHP_EOL . 'Your reservation ID is : ' . $reservation->id;
                 $recipients = ($reservation->customer_tel);
                 $smsService = new SmsServiceController($message, $recipients);
                 $smsService->sendSms();
