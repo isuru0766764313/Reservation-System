@@ -290,7 +290,7 @@ class AdminDashboardController extends Controller
                 ->where('end_time', $reservation->end_time)
                 ->delete();
             // send sms notifying reservation request was rejected.
-            $message = 'We regret to inform you that your reservation request (' . $hall->name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . ' ) could not be approved due to unavoidable circumstances. Your reservation ID is : ' . $reservation->id;
+            $message = 'We regret to inform you that your reservation request (' . $hall->name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . ' ) could not be approved due to unavoidable circumstances. Your reservation Ref Code is : ' . $reservation->id;
             $recipients = ($customer->telephone_number);
             $smsService = new SmsServiceController($message, $recipients);
             $smsService->sendSms();
