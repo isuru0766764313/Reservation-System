@@ -260,7 +260,7 @@ class AdminDashboardController extends Controller
             // Send notification to customer
             $customer->notify(new ReservationAccepted($reservation, $hall, $customer));
             //send sms notifying reservation request was accepted.
-            $message = 'Your reservation has been accepted by admin. ' . $hall->name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . '.' . PHP_EOL . 'Your reservation ID is : ' . $reservation->id;
+            $message = 'Your reservation has been accepted by admin. ' . $hall->name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . '.' . PHP_EOL . 'Your reservation Ref Code is : ' . $reservation->id;
             $recipients = ($customer->telephone_number);
             $smsService = new SmsServiceController($message, $recipients);
             $smsService->sendSms();
