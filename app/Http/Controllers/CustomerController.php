@@ -1087,7 +1087,7 @@ class CustomerController extends Controller
                 $customer->notify(new SendCustomerOTP($email_otp));
 
                 // Send SMS OTP
-                $message = 'New Password Reset Codes for Public Facilities Reservation Portal.' . PHP_EOL .
+                $message = 'New Password Reset Codes for Public Facilities Reservation System.' . PHP_EOL .
                     'Email OTP: ' . $email_otp . PHP_EOL .
                     'Phone OTP: ' . $mobile_otp . PHP_EOL .
                     'Valid for 10 minutes. Do not share.';
