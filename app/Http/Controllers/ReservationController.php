@@ -288,7 +288,7 @@ class ReservationController extends Controller
         }
 
         // Send SMS
-        $message = 'Your PACKAGE reservation has been logged for ' . $hall->name . ' on ' . $request->selected_date . ' from ' . $request->start_time . ' to ' . $request->end_time . '.' . PHP_EOL . 'Package: ' . $package->name . PHP_EOL . 'Your reservation ID is : ' . $reservation->id;
+        $message = 'Your reservation (Package type) has been submitted for ' . $hall->name . ' on ' . $request->selected_date . ' from ' . $request->start_time . ' to ' . $request->end_time . '.' . PHP_EOL . 'Package: ' . $package->name . PHP_EOL . 'Your reservation ID is : ' . $reservation->id;
         $recipients = ($customer->telephone_number . ',' . $admin->telephone_number);
         $smsService = new SmsServiceController($message, $recipients);
         $smsService->sendSms();
