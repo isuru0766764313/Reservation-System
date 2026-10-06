@@ -619,13 +619,15 @@
                   @endif
                 </td>
                 <td class="d-flex align-items-center flex-wrap gap-2">
-                  <button class="btn btn-primary btn-sm action-btn packages-btn" data-hall-id="{{ $hall->id }}"
-                    data-name="{{ $hall->name }}" data-fixed-facilities='@json($hall->fixedfacilities)'
-                    data-unit-facilities='@json($hall->unitfacilities)' data-existing-packages='@json($hall->packages)'
-                    data-bs-toggle="modal" data-bs-target="#AddPackagesModal">
-                    <i class="fas fa-edit me-2"></i>
-                    {{ $hall->packages->count() > 0 ? 'Edit Packages' : 'Packages' }}
-                  </button>
+                  @if(in_array($hall->booking_method, ['package', 'both']))
+                    <button class="btn btn-primary btn-sm action-btn packages-btn" data-hall-id="{{ $hall->id }}"
+                      data-name="{{ $hall->name }}" data-fixed-facilities='@json($hall->fixedfacilities)'
+                      data-unit-facilities='@json($hall->unitfacilities)' data-existing-packages='@json($hall->packages)'
+                      data-bs-toggle="modal" data-bs-target="#AddPackagesModal">
+                      <i class="fas fa-edit me-2"></i>
+                      {{ $hall->packages->count() > 0 ? 'Edit Packages' : 'Packages' }}
+                    </button>
+                  @endif
                   <form action="{{ route('open.hall.update.page', $hall) }}" method="PUT">
                     <button type="submit" class="btn btn-primary btn-sm action-btn update-btn">Edit Property</button>
                   </form>
@@ -1158,12 +1160,12 @@
                             @endif
                           </form>
                           <!--<form action="{{ route('admin.payment.reject', $payment) }}" method="POST" class="d-inline slip-action-form">
-                                                                                                                                                                      @csrf
-                                                                                                                                                                      @method('PATCH')
-                                                                                                                                                                      <button type="submit" class="btn btn-danger" title="Reject payment">
-                                                                                                                                                                        <i class="fas fa-times me-2"></i> Reject
-                                                                                                                                                                      </button>
-                                                                                                                                                                    </form>-->
+                                                                                                                                                                                @csrf
+                                                                                                                                                                                @method('PATCH')
+                                                                                                                                                                                <button type="submit" class="btn btn-danger" title="Reject payment">
+                                                                                                                                                                                  <i class="fas fa-times me-2"></i> Reject
+                                                                                                                                                                                </button>
+                                                                                                                                                                              </form>-->
                         @else
                           @if($payment->status == 2)
                             <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Accepted</span>
@@ -1177,7 +1179,7 @@
                 @else
                   <div class="alert alert-warning mb-0">
                     <i class="fas fa-exclamation-circle me-2"></i>
-                    Reservation has been already  accepted. Awaiting Advance payment Slip.
+                    Reservation has been already accepted. Awaiting Advance payment Slip.
                   </div>
                 @endif
               </div>
