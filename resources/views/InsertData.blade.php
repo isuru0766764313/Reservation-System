@@ -386,15 +386,15 @@
                     <div class="row g-3 mt-3">
                         <div class="col-md-4">
                             <label class="form-label required">Capacity</label>
-                            <input type="number" class="form-control" name="capacity" step="1" value="{{ old('price', $hall->capacity ?? '') }}" required>
+                            <input type="number" class="form-control" name="capacity" min="1" step="1" value="{{ old('capacity', $hall->capacity ?? '') }}" required>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label required">Cancellation Fee (LKR)</label>
-                            <input type="number" class="form-control" name="cancellation_fee" step="0.01" value="{{ old('discount', $hall->cancellation_fee ?? '') }}">
+                            <input type="number" class="form-control" name="cancellation_fee" min="0" step="0.01" value="{{ old('cancellation_fee', $hall->cancellation_fee ?? '') }}">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label required">Refundable Deposit Amount (LKR)</label>
-                            <input type="number" class="form-control" name="deposit" step="0.01" value="{{ old('deposit', $hall->deposit ?? '') }}">
+                            <input type="number" class="form-control" name="deposit" min="0" step="0.01" value="{{ old('deposit', $hall->deposit ?? '') }}">
                         </div>
                         <!--<div class="col-md-4">
                             <label class="form-label required">Advance Amount (LKR)</label>
@@ -431,11 +431,11 @@
                     <div class="row g-3 mt-3" id="priceSection">
                         <div class="col-md-4">
                             <label class="form-label required">Price Per Hour (LKR)</label>
-                            <input type="number" class="form-control" name="price" step="0.01" value="{{ old('price', $hall->price ?? '') }}" required>
+                            <input type="number" class="form-control" name="price" min="0" step="0.01" value="{{ old('price', $hall->price ?? '') }}" required>
                         </div>
                         <div class="col-md-4" style="display: none;">
                             <label class="form-label required">Disdcount (LKR)</label>
-                            <input type="number" class="form-control" name="discount" step="0.01" value="{{ old('discount', $hall->discount ?? '') }}" style="display: none;">
+                            <input type="number" class="form-control" name="discount" min="0" step="0.01" value="{{ old('discount', $hall->discount ?? '') }}" style="display: none;">
                         </div>
                     </div>
 
@@ -510,7 +510,7 @@
                                                         value="{{ $facility->name }}">
                                                 </td>
                                                 <td>
-                                                    <input type="number" class="form-control fixed-price-facity-charge-input" placeholder="0.00"
+                                                    <input type="number" class="form-control fixed-price-facity-charge-input" placeholder="0.00" min="0"
                                                         step="0.01" name="fixedpricefacility[{{ $index }}][charge]"
                                                         value="{{ $facility->charge }}">
                                                 </td>
@@ -576,7 +576,7 @@
                                                         value="{{ $facility->name }}">
                                                 </td>
                                                 <td>
-                                                    <input type="number" class="form-control unit-price-facity-charge-input" placeholder="0.00"
+                                                    <input type="number" class="form-control unit-price-facity-charge-input" placeholder="0.00" min="0"
                                                         step="0.01" name="unitpricefacility[{{ $index }}][charge]"
                                                         value="{{ $facility->charge }}">
                                                 </td>
@@ -1055,7 +1055,7 @@
             <input type="text" class="form-control fixed-price-facity-name-input" placeholder="e.g., WiFi" name="fixedpricefacility[${fixedpricerowcount}][name]">
             </td>
             <td>
-            <input type="number" class="form-control fixed-price-facity-charge-input" placeholder="0.00" step="0.01" name="fixedpricefacility[${fixedpricerowcount}][charge]">
+            <input type="number" class="form-control fixed-price-facity-charge-input" placeholder="0.00" min="0" step="0.01" name="fixedpricefacility[${fixedpricerowcount}][charge]">
             </td>
             <td>
             <button type="button" class="btn btn-sm btn-danger remove-row1"><i class="bi bi-trash"></i>Remove</button>
@@ -1092,7 +1092,7 @@
             <input type="text" class="form-control unit-price-facity-name-input" placeholder="e.g., Generator" name="unitpricefacility[${unitpricerowcount}][name]">
             </td>
             <td>
-            <input type="number" class="form-control unit-price-facity-charge-input" placeholder="0.00" step="0.01" name="unitpricefacility[${unitpricerowcount}][charge]">
+            <input type="number" class="form-control unit-price-facity-charge-input" placeholder="0.00" min="0" step="0.01" name="unitpricefacility[${unitpricerowcount}][charge]">
             </td>
             <td>
             <button type="button" class="btn btn-sm btn-danger remove-row2"><i class="bi bi-trash"></i>Remove</button>
@@ -1295,6 +1295,22 @@
             }
         }
     });
+    </script>
+
+    <script>
+        // Keep all numeric inputs non-negative: block minus/scientific notation keys
+        // and strip minus signs that arrive via paste or the number spinner.
+        document.addEventListener('keydown', function (e) {
+            if (e.target.matches('input[type="number"]') && ['-', '+', 'e', 'E'].includes(e.key)) {
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener('input', function (e) {
+            if (e.target.matches('input[type="number"]') && Number(e.target.value) < 0) {
+                e.target.value = e.target.value.replace(/-/g, '');
+            }
+        });
     </script>
 </body>
 </html>
