@@ -376,7 +376,7 @@
                             <div class="col-md-2 col-6">
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="type" value="outdoorground" id="typeGround" {{ (old('type', $hall->type ?? '') == 'outdoorground') ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="typeGround">Play Ground</label>
+                                    <label class="form-check-label" for="typeGround">Outdoor Ground</label>
                                 </div>
                             </div>
                         </div>
