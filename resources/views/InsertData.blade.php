@@ -482,24 +482,24 @@
                                     <tbody>
                                         <!-- Existing Facilities -->
                                         @php
-                                            // Get old input for fixedpricefacility if validation failed
-                                            $oldFixedFacilities = old('fixedpricefacility', []);
-                                            // If we're editing an existing hall and there's no old input, use the hall's facilities
-                                            if (isset($hall) && $hall->fixedfacilities->count() > 0 && empty($oldFixedFacilities)) {
-                                                $fixedFacilitiesToShow = $hall->fixedfacilities;
-                                            } else {
-                                                // Use old input (could be empty array if creating new with no old input)
-                                                $fixedFacilitiesToShow = collect($oldFixedFacilities)->map(function($item, $index) {
-                                                    return (object) [
-                                                        'name' => $item['name'] ?? '',
-                                                        'charge' => $item['charge'] ?? ''
-                                                    ];
-                                                });
-                                                // If empty, add one empty row
-                                                if ($fixedFacilitiesToShow->isEmpty()) {
-                                                    $fixedFacilitiesToShow = collect([(object) ['name' => '', 'charge' => '']]);
-                                                }
-                                            }
+// Get old input for fixedpricefacility if validation failed
+$oldFixedFacilities = old('fixedpricefacility', []);
+// If we're editing an existing hall and there's no old input, use the hall's facilities
+if (isset($hall) && $hall->fixedfacilities->count() > 0 && empty($oldFixedFacilities)) {
+    $fixedFacilitiesToShow = $hall->fixedfacilities;
+} else {
+    // Use old input (could be empty array if creating new with no old input)
+    $fixedFacilitiesToShow = collect($oldFixedFacilities)->map(function ($item, $index) {
+        return (object) [
+            'name' => $item['name'] ?? '',
+            'charge' => $item['charge'] ?? ''
+        ];
+    });
+    // If empty, add one empty row
+    if ($fixedFacilitiesToShow->isEmpty()) {
+        $fixedFacilitiesToShow = collect([(object) ['name' => '', 'charge' => '']]);
+    }
+}
                                         @endphp
                                         
                                         @foreach($fixedFacilitiesToShow as $index => $facility)
@@ -548,24 +548,24 @@
                                     </thead>
                                     <tbody>
                                         @php
-                                            // Get old input for unitpricefacility if validation failed
-                                            $oldUnitFacilities = old('unitpricefacility', []);
-                                            // If we're editing an existing hall and there's no old input, use the hall's facilities
-                                            if (isset($hall) && $hall->unitfacilities->count() > 0 && empty($oldUnitFacilities)) {
-                                                $unitFacilitiesToShow = $hall->unitfacilities;
-                                            } else {
-                                                // Use old input (could be empty array if creating new with no old input)
-                                                $unitFacilitiesToShow = collect($oldUnitFacilities)->map(function($item, $index) {
-                                                    return (object) [
-                                                        'name' => $item['name'] ?? '',
-                                                        'charge' => $item['charge'] ?? ''
-                                                    ];
-                                                });
-                                                // If empty, add one empty row
-                                                if ($unitFacilitiesToShow->isEmpty()) {
-                                                    $unitFacilitiesToShow = collect([(object) ['name' => '', 'charge' => '']]);
-                                                }
-                                            }
+// Get old input for unitpricefacility if validation failed
+$oldUnitFacilities = old('unitpricefacility', []);
+// If we're editing an existing hall and there's no old input, use the hall's facilities
+if (isset($hall) && $hall->unitfacilities->count() > 0 && empty($oldUnitFacilities)) {
+    $unitFacilitiesToShow = $hall->unitfacilities;
+} else {
+    // Use old input (could be empty array if creating new with no old input)
+    $unitFacilitiesToShow = collect($oldUnitFacilities)->map(function ($item, $index) {
+        return (object) [
+            'name' => $item['name'] ?? '',
+            'charge' => $item['charge'] ?? ''
+        ];
+    });
+    // If empty, add one empty row
+    if ($unitFacilitiesToShow->isEmpty()) {
+        $unitFacilitiesToShow = collect([(object) ['name' => '', 'charge' => '']]);
+    }
+}
                                         @endphp
                                         
                                         @foreach($unitFacilitiesToShow as $index => $facility)
@@ -680,25 +680,25 @@
                                 </thead>
                                 <tbody>
                                     @php
-                                        // Get old input for availability if validation failed
-                                        $oldAvailability = old('availability', []);
-                                        // If we're editing an existing hall and there's no old input, use the hall's availability
-                                        if (isset($hall) && $hall->availability->count() > 0 && empty($oldAvailability)) {
-                                            $availabilityToShow = $hall->availability;
-                                        } else {
-                                            // Use old input (could be empty array if creating new with no old input)
-                                            $availabilityToShow = collect($oldAvailability)->map(function($item, $index) {
-                                                return (object) [
-                                                    'date' => $item['date'] ?? '',
-                                                    'start_time' => $item['start_time'] ?? '',
-                                                    'end_time' => $item['end_time'] ?? ''
-                                                ];
-                                            });
-                                            // If empty, add one empty row
-                                            if ($availabilityToShow->isEmpty()) {
-                                                $availabilityToShow = collect([(object) ['date' => '', 'start_time' => '', 'end_time' => '']]);
-                                            }
-                                        }
+// Get old input for availability if validation failed
+$oldAvailability = old('availability', []);
+// If we're editing an existing hall and there's no old input, use the hall's availability
+if (isset($hall) && $hall->availability->count() > 0 && empty($oldAvailability)) {
+    $availabilityToShow = $hall->availability;
+} else {
+    // Use old input (could be empty array if creating new with no old input)
+    $availabilityToShow = collect($oldAvailability)->map(function ($item, $index) {
+        return (object) [
+            'date' => $item['date'] ?? '',
+            'start_time' => $item['start_time'] ?? '',
+            'end_time' => $item['end_time'] ?? ''
+        ];
+    });
+    // If empty, add one empty row
+    if ($availabilityToShow->isEmpty()) {
+        $availabilityToShow = collect([(object) ['date' => '', 'start_time' => '', 'end_time' => '']]);
+    }
+}
                                     @endphp
                                     
                                     @foreach($availabilityToShow as $index => $slot)
@@ -753,8 +753,8 @@
             
                         <!-- Empty upload boxes for new images (only show if we have less than 5 images) -->
                         @php
-                            $existingCount = isset($hall) ? count($hall->images) : 0;
-                            $emptySlots = 5 - $existingCount;
+$existingCount = isset($hall) ? count($hall->images) : 0;
+$emptySlots = 5 - $existingCount;
                         @endphp
                         @if($emptySlots > 0)
                             <!-- Initial empty upload box -->
@@ -845,9 +845,9 @@
                 <div class="mb-3">
                     <label class="form-label">
                         @if(isset($hall) && $hall->clearence_form)
-                            Upload New Clearence Form (Optional - replaces current file)
+                            Upload New Application Form (Optional - replaces current file)
                         @else
-                            Upload Clearence File (PDF)
+                            Upload Application File (PDF)
                         @endif
                     </label>
                     <input type="file" name="clearence_form" class="form-control" accept=".pdf" id="clearenceInput">
