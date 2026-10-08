@@ -192,6 +192,10 @@
         // Set when an unauthenticated visitor tried to open a hall page and was
         // bounced back here by the auth middleware -> auto-slide-in the sign-in panel
         window.authRedirected = @json($auth_redirected ?? session('auth_redirected', false));
+        // Set right after a customer completes email + mobile OTP verification
+        // -> auto-slide-in the sign-in panel with a "Successfully registered" alert
+        window.justRegistered = @json($just_registered ?? session('just_registered', false));
+        window.registeredEmail = @json($registered_email ?? session('registered_email', ''));
         console.log('Hall Data Loaded:', window.hallData);
     </script>
 
@@ -300,6 +304,15 @@
                     </span>
                     <p class="pl-8 text-sm font-medium">Please sign in to see the hall details.</p>
                 </div>
+                <!-- Success alert shown right after registration + OTP verification -->
+                @if ($just_registered ?? session('just_registered', false))
+                    <div id="registered-success-alert" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative flex items-start justify-between" role="alert">
+                        <span class="font-medium text-sm">
+                            <i class="fa-solid fa-circle-check mr-1"></i>
+                            Successfully registered! Please sign in to continue.
+                        </span>
+                    </div>
+                @endif
                 @if ($errors->any())
                     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
                         <ul class="list-disc list-inside">
@@ -852,8 +865,9 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Auto-slide-in the customer sign-in panel when the visitor was bounced
-            // back here after clicking a hall while not signed in
-            if (window.authRedirected) {
+            // back here after clicking a hall while not signed in, or right after
+            // completing registration + OTP verification (justRegistered)
+            if (window.authRedirected || window.justRegistered) {
                 const customerAuthContainer = document.getElementById('customer-auth-container');
                 const adminAuthContainer = document.getElementById('admin-auth-container');
                 const customerLoginForm = document.getElementById('customer-login-form');
@@ -864,16 +878,20 @@
                     customerLoginForm.classList.remove('hidden');
                     customerAuthContainer.classList.add('active');
 
-                    // Show a contextual hint inside the panel
+                    // Show a contextual hint inside the panel (hall-redirect only;
+                    // for just-registered users the green success alert is shown instead)
                     const hint = document.getElementById('auth-redirect-hint');
-                    if (hint) {
+                    if (hint && window.authRedirected) {
                         hint.classList.remove('hidden');
                     }
 
-                    // Pre-fill the email the user typed previously, if any
+                    // Pre-fill the email: freshly registered email takes priority,
+                    // otherwise fall back to the previously typed one
                     const emailInput = document.getElementById('customer-login-email');
                     if (emailInput && !emailInput.value) {
-                        emailInput.value = @json(old('email', ''));
+                        emailInput.value = window.justRegistered
+                            ? (window.registeredEmail || @json(old('email', '')))
+                            : @json(old('email', ''));
                     }
                 }
             }
