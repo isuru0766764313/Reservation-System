@@ -867,7 +867,6 @@
                                                 data-price="{{ $up_facility->charge }}">
                                             <label class="form-check-label" for="unit_facility_{{ $up_facility->id }}">
                                                 {{$up_facility->name}} - Rs. {{ number_format($up_facility->charge, 2) }}
-                                                per unit
                                             </label>
                                         </div>
                                     </div>
