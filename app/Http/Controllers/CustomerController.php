@@ -138,10 +138,15 @@ class CustomerController extends Controller
             ]);
 
             $request->session()->forget('verify_customer_id');
-            Auth::guard('customer')->login($customer);
+            // Do NOT auto-login here: the customer must sign in from the home page.
+            // Flag the session so home.blade.php auto-slides in the sign-in panel
+            // with a "Successfully registered" alert. The email is kept in the
+            // session to pre-fill the login form for convenience.
+            $request->session()->put('just_registered', true);
+            $request->session()->put('registered_email', $customer->email);
 
             // Redirect to home route (the home route controller will load halls data automatically)
-            return redirect()->route('home_route')->with('success', 'Email verified successfully!');
+            return redirect()->route('home_route')->with('success', 'You have successfully registered! Please sign in to continue.');
         } else {
             return back()->withErrors(['otp' => 'Invalid or expired OTP']);
         }
@@ -182,7 +187,15 @@ class CustomerController extends Controller
         // sign-in panel auto-slides in exactly once, on this page render only.
         $authRedirected = session()->pull('auth_redirected', false);
 
-        return view('home')->with('auth_redirected', $authRedirected);
+        // Read the just-registered flag (also one-shot) so the sign-in panel can
+        // auto-slide in with a "Successfully registered" alert after OTP verification.
+        $justRegistered = session()->pull('just_registered', false);
+        $registeredEmail = $justRegistered ? session()->get('registered_email', '') : '';
+
+        return view('home')
+            ->with('auth_redirected', $authRedirected)
+            ->with('just_registered', $justRegistered)
+            ->with('registered_email', $registeredEmail);
     }
 
     function Login(Request $request)
