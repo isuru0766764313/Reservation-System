@@ -258,11 +258,11 @@
                         class="bg-white text-indigo-600 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-gray-100 transition-colors">
                         Make a Reservation
                     </button>
-                    <!-- A simple search button placeholder -->
+                    <!-- A simple search button placeholder 
                     <button id="search-venue-btn"
                         class="bg-transparent border-2 border-white text-white font-bold py-3 px-8 rounded-full hover:bg-white hover:text-indigo-600 transition-colors">
                         Register Venue
-                    </button>
+                    </button>-->
                 </div>
             </div>
             <!-- Right side illustration -->
