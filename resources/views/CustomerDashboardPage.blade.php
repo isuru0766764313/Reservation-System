@@ -1135,7 +1135,7 @@
                         <tr>
                             <th class="reservation-id">Reference Code</th>
                             <th class="property-name">Venue Name</th>
-                            <th>Property Details</th>
+                            <th>Venue Details</th>
                             <th>Reservation Date</th>
                             <th class="time-period">Reservation Period</th>
                             <th>Reservation Charge</th>
