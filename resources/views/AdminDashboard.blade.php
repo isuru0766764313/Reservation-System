@@ -744,7 +744,7 @@
       <form method="GET" action="{{ route('admin.dashboard.route') }}" class="mb-3" style="max-width: 420px;">
         <div class="input-group">
           <input type="text" class="form-control" name="search"
-            placeholder="Enter reference code, customer, or property..." value="{{ request('search') }}">
+            placeholder="Enter Reference Code, Customer name, or Venue..." value="{{ request('search') }}">
           <button class="btn btn-primary" type="submit">
             <i class="fas fa-search"></i>
           </button>
