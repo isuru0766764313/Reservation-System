@@ -430,7 +430,7 @@
                     <!-- Price & Discount -->
                     <div class="row g-3 mt-3" id="priceSection">
                         <div class="col-md-4">
-                            <label class="form-label required">Price Per Hour (LKR)</label>
+                            <label class="form-label required">Price Per Hour (Rs.)</label>
                             <input type="number" class="form-control" name="price" min="0" step="0.01" value="{{ old('price', $hall->price ?? '') }}" required>
                         </div>
                         <div class="col-md-4" style="display: none;">
@@ -466,7 +466,7 @@
                         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">Fixed Price Facilities</h5>
                             <button type="button" class="btn btn-sm btn-light" id="addFixedFacility">
-                                <i class="bi bi-plus-circle"></i> Add Fixed Priced Facilities
+                                <i class="bi bi-plus-circle"></i> Add Fixed Price Facilities
                             </button>
                         </div>
                         <div class="card-body">
