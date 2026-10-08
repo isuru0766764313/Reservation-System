@@ -576,7 +576,7 @@
                                     <div class="flex-grow-1">
                                         <div class="d-flex justify-content-between align-items-start mb-2">
                                             <h5 class="card-title mb-0">{{ $hall->name }}</h5>
-                                            <span class="badge type-badge">{{ $hall->type }}</span>
+                                            <span class="badge type-badge">{{ $hall->type_label }}</span>
                                         </div>
 
                                         <div class="mb-2">
