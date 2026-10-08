@@ -667,7 +667,7 @@ if (isset($hall) && $hall->unitfacilities->count() > 0 && empty($oldUnitFaciliti
             <div class="form-section">
                 <div class="row g-3">
                     <div class="form-section">
-                        <h4 class="mb-4"><i class="fas fa-calendar-alt me-2"></i>Unavailability of a Property</h4>
+                        <h4 class="mb-4"><i class="fas fa-calendar-alt me-2"></i>Unavailability of the Venue</h4>
                         <div class="table-responsive">
                             <table class="table table-bordered" id="availability-table">
                                 <thead class="table-dark">
