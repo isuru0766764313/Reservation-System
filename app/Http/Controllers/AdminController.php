@@ -56,7 +56,7 @@ class AdminController extends Controller
             return redirect(route('admin.registration.get.route'))->with('error_key_1', 'Registration is failed. Pls try again');
         } else {
             // send sms otp to admin at registration..
-            $message = 'Welcome to Public Facilities Reservation System.' . PHP_EOL . '"' . $mobile_otp . '" is your one-time entry otp code. Do not share with others.';
+            $message = 'Welcome to Public Facilities Reservation System. Your OTP for registration is : ' . PHP_EOL . '"' . $mobile_otp . '" Do not share this code with others.';
             $recipients = ($request->telephone_number);
             $smsService = new SmsServiceController($message, $recipients);
             $smsService->sendSms();
