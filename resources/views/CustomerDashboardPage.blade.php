@@ -983,7 +983,10 @@
                 <button class="settings-btn" id="settingsButton" data-bs-toggle="popover" data-bs-placement="bottom"
                     data-bs-custom-class="popover-settings" data-bs-title="User Settings" data-bs-content='
                             <div class="user-info-header">
-                                <div class="user-avatar-lg">IT</div>
+                                @php
+                                    $initials = strtoupper(mb_substr(trim($customer->first_name ?? ''), 0, 1) . mb_substr(trim($customer->last_name ?? ''), 0, 1));
+                                @endphp
+                                <div class="user-avatar-lg">{{ $initials }}</div>
                                 <div class="user-details-lg">
                                     <h6 class="mb-1">{{ $customer->first_name }} {{ $customer->last_name }}</h6>
                                     <p class="small text-muted mb-2">{{ $customer->email }}</p>
