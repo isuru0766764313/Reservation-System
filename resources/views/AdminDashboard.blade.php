@@ -602,7 +602,7 @@
         <table class="table table-custom hall-table">
           <thead>
             <tr>
-              <th>Hall</th>
+              <th>Venue</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
