@@ -2423,7 +2423,7 @@
                 }
                 if (newTotalDuration > originalTotalDuration) { document.getElementById('durationMessage').textContent = `Total duration (${newTotalDuration.toFixed(1)} hours) exceeds original duration (${originalTotalDuration.toFixed(1)} hours). Please adjust your selection.`; durationWarning.style.display = 'block'; }
                 else if (newTotalDuration === originalTotalDuration) { durationWarning.style.display = 'none'; durationSuccess.style.display = 'block'; saveBtn.disabled = false; }
-                else { document.getElementById('durationMessage').textContent = `Total duration (${newTotalDuration.toFixed(1)} hours) is less than original (${originalTotalDuration.toFixed(1)} hours). You can proceed, but unused time will be released.`; durationWarning.style.display = 'block'; saveBtn.disabled = false; }
+                else { document.getElementById('durationMessage').textContent = `Total duration (${newTotalDuration.toFixed(1)} hours) is less than original (${originalTotalDuration.toFixed(1)} hours). Please adjust your selection so the duration matches the original.`; durationWarning.style.display = 'block'; }
             }
 
             function formatTime12Hour(time24) { if (!time24) return ''; const [h, m] = time24.split(':'); const hour = parseInt(h); return `${hour % 12 || 12}:${m} ${hour >= 12 ? 'PM' : 'AM'}`; }
