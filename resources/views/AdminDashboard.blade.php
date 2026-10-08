@@ -629,7 +629,7 @@
                     </button>
                   @endif
                   <form action="{{ route('open.hall.update.page', $hall) }}" method="PUT">
-                    <button type="submit" class="btn btn-primary btn-sm action-btn update-btn">Edit Property</button>
+                    <button type="submit" class="btn btn-primary btn-sm action-btn update-btn">Edit Details</button>
                   </form>
                   @if ($hall->available === true)
                     <form action="{{ route('deactivate.hall', $hall) }}" method="POST" style="display: inline;"
