@@ -757,7 +757,7 @@
     <!-- Auto Image Grid Section -->
     <section class="py-12 sm:py-16 bg-gray-100 overflow-hidden">
         <div class="container mx-auto px-4">
-            <h2 class="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-8">Discover a Public Venues</h2>
+            <h2 class="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-8">Discover Public Venues</h2>
             <!-- The inner flex container now has the animation applied -->
             <div id="card-grid" class="card-grid flex space-x-6 py-4 px-2 -mx-2">
                 <!-- Cards will be dynamically added here by JavaScript -->
