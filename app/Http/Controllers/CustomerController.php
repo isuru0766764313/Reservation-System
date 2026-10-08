@@ -178,7 +178,7 @@ class CustomerController extends Controller
 
         $customer->notify(new SendCustomerOTP($new_email_otp));
 
-        return back()->with('status', 'New OTP has been sent to your email and telephone number!');
+        return back()->with('status', 'New OTP has been sent to your email and mobile number!');
     }
 
     function ShowLoginPage()
