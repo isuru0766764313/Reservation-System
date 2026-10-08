@@ -142,7 +142,7 @@ class AdminController extends Controller
         ]);
 
         //  re-send sms otp to admin at registration..
-        $message = 'Welcome back to Public Facilities Reservation System. Please verify your account before sign in' . PHP_EOL . '"' . $new_mobile_otp . '" is your one-time entry code. Do not share with others.';
+        $message = 'Welcome back to Public Facilities Reservation System. Please verify your account before sign in' . PHP_EOL . '"' . $new_mobile_otp . '" is your OTP code. Do not share with others.';
         $recipients = ($admin->telephone_number);
         $smsService = new SmsServiceController($message, $recipients);
         $smsService->sendSms();
