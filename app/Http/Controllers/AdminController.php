@@ -674,7 +674,7 @@ class AdminController extends Controller
 
                 // Send SMS OTP
                 $message = 'New Password Reset Codes for Public Facilities Reservation System.' . PHP_EOL .
-                    'Phone OTP: ' . $mobile_otp . PHP_EOL .
+                    'Your OTP: ' . $mobile_otp . PHP_EOL .
                     'Valid for 10 minutes. Do not share.';
                 $smsService = new SmsServiceController($message, $admin->telephone_number);
                 $smsService->sendSms();
