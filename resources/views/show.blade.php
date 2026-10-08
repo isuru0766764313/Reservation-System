@@ -604,7 +604,7 @@
                         <!-- Regular Charge Breakdown -->
                         <div id="regularCharges">
                             <div class="mb-3 p-3 bg-light rounded">
-                                <h5 class="mb-0">Property Charge: <span id="propertyChargeRegular">Rs. 0.00</span></h5>
+                                <h5 class="mb-0">Venue Charge: <span id="propertyChargeRegular">Rs. 0.00</span></h5>
                             </div>
                             @if ($hall->discount > 0)
                                 <div class="mb-3 p-3 bg-light rounded">
