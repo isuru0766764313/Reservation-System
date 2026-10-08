@@ -2101,6 +2101,19 @@
                 }
             });
 
+            // Clear the Reset Password form whenever the modal is closed
+            const resetPasswordModalEl = document.getElementById('resetPasswordModal');
+            if (resetPasswordModalEl) {
+                resetPasswordModalEl.addEventListener('hidden.bs.modal', function () {
+                    const form = this.querySelector('#resetPasswordForm');
+                    if (form) {
+                        form.reset();
+                        form.querySelectorAll('.is-invalid').forEach(input => input.classList.remove('is-invalid'));
+                        form.querySelectorAll('.invalid-feedback').forEach(error => error.remove());
+                    }
+                });
+            }
+
             // Password Reset
             const resetPasswordForm = document.getElementById('resetPasswordForm');
             if (resetPasswordForm) {
