@@ -113,7 +113,7 @@ class HallModel extends Model
             'floor'           => 'Floor',
             'room'            => 'Room',
             'outdoortheator'  => 'Outdoor Theator',
-            'multipurpose'    => 'Multipurpose',
+            'multipurpose'    => 'Multi-Purpose',
             'resorts'         => 'Resorts',
             'bangalow'        => 'Bangalow',
             'conference'      => 'Conference',
