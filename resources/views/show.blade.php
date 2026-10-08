@@ -805,7 +805,7 @@ $images = $hall->images ?? [];
 
                         <!-- Reserve Button for Package -->
                         <button type="submit" class="btn btn-primary w-100 btn-lg" id="packageReserveButton" disabled>
-                            <i class="fas fa-calendar-check me-2"></i>Request The Reservation (Package)
+                            <i class="fas fa-calendar-check me-2"></i>Submit Reservation Request (Package)
                         </button>
                     </form>
 
