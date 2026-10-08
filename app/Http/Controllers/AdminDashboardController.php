@@ -260,7 +260,7 @@ class AdminDashboardController extends Controller
             // Send notification to customer
             $customer->notify(new ReservationAccepted($reservation, $hall, $customer));
             //send sms notifying reservation request was accepted.
-            $message = 'Your reservation has been accepted by admin. ' . $hall->name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . '.' . PHP_EOL . 'Your reservation Ref Code is : ' . $reservation->id;
+            $message = 'Your reservation has been accepted by admin. ' . $hall->name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . '.' . PHP_EOL . 'Your reservation Ref Code is : ' . $reservation->ref_code;
             $recipients = ($customer->telephone_number);
             $smsService = new SmsServiceController($message, $recipients);
             $smsService->sendSms();
@@ -290,7 +290,7 @@ class AdminDashboardController extends Controller
                 ->where('end_time', $reservation->end_time)
                 ->delete();
             // send sms notifying reservation request was rejected.
-            $message = 'We regret to inform you that your reservation (' . $hall->name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . ' ) has been rejected due to unavoidable circumstances. Pleases contact the admin. Your reservation Ref Code is : ' . $reservation->id;
+            $message = 'We regret to inform you that your reservation (' . $hall->name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . ' ) has been rejected due to unavoidable circumstances. Pleases contact the admin. Your reservation Ref Code is : ' . $reservation->ref_code;
             $recipients = ($customer->telephone_number);
             $smsService = new SmsServiceController($message, $recipients);
             $smsService->sendSms();

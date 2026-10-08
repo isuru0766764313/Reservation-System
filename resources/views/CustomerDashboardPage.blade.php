@@ -1361,8 +1361,8 @@
         </div>
     </div>
 
-    @foreach ($reservations as $reservation)
-        <!-- Re-schedule Modal -->
+    <!-- Re-schedule Modal -->
+    @foreach ($reservations as $reservation)        
         <div class="modal fade" id="rescheduleModal" tabindex="-1" aria-labelledby="rescheduleModalLabel"
             aria-hidden="true">
             <div class="modal-dialog modal-lg">
