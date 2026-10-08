@@ -1040,7 +1040,7 @@
                 <div class="stat-icon total"><i class="fas fa-calendar"></i></div>
                 <div class="stat-content">
                     <div class="stat-number">{{ $total }}</div>
-                    <div class="stat-label">Total Reservations</div>
+                    <div class="stat-label">Total</div>
                 </div>
             </a>
             <a href="{{ route('load_customer_dashboard', array_filter(['status' => 1, 'search' => $searchParam])) }}"
