@@ -1826,6 +1826,17 @@
                                                         } elseif ($statusId == 5 && (!$cancelPay || $cancelPay->status == 3)) {
                                                             $nextLabel = 'Pay Cancellation Fee';
                                                             $nextAmount = $reservation->hall->cancellation_fee ?? 0;
+                                                        } elseif ($statusId == 7) {
+                                                            if (!$prelimPay || $prelimPay->status == 3) {
+                                                                $nextLabel = 'Pay Advance';
+                                                                $nextAmount = $reservation->advanceAmount;
+                                                            } elseif ($prelimPay->status == 1) {
+                                                                $nextLabel = 'Awaiting admin approval for Advance payment';
+                                                                $nextAmount = $prelimPay->amount;
+                                                            } else {
+                                                                $nextLabel = 'Pay balance amount';
+                                                                $nextAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
+                                                            }
                                                         }
                                                     @endphp
                                                     @if($nextLabel)
@@ -2412,7 +2423,7 @@
                 }
                 if (newTotalDuration > originalTotalDuration) { document.getElementById('durationMessage').textContent = `Total duration (${newTotalDuration.toFixed(1)} hours) exceeds original duration (${originalTotalDuration.toFixed(1)} hours). Please adjust your selection.`; durationWarning.style.display = 'block'; }
                 else if (newTotalDuration === originalTotalDuration) { durationWarning.style.display = 'none'; durationSuccess.style.display = 'block'; saveBtn.disabled = false; }
-                else { document.getElementById('durationMessage').textContent = `Total duration (${newTotalDuration.toFixed(1)} hours) is less than original (${originalTotalDuration.toFixed(1)} hours). You can proceed, but unused time will be released.`; durationWarning.style.display = 'block'; saveBtn.disabled = false; }
+                else { document.getElementById('durationMessage').textContent = `Total duration (${newTotalDuration.toFixed(1)} hours) is less than original (${originalTotalDuration.toFixed(1)} hours). Please adjust your selection so the duration matches the original.`; durationWarning.style.display = 'block'; }
             }
 
             function formatTime12Hour(time24) { if (!time24) return ''; const [h, m] = time24.split(':'); const hour = parseInt(h); return `${hour % 12 || 12}:${m} ${hour >= 12 ? 'PM' : 'AM'}`; }
