@@ -217,7 +217,7 @@ class AdminController extends Controller
                     $admin->update(['email_verification_otp' => $new_email_otp, 'mobile_verification_otp' => $new_mobile_otp, 'otp_expires_at' => Carbon::now()->addMinutes(10)]);
 
                     // Send SMS OTP
-                    $message = 'Welcome back to Public Facilities Reservation System. Please verify your account before sign in' . PHP_EOL . '"' . $new_mobile_otp . '" is your one-time entry code. Do not share with others.';
+                    $message = 'Welcome back to Public Facilities Reservation System. Please verify your account before sign in' . PHP_EOL . '"' . $new_mobile_otp . '" is your OTP code. Do not share with others.';
                     $recipients = ($admin->telephone_number);
                     $smsService = new SmsServiceController($message, $recipients);
                     $smsService->sendSms();
