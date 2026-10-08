@@ -172,7 +172,7 @@ class ReservationController extends Controller
         }
 
         // Send SMS
-        $message = 'Your reservation (Regular type) request has been submitted for ' . $hall->name . ' on ' . $request->selected_date . ' from ' . $request->start_time . ' to ' . $request->end_time . '.' . PHP_EOL . 'Your reservation Ref Code is : ' . $reservation->id;
+        $message = 'Your reservation (Regular type) request has been submitted for ' . $hall->name . ' on ' . $request->selected_date . ' from ' . $request->start_time . ' to ' . $request->end_time . '.' . PHP_EOL . 'Your reservation Ref Code is : ' . $reservation->ref_code;
         $recipients = ($customer->telephone_number . ',' . $admin->telephone_number);
         $smsService = new SmsServiceController($message, $recipients);
         $smsService->sendSms();
@@ -288,7 +288,7 @@ class ReservationController extends Controller
         }
 
         // Send SMS
-        $message = 'Your reservation (Package type) has been submitted for ' . $hall->name . ' on ' . $request->selected_date . ' from ' . $request->start_time . ' to ' . $request->end_time . '.' . PHP_EOL . 'Package: ' . $package->name . PHP_EOL . 'Your reservation Ref Code is : ' . $reservation->id;
+        $message = 'Your reservation (Package type) has been submitted for ' . $hall->name . ' on ' . $request->selected_date . ' from ' . $request->start_time . ' to ' . $request->end_time . '.' . PHP_EOL . 'Package: ' . $package->name . PHP_EOL . 'Your reservation Ref Code is : ' . $reservation->ref_code;
         $recipients = ($customer->telephone_number . ',' . $admin->telephone_number);
         $smsService = new SmsServiceController($message, $recipients);
         $smsService->sendSms();
@@ -506,7 +506,7 @@ class ReservationController extends Controller
                 // Send confirmation to customer
                 $reservation->customer->notify(new PaymentAccepted($reservation));
                 // send sms notifying reservation payment was accepted.
-                $message = 'Your reservation has been reserved for ' . $reservation->hall_name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . '.' . PHP_EOL . 'Your reservation Ref Code is : ' . $reservation->id;
+                $message = 'Your reservation has been reserved for ' . $reservation->hall_name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . '.' . PHP_EOL . 'Your reservation Ref Code is : ' . $reservation->ref_code;
                 $recipients = ($reservation->customer_tel);
                 $smsService = new SmsServiceController($message, $recipients);
                 $smsService->sendSms();
@@ -572,7 +572,7 @@ class ReservationController extends Controller
                     ->where('end_time', $actualEndTime)
                     ->delete();
                 // send sms notifying reservation payment was rejected.
-                $message = 'We regret to inform you that your payment for your reservation (' . $reservation->hall_name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . ' ) could not be accepted. Pls contact the admin.Your reservation Ref Code is : ' . $reservation->id;
+                $message = 'We regret to inform you that your payment for your reservation (' . $reservation->hall_name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . ' ) could not be accepted. Pls contact the admin.Your reservation Ref Code is : ' . $reservation->ref_code;
                 $recipients = ($reservation->customer_tel);
                 $smsService = new SmsServiceController($message, $recipients);
                 $smsService->sendSms();
@@ -603,7 +603,7 @@ class ReservationController extends Controller
         if ($payment->payment_alias === 'Preliminary') {
             $reservation->update(['status' => 3]);
             $reservation->customer->notify(new AdvancePaymentAccepted($reservation));
-            $message = 'Your advance payment for the reservation (' . $reservation->hall_name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . ' ) has been accepted. Please proceed with the balance payment to finalize your booking. Your reservation Ref Code is : ' . $reservation->id;
+            $message = 'Your advance payment for the reservation (' . $reservation->hall_name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . ' ) has been accepted. Please proceed with the balance payment to finalize your booking. Your reservation Ref Code is : ' . $reservation->ref_code;
             $recipients = ($reservation->customer_tel);
             $smsService = new SmsServiceController($message, $recipients);
             $smsService->sendSms();
@@ -641,7 +641,7 @@ class ReservationController extends Controller
             ->where('status', 1)
             ->update(['status' => 2]);
         $reservation->customer->notify(new PaymentAccepted($reservation));
-        $message = 'Your reservation has been Scheduled for ' . $reservation->hall_name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . '.' . PHP_EOL . 'Your reservation ID is : ' . $reservation->id;
+        $message = 'Your reservation has been Scheduled for ' . $reservation->hall_name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . '.' . PHP_EOL . 'Your reservation ID is : ' . $reservation->ref_code;
         $recipients = ($reservation->customer_tel);
         $smsService = new SmsServiceController($message, $recipients);
         $smsService->sendSms();
@@ -686,7 +686,7 @@ class ReservationController extends Controller
             ->delete();
 
         // send sms notifying reservation request was rejected.
-        $message = 'We regret to inform you that your reservation request (' . $reservation->hall->name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . ' ) could not be approved due to unavoidable circumstances. Your reservation ID is : ' . $reservation->id;
+        $message = 'We regret to inform you that your reservation request (' . $reservation->hall->name . ' on ' . $reservation->reservation_date . ' from ' . $reservation->start_time . ' to ' . $reservation->end_time . ' ) could not be approved due to unavoidable circumstances. Your reservation ID is : ' . $reservation->ref_code;
         $recipients = ($reservation->customer->telephone_number);
         $smsService = new SmsServiceController($message, $recipients);
         $smsService->sendSms();
@@ -854,6 +854,14 @@ class ReservationController extends Controller
             }
 
             $reservation->update($updateData);
+
+
+
+            // Only move the status to Rescheduled (7) if it is not already Reserved (4);
+            // a Reserved reservation keeps its status when re-scheduled.
+            if ((int) $reservation->status !== 4) {
+                $updateData['status'] = 7;
+            }
 
             \Log::info('Updated ReservationModel with ID: ' . $reservation->id);
 
