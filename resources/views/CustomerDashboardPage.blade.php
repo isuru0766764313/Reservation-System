@@ -1644,9 +1644,7 @@
                                 <h5 class="mb-0"><i class="fas fa-map-marker-alt me-2"></i> Location Details</h5>
                             </div>
                             <div class="location-details">
-                                <p><strong>Full Address:</strong> {{ $reservation->hall->address }},
-                                    {{ $reservation->hall->area }}, {{ $reservation->hall->district }},
-                                    {{ $reservation->hall->province }}
+                                <p><strong>Full Address:</strong> {{ $reservation->hall->address }}
                                 </p>
                                 <p><strong>Coordinates:</strong> {{ $reservation->hall->latitude }},
                                     {{ $reservation->hall->longitude }}
