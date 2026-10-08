@@ -2510,6 +2510,26 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Clear an uploaded receipt file from a Pay Now modal's upload zone
+            function clearReceiptInput(input) {
+                const reservationId = input.id.replace('receipt-', '');
+                const uploadZone = document.getElementById(
+                    'receiptUploadZone-' + reservationId
+                );
+                const fileName = document.getElementById(
+                    'receiptFileName-' + reservationId
+                );
+
+                input.value = '';
+
+                if (fileName) {
+                    fileName.textContent = 'No file selected';
+                }
+                if (uploadZone) {
+                    uploadZone.classList.remove('drag-active');
+                }
+            }
+
             document.querySelectorAll('.receipt-file-input').forEach(function (input) {
                 const reservationId = input.id.replace('receipt-', '');
                 const uploadZone = document.getElementById(
@@ -2557,6 +2577,19 @@
                             uploadZone.classList.remove('drag-active');
                         }
                     });
+                });
+            });
+
+            // Clear the receipt upload whenever a Pay Now modal is closed without submitting
+            document.querySelectorAll('.modal[id^="PayNowModel-"]').forEach(function (modalEl) {
+                modalEl.addEventListener('hidden.bs.modal', function () {
+                    const form = modalEl.querySelector('form[action*="payment.submit"]');
+                    if (form) {
+                        const receiptInput = form.querySelector('.receipt-file-input');
+                        if (receiptInput) {
+                            clearReceiptInput(receiptInput);
+                        }
+                    }
                 });
             });
         });
