@@ -780,7 +780,7 @@ $images = $hall->images ?? [];
                                     I agree to the
                                     <a href="#" class="open-terms-link" data-pdf="{{ asset('storage/' . $hall->pdf) }}"
                                         data-bs-toggle="modal" data-bs-target="#termsModal">
-                                        Terms And Conditions Link
+                                        Terms And Conditions
                                     </a>
                                 </label>
                                 <div class="invalid-feedback">
