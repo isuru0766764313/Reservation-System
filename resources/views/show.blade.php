@@ -644,7 +644,7 @@ $images = $hall->images ?? [];
                         <!-- Clearence Form Upload -->
                         <div class="mb-3">
                             <label class="form-label">
-                                <i class="fas fa-file-pdf me-2"></i>Upload Dully Filled Application Form (PDF)
+                                <i class="fas fa-file-pdf me-2"></i>Upload Duly Filled Application Form (PDF)
                             </label>
                             <input type="file" name="clearence_form" class="form-control" accept=".pdf" required>
                             @error('clearence_form')
