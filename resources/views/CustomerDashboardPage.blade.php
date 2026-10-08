@@ -1826,6 +1826,17 @@
                                                         } elseif ($statusId == 5 && (!$cancelPay || $cancelPay->status == 3)) {
                                                             $nextLabel = 'Pay Cancellation Fee';
                                                             $nextAmount = $reservation->hall->cancellation_fee ?? 0;
+                                                        } elseif ($statusId == 7) {
+                                                            if (!$prelimPay || $prelimPay->status == 3) {
+                                                                $nextLabel = 'Pay Advance';
+                                                                $nextAmount = $reservation->advanceAmount;
+                                                            } elseif ($prelimPay->status == 1) {
+                                                                $nextLabel = 'Awaiting admin approval for Advance payment';
+                                                                $nextAmount = $prelimPay->amount;
+                                                            } else {
+                                                                $nextLabel = 'Pay balance amount';
+                                                                $nextAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
+                                                            }
                                                         }
                                                     @endphp
                                                     @if($nextLabel)
