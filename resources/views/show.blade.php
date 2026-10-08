@@ -822,7 +822,7 @@
                     <!-- Basic Info -->
                     <div class="row mb-4">
                         <div class="col-md-4">
-                            <p class="mb-1"><strong>Type:</strong> {{ $hall->type }}</p>
+                            <p class="mb-1"><strong>Type:</strong> {{ $hall->type_label }}</p>
                         </div>
                         <div class="col-md-4">
                             <p class="mb-1"><strong>Price:</strong>Rs. {{ number_format($hall->price, 2) }}/Hr</p>
