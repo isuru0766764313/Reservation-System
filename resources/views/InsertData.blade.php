@@ -824,7 +824,7 @@ $emptySlots = 5 - $existingCount;
 
             <!-- Clearence PDF section-->
             <div class="form-section">
-                <h4 class="mb-4">Upload Clearence form (PDF) :</h4>
+                <h4 class="mb-4">Upload Application form (PDF) :</h4>
             
                 <!-- Display existing PDF if available -->
                 @if(isset($hall) && $hall->clearence_form)
