@@ -845,8 +845,15 @@ class ReservationController extends Controller
                 'pre_arrange_time' => $newPreArrange,
                 'post_arrange_time' => $newPostArrange,
                 're_scheduled' => true,
-                'status' => 7,
             ]);
+
+
+
+            // Only move the status to Rescheduled (7) if it is not already Reserved (4);
+            // a Reserved reservation keeps its status when re-scheduled.
+            if ((int) $reservation->status !== 4) {
+                $updateData['status'] = 7;
+            }
 
             \Log::info('Updated ReservationModel with ID: ' . $reservation->id);
 
