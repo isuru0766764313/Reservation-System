@@ -533,7 +533,7 @@ if (isset($hall) && $hall->fixedfacilities->count() > 0 && empty($oldFixedFacili
                         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">Unit Price Facilities (Per Hour)</h5>
                             <button type="button" class="btn btn-sm btn-light" id="addUnitFacility">
-                                <i class="bi bi-plus-circle"></i> Add Unit Priced Facilities
+                                <i class="bi bi-plus-circle"></i> Add Unit Price Facilities
                             </button>
                         </div>
                         <div class="card-body">
