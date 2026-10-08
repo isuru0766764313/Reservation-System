@@ -2114,6 +2114,40 @@
                 });
             }
 
+            // Restore the Edit Account form to the saved values whenever the modal is closed
+            // (so unsaved edits typed by the customer are discarded on close)
+            const editAccountModalEl = document.getElementById('editAccountModal');
+            if (editAccountModalEl) {
+                editAccountModalEl.addEventListener('shown.bs.modal', function () {
+                    // Snapshot the server-rendered default values once the modal is fully open
+                    const form = this.querySelector('#editAccountForm');
+                    if (form && !form.dataset.defaultValues) {
+                        const defaults = {};
+                        form.querySelectorAll('input[name], select[name], textarea[name]').forEach(field => {
+                            defaults[field.name] = field.value;
+                        });
+                        form.dataset.defaultValues = JSON.stringify(defaults);
+                    }
+                });
+
+                editAccountModalEl.addEventListener('hidden.bs.modal', function () {
+                    const form = this.querySelector('#editAccountForm');
+                    if (form) {
+                        if (form.dataset.defaultValues) {
+                            const defaults = JSON.parse(form.dataset.defaultValues);
+                            Object.keys(defaults).forEach(name => {
+                                const field = form.querySelector(`[name="${name}"]`);
+                                if (field) field.value = defaults[name];
+                            });
+                        } else {
+                            form.reset();
+                        }
+                        form.querySelectorAll('.is-invalid').forEach(input => input.classList.remove('is-invalid'));
+                        form.querySelectorAll('.invalid-feedback').forEach(error => error.remove());
+                    }
+                });
+            }
+
             // Password Reset
             const resetPasswordForm = document.getElementById('resetPasswordForm');
             if (resetPasswordForm) {
