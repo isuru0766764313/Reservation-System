@@ -171,7 +171,7 @@
         <a href="#" id="mobile-nav-customer-signin"
             class="w-full text-lg hover:bg-gray-700 rounded-lg p-2 transition-colors">User Sign In</a>
         <a href="#" id="mobile-nav-customer-register"
-            class="w-full text-lg hover:bg-gray-700 rounded-lg p-2 transition-colors">Customer Register</a>
+            class="w-full text-lg hover:bg-gray-700 rounded-lg p-2 transition-colors">User Register</a>
         <a href="#" id="mobile-nav-admin-login"
             class="w-full text-lg hover:bg-gray-700 rounded-lg p-2 transition-colors">Admin Login</a>
         <!--<a href="#" id="mobile-nav-admin-register" class="w-full text-lg hover:bg-gray-700 rounded-lg p-2 transition-colors">Admin Register</a>-->
