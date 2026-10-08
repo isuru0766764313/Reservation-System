@@ -95,4 +95,44 @@ class HallModel extends Model
             'images' => '[]'  // Add default empty array
         ];
 
+    // Human-readable labels for the stored hall type slugs (used for display only;
+    // the raw 'type' value in the database is never changed)
+    public static function typeLabels(): array
+    {
+        return [
+            'wedding'         => 'Wedding',
+            'party'           => 'Party',
+            'exhibition'      => 'Exhibition',
+            'reception'       => 'Reception',
+            'sport'           => 'Sport',
+            'arena'           => 'Arena',
+            'concert'         => 'Concert',
+            'memorial'        => 'Memorial',
+            'lecture'         => 'Lecture',
+            'building'        => 'Building',
+            'floor'           => 'Floor',
+            'room'            => 'Room',
+            'outdoortheator'  => 'Outdoor Theator',
+            'multipurpose'    => 'Multipurpose',
+            'resorts'         => 'Resorts',
+            'bangalow'        => 'Bangalow',
+            'conference'      => 'Conference',
+            'banquet'         => 'Banquet',
+            'convention'      => 'Convention',
+            'crematorium'     => 'Crematorium',
+            'auditorium'      => 'Auditorium',
+            'community'       => 'Community',
+            'stadium'         => 'Stadium',
+            'outdoorground'   => 'Outdoor Ground',
+        ];
+    }
+
+    // Accessor: returns the formatted display label for the hall type
+    public function getTypeLabelAttribute(): string
+    {
+        $labels = self::typeLabels();
+
+        return $labels[$this->type] ?? ucwords($this->type);
+    }
+
 }
