@@ -1784,6 +1784,16 @@
     });
 
     // Clean up when modal is hidden
+    // Reset the bank details modal form when it is closed so previously
+    // entered (unsaved) data does not remain in the fields on reopening.
+    const bankinfoModal = document.getElementById('bankinfo');
+    if (bankinfoModal) {
+      bankinfoModal.addEventListener('hidden.bs.modal', function () {
+        const form = bankinfoModal.querySelector('form');
+        if (form) form.reset();
+      });
+    }
+
     document.getElementById('calendarModal').addEventListener('hidden.bs.modal', function () {
       if (adminCalendar) {
         adminCalendar.destroy();
