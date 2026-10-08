@@ -207,7 +207,7 @@
         <div class="hidden md:flex items-center space-x-6 lg:space-x-10">
             <!--<a href="#" class="hover:text-gray-200">Home</a>-->
             <a href="#" id="nav-customer-signin" class="hover:text-gray-200">User Login</a>
-            <a href="#" id="nav-customer-register" class="hover:text-gray-200">Customer Register</a>
+            <a href="#" id="nav-customer-register" class="hover:text-gray-200">User Register</a>
             <a href="#" id="nav-admin-login" class="hover:text-gray-200">Admin Login</a>
             <!--<a href="#" id="nav-admin-register" class="hover:text-gray-200">Admin Register</a>-->
             <!--<a href="#" class="hover:text-gray-200">About Us</a>-->
