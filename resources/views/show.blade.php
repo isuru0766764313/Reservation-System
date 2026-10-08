@@ -436,7 +436,7 @@
             <div class="col-12">
                 <div class="image-slider position-relative">
                     @php
-                        $images = $hall->images ?? [];
+$images = $hall->images ?? [];
                     @endphp
 
                     @if(count($images) > 0)
@@ -657,7 +657,7 @@
 
                         <!-- Reserve Button for Regular -->
                         <button type="submit" class="btn btn-primary w-100 btn-lg" id="regularReserveButton" disabled>
-                            <i class="fas fa-calendar-check me-2"></i>Request The Reservation (Regular)
+                            <i class="fas fa-calendar-check me-2"></i>Submit Reservation Request (Regular)
                         </button>
                     </form>
 
@@ -886,7 +886,7 @@
                                     @foreach ($hall->packages as $package)
                                         <div class="col-md-6 mb-3">
                                             @php
-                                                $unitCharges = $package->getUnitFacilitiesAttribute()->pluck('charge')->toArray();
+    $unitCharges = $package->getUnitFacilitiesAttribute()->pluck('charge')->toArray();
                                             @endphp
                                             <div class="card package-card h-100" data-duration="{{ $package->duration }}"
                                                 data-price="{{ $package->price }}"
