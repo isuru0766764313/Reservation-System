@@ -838,14 +838,22 @@ class ReservationController extends Controller
             \Log::info('Created new HallUnAvailability record with ID: ' . $hallUnavailability->id);
 
             // Step 3: Update the reservation with new details
-            $reservation->update([
+            $updateData = [
                 'reservation_date' => $newDate,
                 'start_time' => $newStartTime,
                 'end_time' => $newEndTime,
                 'pre_arrange_time' => $newPreArrange,
                 'post_arrange_time' => $newPostArrange,
                 're_scheduled' => true,
-            ]);
+            ];
+
+            // Only move the status to Rescheduled (7) if it is not already Reserved (4);
+            // a Reserved reservation keeps its status when re-scheduled.
+            if ((int) $reservation->status !== 4) {
+                $updateData['status'] = 7;
+            }
+
+            $reservation->update($updateData);
 
 
 
