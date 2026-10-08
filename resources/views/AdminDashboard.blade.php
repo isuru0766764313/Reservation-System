@@ -757,7 +757,7 @@
             <tr>
               <th>Reference Code</th>
               <th>Customer</th>
-              <th>Property</th>
+              <th>Venue</th>
               <th>Date</th>
               <th>Period</th>
               <th>Status</th>
