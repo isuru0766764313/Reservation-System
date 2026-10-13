@@ -2348,7 +2348,8 @@
                     document.getElementById('currentTime').textContent = `${formatTime12Hour(startTime)} - ${formatTime12Hour(endTime)}`;
                     document.getElementById('currentPreArrange').textContent = `${preArrange} hour(s)`;
                     document.getElementById('currentPostArrange').textContent = `${postArrange} hour(s)`;
-                    document.getElementById('currentDuration').textContent = mainDuration;
+                    // Total Duration must include the event time (mainDuration) plus pre- and post-arrange hours
+                    document.getElementById('currentDuration').textContent = originalTotalDuration;
                     document.getElementById('reservationId').value = reservationId;
                     document.getElementById('hallId').value = hallId;
                     document.getElementById('originalDuration').value = originalTotalDuration;
