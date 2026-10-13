@@ -359,11 +359,6 @@
                         </form>
                         @endif
                     </div>
-                    <div>
-                        <a href="{{ route('admin.dashboard.route') }}" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
-                        </a>
-                    </div>
                 </div>
             </div>
         </div>
