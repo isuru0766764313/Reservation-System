@@ -348,7 +348,12 @@
                         <form id="reject-reservation-form-{{ $reservation->id }}" action="{{ route('admin.reservation.reject', $reservation) }}" method="POST">
                             @csrf
                             @method('PATCH')
-                            <button type="button" class="btn btn-danger" onclick="rejectReservationWithReason({{ $reservation->id }})">
+                            <div class="mb-3">
+                                <textarea class="form-control" id="remarks-{{ $reservation->id }}" name="remarks" rows="4"
+                                    placeholder="Please enter the reason for rejecting this reservation..."
+                                    style="width: 100%;"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-danger">
                                 <i class="fas fa-times-circle me-2"></i>Reject Reservation
                             </button>
                         </form>
@@ -365,21 +370,5 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function rejectReservationWithReason(reservationId) {
-            const reason = prompt('Please enter the reason for rejecting this reservation:');
-            if (reason !== null && reason.trim() !== '') {
-                const form = document.getElementById('reject-reservation-form-' + reservationId);
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'rejection_reason';
-                input.value = reason.trim();
-                form.appendChild(input);
-                form.submit();
-            } else if (reason !== null) {
-                alert('Rejection reason is required.');
-            }
-        }
-    </script>
 </body>
 </html>
