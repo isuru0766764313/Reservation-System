@@ -120,6 +120,49 @@
             transform: translateY(-1px);
             box-shadow: 0 4px 10px rgba(0,0,0,0.12);
         }
+
+        /* Reject-reservation remarks: force full width + right-aligned button.
+           These rules override ANY inherited/global flex, grid or float sizing. */
+        form.reject-reservation-form {
+            display: block !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+        }
+        form.reject-reservation-form > textarea[name="remarks"] {
+            /* full-width block on its own line regardless of parent layout */
+            float: none !important;
+            position: static !important;
+            display: block !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            height: auto;
+            box-sizing: border-box !important;
+            flex-grow: 1 !important;       /* take whole row if parent is flex */
+            flex-basis: 100% !important;
+            grid-column: 1 / -1 !important; /* take whole row if parent is grid */
+            align-self: stretch !important;
+            justify-self: stretch !important;
+            margin: 0 0 1rem 0 !important;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+        }
+        form.reject-reservation-form > button.btn-danger {
+            /* own row, then right-aligned inside it via text-align:end */
+            float: none !important;
+            position: static !important;
+            display: block !important;
+            width: auto !important;
+            margin-left: auto !important;
+            margin-right: 0 !important;
+            flex-grow: 1 !important;
+            flex-basis: 100% !important;
+            grid-column: 1 / -1 !important;
+            align-self: start !important;
+            justify-self: end !important;
+        }
     </style>
 </head>
 <body>
@@ -353,16 +396,13 @@
 
                     {{-- Reject Reservation Form (full-width remarks, button aligned right — same as AdminDashboard modal footer) --}}
                     @if((int) $reservation->status !== 6)
-                    <form id="reject-reservation-form-{{ $reservation->id }}" class="text-end"
+                    <form id="reject-reservation-form-{{ $reservation->id }}" class="reject-reservation-form text-end"
                         action="{{ route('admin.reservation.reject', $reservation) }}" method="POST">
                         @csrf
                         @method('PATCH')
-                        <div class="mb-3">
-                            <textarea class="form-control" id="remarks-{{ $reservation->id }}" name="remarks" rows="4"
-                                placeholder="Please enter the reason for rejecting this reservation..."
-                                style="width: 100%;"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-danger">
+                        <textarea class="form-control" id="remarks" name="remarks" rows="4"
+                            placeholder="Please enter the reason for rejecting this reservation..."></textarea>
+                        <button type="submit" class="btn btn-danger mt-2">
                             <i class="fas fa-times-circle me-2"></i>Reject Reservation
                         </button>
                     </form>
