@@ -326,47 +326,39 @@
                 </div>
 
                 <!-- Footer Actions -->
-                <div class="border-top pt-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div class="d-flex gap-2">
-                            @php
-                                $hasCancellationPending = $reservation->payments->where('payment_alias', 'Cancellation')->where('status', 1)->count() > 0;
-                            @endphp
+                <div class="d-flex justify-content-between border-top pt-4">
+                    <div class="d-flex gap-2">
+                        @php
+                            $hasCancellationPending = $reservation->payments->where('payment_alias', 'Cancellation')->where('status', 1)->count() > 0;
+                        @endphp
 
-                            {{-- Accept Cancellation Payment Button --}}
-                            @if($hasCancellationPending)
-                            <form action="{{ route('admin.slip.accept', $reservation) }}" method="POST">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit" class="btn btn-warning">
-                                    <i class="fas fa-check-circle me-2"></i>Accept Cancellation Payment
-                                </button>
-                            </form>
-                            @endif
-                        </div>
-                        <div>
-                            <a href="{{ route('admin.dashboard.route') }}" class="btn btn-secondary">
-                                <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
-                            </a>
-                        </div>
+                        {{-- Accept Cancellation Payment Button --}}
+                        @if($hasCancellationPending)
+                        <form action="{{ route('admin.slip.accept', $reservation) }}" method="POST">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-check-circle me-2"></i>Accept Cancellation Payment
+                            </button>
+                        </form>
+                        @endif
+
+                        {{-- Reject Reservation Button --}}
+                        @if((int) $reservation->status !== 6)
+                        <form id="reject-reservation-form-{{ $reservation->id }}" action="{{ route('admin.reservation.reject', $reservation) }}" method="POST">
+                            @csrf
+                            @method('PATCH')
+                            <div class="mb-3">
+                                <textarea class="form-control" id="remarks-{{ $reservation->id }}" name="remarks" rows="4"
+                                    placeholder="Please enter the reason for rejecting this reservation..."
+                                    style="width: 100%;"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-times-circle me-2"></i>Reject Reservation
+                            </button>
+                        </form>
+                        @endif
                     </div>
-
-                    {{-- Reject Reservation Form (full-width remarks, button aligned right — same as AdminDashboard modal footer) --}}
-                    @if((int) $reservation->status !== 6)
-                    <form id="reject-reservation-form-{{ $reservation->id }}" class="text-end"
-                        action="{{ route('admin.reservation.reject', $reservation) }}" method="POST">
-                        @csrf
-                        @method('PATCH')
-                        <div class="mb-3">
-                            <textarea class="form-control" id="remarks-{{ $reservation->id }}" name="remarks" rows="4"
-                                placeholder="Please enter the reason for rejecting this reservation..."
-                                style="width: 100%;"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-danger">
-                            <i class="fas fa-times-circle me-2"></i>Reject Reservation
-                        </button>
-                    </form>
-                    @endif
                 </div>
             </div>
         </div>
