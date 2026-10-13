@@ -222,8 +222,13 @@ class CustomerController extends Controller
                     // Regenerate session to prevent fixation
                     $request->session()->regenerate();
 
-                    return redirect()->intended(route('load_venues_page'))
-                        ->with('success', 'You are already logged in!');
+                    // Only follow an intended URL that belongs to the customer
+                    // area; otherwise fall back to the venues page.
+                    $intended = $this->pullIntendedUrl('/customer');
+
+                    return $intended
+                        ? redirect($intended)->with('success', 'You are already logged in!')
+                        : redirect()->route('load_venues_page')->with('success', 'You are already logged in!');
                 } else {
                     // Different user trying to login - logout current user first
                     Auth::guard('customer')->logout();
@@ -283,8 +288,14 @@ class CustomerController extends Controller
                             'telephone_number' => $customer->telephone_number
                         ]);
                 } else {
-                    return redirect()->intended(route('load_venues_page'))
-                        ->with('success', 'Login successful!');
+                    // Only follow an intended URL that belongs to the customer
+                    // area; otherwise fall back to the venues page. This keeps a
+                    // stale admin URL from hijacking the customer's redirect.
+                    $intended = $this->pullIntendedUrl('/customer');
+
+                    return $intended
+                        ? redirect($intended)->with('success', 'Login successful!')
+                        : redirect()->route('load_venues_page')->with('success', 'Login successful!');
                 }
             } else {
                 return redirect()
@@ -1150,6 +1161,34 @@ class CustomerController extends Controller
     private function maskPhone($phone)
     {
         return substr($phone, 0, 3) . str_repeat('*', max(0, strlen($phone) - 6)) . substr($phone, -3);
+    }
+
+    /**
+     * Resolve a stored "intended" URL for the guard that just signed in.
+     *
+     * Laravel keeps the intended URL in a single session key ("url.intended")
+     * that is shared by every guard. Without scoping, an admin URL captured by
+     * the auth middleware could hijack the post-login redirect for a customer
+     * and bounce them into the admin sign-in flow.
+     *
+     * The flag is always pulled (removed) so it cannot leak into a later login.
+     *
+     * @param  string  $prefix  Path prefix the intended URL must start with
+     * @return string|null
+     */
+    private function pullIntendedUrl($prefix)
+    {
+        $intended = session()->pull('url.intended');
+
+        if (is_string($intended) && $intended !== '') {
+            $path = parse_url($intended, PHP_URL_PATH);
+
+            if (is_string($path) && strpos($path, $prefix) === 0) {
+                return $intended;
+            }
+        }
+
+        return null;
     }
 
 }

@@ -174,7 +174,16 @@ class AdminController extends Controller
                 $current_admin = Auth::guard('admin')->user();
                 // If trying to login as the same admin, just redirect
                 if ($current_admin->email === $request->email) {
-                    return redirect()->intended(route('admin.dashboard.route'))->with('success', 'You are already logged in!');
+                    // Drop any cross-guard redirect flag so the customer sign-in
+                    // panel does not auto-slide in on the home page.
+                    $request->session()->forget('auth_redirected');
+
+                    // Only follow an intended URL that belongs to the admin area.
+                    $intended = $this->pullIntendedUrl('/admin');
+
+                    return $intended
+                        ? redirect($intended)->with('success', 'You are already logged in!')
+                        : redirect()->route('admin.dashboard.route')->with('success', 'You are already logged in!');
                 } else {
                     // Different admin trying to login - invalidate current session
                     Auth::guard('admin')->logout();
@@ -232,8 +241,20 @@ class AdminController extends Controller
                             'telephone_number' => $admin->telephone_number
                         ]);
                 } else {
-                    return redirect()->intended(route('admin.dashboard.route'))
-                        ->with('success', 'Login successful!');
+                    // Forget any customer-guard redirect flag so the customer
+                    // sign-in panel does not slide in on the home page.
+                    $request->session()->forget('auth_redirected');
+
+                    // Only follow an intended URL that belongs to the admin
+                    // area; otherwise send the admin straight to the dashboard.
+                    // This prevents a stale customer URL (e.g. a hall page the
+                    // visitor clicked before signing in) from hijacking the
+                    // admin's post-login redirect.
+                    $intended = $this->pullIntendedUrl('/admin');
+
+                    return $intended
+                        ? redirect($intended)->with('success', 'Login successful!')
+                        : redirect()->route('admin.dashboard.route')->with('success', 'Login successful!');
                 }
             } else {
                 return redirect()
@@ -722,6 +743,36 @@ class AdminController extends Controller
     private function maskPhone($phone)
     {
         return substr($phone, 0, 3) . str_repeat('*', max(0, strlen($phone) - 6)) . substr($phone, -3);
+    }
+
+    /**
+     * Resolve a stored "intended" URL for the guard that just signed in.
+     *
+     * Laravel keeps the intended URL in a single session key ("url.intended")
+     * that is shared by every guard. Without scoping, a customer URL captured
+     * by the auth middleware (for example /customer/halls/3 after an
+     * unauthenticated visitor clicked a hall) would hijack the post-login
+     * redirect for an admin and bounce them to the customer sign-in panel
+     * instead of the admin dashboard.
+     *
+     * The flag is always pulled (removed) so it cannot leak into a later login.
+     *
+     * @param  string  $prefix  Path prefix the intended URL must start with
+     * @return string|null
+     */
+    private function pullIntendedUrl($prefix)
+    {
+        $intended = session()->pull('url.intended');
+
+        if (is_string($intended) && $intended !== '') {
+            $path = parse_url($intended, PHP_URL_PATH);
+
+            if (is_string($path) && strpos($path, $prefix) === 0) {
+                return $intended;
+            }
+        }
+
+        return null;
     }
 
 }
