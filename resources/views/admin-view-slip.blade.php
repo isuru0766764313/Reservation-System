@@ -385,22 +385,6 @@
                             </button>
                         </form>
                         @endif
-
-                        {{-- Reject Reservation Button --}}
-                        @if((int) $reservation->status !== 6)
-                        <form id="reject-reservation-form-{{ $reservation->id }}" action="{{ route('admin.reservation.reject', $reservation) }}" method="POST">
-                            @csrf
-                            @method('PATCH')
-                            <div class="mb-3">
-                                <textarea class="form-control" id="remarks-{{ $reservation->id }}" name="remarks" rows="4"
-                                    placeholder="Please enter the reason for rejecting this reservation..."
-                                    style="width: 100%;"></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-danger">
-                                <i class="fas fa-times-circle me-2"></i>Reject Reservation
-                            </button>
-                        </form>
-                        @endif
                     </div>
 
                     {{-- Reject Reservation Form (full-width remarks, button aligned right — same as AdminDashboard modal footer) --}}
