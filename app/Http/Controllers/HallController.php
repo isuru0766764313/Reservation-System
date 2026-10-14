@@ -72,6 +72,8 @@ class HallController extends Controller
             'pdf' => 'sometimes|file|mimes:pdf|max:10240', // Max 10MB PDF
             'clearence_form' => 'sometimes|file|mimes:pdf|max:10240' // Max 10MB PDF
 
+        ], [
+            'clearence_form.max' => 'The application form may not be greater than 10240 kilobytes.',
         ]);
 
         $halldata = $request->except(['fixedpricefacility','unitpricefacility','availability', '_token', 'images']);
@@ -211,6 +213,8 @@ class HallController extends Controller
             'pdf' => 'sometimes|file|mimes:pdf|max:10240',// Max 10MB PDF
             'clearence_form' => 'sometimes|file|mimes:pdf|max:10240' // Max 10MB PDF
 
+        ], [
+            'clearence_form.max' => 'The application form may not be greater than 10240 kilobytes.',
         ]);
 
         $halldata = $request->except(['fixedpricefacility', 'unitpricefacility', 'availability', '_token', 'images', 'deleted_images']);
