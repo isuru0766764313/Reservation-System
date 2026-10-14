@@ -829,7 +829,7 @@ $emptySlots = 5 - $existingCount;
                 <!-- Display existing PDF if available -->
                 @if(isset($hall) && $hall->clearence_form)
                     <div class="mb-3">
-                        <label class="form-label">Current Clearence Form:</label>
+                        <label class="form-label">Current Application Form:</label>
                         <div class="d-flex align-items-center p-3 border rounded bg-light">
                             <i class="fas fa-file-pdf text-danger me-2 fs-4"></i>
                             <div>
