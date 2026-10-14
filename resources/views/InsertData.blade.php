@@ -834,7 +834,7 @@ $emptySlots = 5 - $existingCount;
                             <i class="fas fa-file-pdf text-danger me-2 fs-4"></i>
                             <div>
                                 <a href="{{ route('view.hall.clearence', $hall) }}" target="_blank" class="text-decoration-none fw-bold">
-                                    Open the clearence form
+                                    Open the application form
                                 </a>
                             </div>
                         </div>
