@@ -797,7 +797,7 @@ $emptySlots = 5 - $existingCount;
                     </div>
                     <hr>
                 @endif            
-                <!-- PDF Upload -->
+                <!-- Terms & Conditions PDF Upload -->
                 <div class="mb-3">
                     <label class="form-label">
                         @if(isset($hall) && $hall->pdf)
@@ -822,7 +822,7 @@ $emptySlots = 5 - $existingCount;
             </div>
 
 
-            <!-- Clearence PDF section-->
+            <!-- Application PDF section-->
             <div class="form-section">
                 <h4 class="mb-4">Upload Application form (PDF) :</h4>
             
@@ -841,7 +841,7 @@ $emptySlots = 5 - $existingCount;
                     </div>
                     <hr>
                 @endif            
-                <!-- Clerence PDF Upload -->
+                <!-- Application PDF Upload -->
                 <div class="mb-3">
                     <label class="form-label">
                         @if(isset($hall) && $hall->clearence_form)
