@@ -196,6 +196,9 @@
         // -> auto-slide-in the sign-in panel with a "Successfully registered" alert
         window.justRegistered = @json($just_registered ?? session('just_registered', false));
         window.registeredEmail = @json($registered_email ?? session('registered_email', ''));
+        // Set right after an organisation admin submits a registration that is
+        // waiting for super admin approval -> auto-open the admin panel with the notice
+        window.adminApprovalPending = @json(session()->has('success') && str_contains((string) session('success'), 'admin registration'));
         console.log('Hall Data Loaded:', window.hallData);
     </script>
 
@@ -511,9 +514,36 @@
             <div id="admin-signup-form" class="form-container space-y-6 hidden">
                 <h2 class="text-3xl font-bold text-center text-gray-800">Admin Register</h2>
                 <p class="text-center text-gray-600">Register as an administrator.</p>
+
+                @if (session('success') && str_contains((string) session('success'), 'admin registration'))
+                    <div class="bg-green-50 border border-green-300 text-green-800 text-sm rounded-lg p-4">
+                        <i class="fas fa-check-circle me-1"></i>{{ session('success') }}
+                    </div>
+                @endif
+
                 <form action="{{route('admin.registration.post.route')}}" method="post" class="space-y-4"
                     id="AdminRegitrationForm">
                     @csrf
+
+                    @php $superAdminExists = $superAdminExists ?? \App\Models\AdminModel::where('admin_type', 'super')->exists(); @endphp
+                    @if (!$superAdminExists)
+                        {{-- First admin only: choose the account type. Once a super admin exists this dropdown disappears. --}}
+                        <select name="admin_type" id="admin-type-select"
+                            class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+                            required>
+                            <option value="" disabled selected>Select Admin Type</option>
+                            <option value="super">Super Admin (First Administrator)</option>
+                            <option value="organisation">Organisation Admin</option>
+                        </select>
+                    @else
+                        {{-- No dropdown after the super admin is registered; every new admin needs approval. --}}
+                        <input type="hidden" name="admin_type" value="organisation">
+                        <div class="bg-blue-50 border border-blue-300 text-blue-800 text-sm rounded-lg p-4">
+                            <i class="fas fa-info-circle me-1"></i>New organisation admin accounts require approval from
+                            the super administrator before you can verify and sign in.
+                        </div>
+                    @endif
+
                     <input type="text" name="company_name" placeholder="Company Name"
                         class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         pattern="[a-zA-Z\s'\-]{2,50}"
@@ -949,6 +979,21 @@
                     adminAuthContainer.classList.add('active');
                     adminSignupForm.classList.add('hidden');
                     adminLoginForm.classList.remove('hidden');
+                }
+            }
+
+            // Auto-open admin signup card after an organisation admin submits a
+            // registration that is waiting for super admin approval (shows the notice)
+            if (window.adminApprovalPending) {
+                const adminAuthContainer = document.getElementById('admin-auth-container');
+                const customerAuthContainer = document.getElementById('customer-auth-container');
+                const adminLoginForm = document.getElementById('admin-login-form');
+                const adminSignupForm = document.getElementById('admin-signup-form');
+                if (adminAuthContainer && customerAuthContainer && adminLoginForm && adminSignupForm) {
+                    customerAuthContainer.classList.remove('active');
+                    adminAuthContainer.classList.add('active');
+                    adminLoginForm.classList.add('hidden');
+                    adminSignupForm.classList.remove('hidden');
                 }
             }
 
