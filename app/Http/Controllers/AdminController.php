@@ -111,6 +111,75 @@ class AdminController extends Controller
             ->with('success', 'Your admin registration was submitted. It will be reviewed by the administrator and you will be notified once approved.');
     }
 
+    /**
+     * Show the admin registration request details to the super admin
+     * (opened via the "Review Registration Request" button in the email).
+     */
+    public function ShowApprovalPage($applicant)
+    {
+        $applicantAdmin = AdminModel::find($applicant);
+
+        if (!$applicantAdmin || $applicantAdmin->admin_type === 'super') {
+            return view('AdminApprovalPage', ['error' => 'This registration request does not exist.']);
+        }
+
+        $superAdmin = AdminModel::where('admin_type', 'super')->first();
+
+        return view('AdminApprovalPage', [
+            'applicantAdmin' => $applicantAdmin,
+            'superAdmin' => $superAdmin,
+        ]);
+    }
+
+    /**
+     * Super admin approves an organisation admin registration request.
+     */
+    public function ApproveRegistration(Request $request, $applicant)
+    {
+        $applicantAdmin = AdminModel::find($applicant);
+
+        if (!$applicantAdmin || $applicantAdmin->admin_type === 'super') {
+            return back()->with('approval_error', 'This registration request does not exist.');
+        }
+
+        $applicantAdmin->update([
+            'approval_status' => 'approved',
+            'approved_at' => Carbon::now(),
+        ]);
+
+        // Notify the applicant that their account has been approved.
+        $applicantAdmin->notify(new \App\Notifications\AdminRegistrationApproved($applicantAdmin));
+
+        return view('AdminApprovalPage', [
+            'applicantAdmin' => $applicantAdmin,
+            'result' => 'approved',
+        ]);
+    }
+
+    /**
+     * Super admin rejects an organisation admin registration request.
+     */
+    public function RejectRegistration(Request $request, $applicant)
+    {
+        $applicantAdmin = AdminModel::find($applicant);
+
+        if (!$applicantAdmin || $applicantAdmin->admin_type === 'super') {
+            return back()->with('approval_error', 'This registration request does not exist.');
+        }
+
+        $applicantAdmin->update([
+            'approval_status' => 'rejected',
+        ]);
+
+        // Notify the applicant that their request was rejected.
+        $applicantAdmin->notify(new \App\Notifications\AdminRegistrationRejected($applicantAdmin));
+
+        return view('AdminApprovalPage', [
+            'applicantAdmin' => $applicantAdmin,
+            'result' => 'rejected',
+        ]);
+    }
+
 
     public function verifyOTP(Request $request)
     {
@@ -136,6 +205,14 @@ class AdminController extends Controller
 
         if (!$admin) {
             return redirect()->route('admin.registration.get.route')->with('error', 'Session expired. Please register again.');
+        }
+
+        // Approval gate: an organisation admin must not be able to complete OTP
+        // verification (or reach the dashboard) until the super admin approves.
+        if ($admin->approval_status !== 'approved') {
+            $request->session()->forget('verify_admin_id');
+            Auth::guard('admin')->logout();
+            return redirect()->route('home_route')->with('admin_error_key_2', 'Your registration is still awaiting approval from the super administrator.');
         }
 
         if ($admin->email_verification_otp === $email_otp && $admin->mobile_verification_otp === $mobile_otp && Carbon::now()->lt($admin->otp_expires_at)) {
@@ -241,6 +318,22 @@ class AdminController extends Controller
                 return redirect()
                     ->back()
                     ->with('admin_error_key_2', 'Email is not available. Pls sign up')
+                    ->withInput($request->only('email'));
+            }
+
+            // Super admin approval gate: an organisation admin cannot sign in
+            // (or reach OTP verification) until their registration is approved.
+            $applicantAdmin = AdminModel::where('email', $request->email)->first();
+            if ($applicantAdmin->approval_status === 'pending') {
+                return redirect()
+                    ->back()
+                    ->with('admin_error_key_2', 'Your registration is still awaiting approval from the super administrator. Please try again once it is approved.')
+                    ->withInput($request->only('email'));
+            }
+            if ($applicantAdmin->approval_status === 'rejected') {
+                return redirect()
+                    ->back()
+                    ->with('admin_error_key_2', 'Your admin registration request was rejected. Please contact the system administrator for more information.')
                     ->withInput($request->only('email'));
             }
 

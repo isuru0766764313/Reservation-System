@@ -136,6 +136,14 @@ Route::prefix('admin')->group(function()
     Route::post('/forgot-password/verify-otp', [AdminController::class, 'forgotPasswordVerifyOTP'])->name('admin.forgot.password.verify.otp');
     Route::post('/forgot-password/reset', [AdminController::class, 'forgotPasswordReset'])->name('admin.forgot.password.reset');
     Route::post('/forgot-password/resend-otp', [AdminController::class, 'forgotPasswordResendOTP'])->name('admin.forgot.password.resend.otp');
+
+    // Admin registration approval (super admin reviews organisation admin requests)
+    // Linked from the NewAdminRegistrationRequest email — opens a review page with
+    // Approve / Reject buttons. Kept outside auth:admin so the super admin can act
+    // straight from the email link.
+    Route::get('/approve-registration/{applicant}', [AdminController::class, 'ShowApprovalPage'])->name('admin.approval.show');
+    Route::post('/approve-registration/{applicant}/approve', [AdminController::class, 'ApproveRegistration'])->name('admin.approval.approve');
+    Route::post('/approve-registration/{applicant}/reject', [AdminController::class, 'RejectRegistration'])->name('admin.approval.reject');
 });
 
 // Protected Routes (Verified Admins Only)
