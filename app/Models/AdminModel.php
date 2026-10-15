@@ -35,6 +35,9 @@ class AdminModel extends Authenticatable
         'otp_expires_at',
         'temp_password',
         'password_reset_expiry',
+        'admin_type',
+        'approval_status',
+        'approved_at',
     ];
 
     protected $hidden =
