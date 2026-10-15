@@ -198,7 +198,10 @@
         window.registeredEmail = @json($registered_email ?? session('registered_email', ''));
         // Set right after an organisation admin submits a registration that is
         // waiting for super admin approval -> auto-open the admin panel with the notice
-        window.adminApprovalPending = @json(session()->has('success') && str_contains((string) session('success'), 'admin registration'));
+        window.adminApprovalPending = @json(session()->has('success') && str_contains((string) session('success'), 'admin registration') && !session('admin_just_registered'));
+        // Set right after an admin completes email + mobile OTP verification
+        // -> auto-slide-in the admin sign-in panel with a "Successfully registered" alert
+        window.adminJustRegistered = @json(session('admin_just_registered', false));
         console.log('Hall Data Loaded:', window.hallData);
     </script>
 
@@ -482,6 +485,14 @@
                 @if (session('admin_registration_email_exists'))
                     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
                         You are already registered. Please sign in.
+                    </div>
+                @endif
+                @if (session('admin_just_registered'))
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative flex items-start justify-between" role="alert">
+                        <span class="font-medium text-sm">
+                            <i class="fa-solid fa-circle-check mr-1"></i>
+                            Successfully registered! Please sign in to continue.
+                        </span>
                     </div>
                 @endif
                 <form action="{{route('admin.login.post.route')}}" method="post" class="space-y-4">
@@ -994,6 +1005,27 @@
                     adminAuthContainer.classList.add('active');
                     adminLoginForm.classList.add('hidden');
                     adminSignupForm.classList.remove('hidden');
+                }
+            }
+
+            // Auto-slide-in the admin sign-in panel right after an admin completes
+            // email + mobile OTP verification, with the green success alert and
+            // their email pre-filled
+            if (window.adminJustRegistered) {
+                const adminAuthContainer = document.getElementById('admin-auth-container');
+                const customerAuthContainer = document.getElementById('customer-auth-container');
+                const adminLoginForm = document.getElementById('admin-login-form');
+                const adminSignupForm = document.getElementById('admin-signup-form');
+                if (adminAuthContainer && customerAuthContainer && adminLoginForm && adminSignupForm) {
+                    customerAuthContainer.classList.remove('active');
+                    adminSignupForm.classList.add('hidden');
+                    adminLoginForm.classList.remove('hidden');
+                    adminAuthContainer.classList.add('active');
+
+                    const adminEmailInput = adminLoginForm.querySelector('input[name="email"]');
+                    if (adminEmailInput && !adminEmailInput.value) {
+                        adminEmailInput.value = window.registeredEmail || '';
+                    }
                 }
             }
 
