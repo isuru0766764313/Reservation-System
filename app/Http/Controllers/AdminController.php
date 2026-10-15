@@ -228,8 +228,13 @@ class AdminController extends Controller
             $request->session()->forget('verify_admin_id');
             Auth::guard('admin')->login($admin);
 
-            // Redirect to your specified route after verification
-            return redirect()->route('home_route')->with('success', 'Email verified successfully!');
+            // Redirect to home after verification. The admin is already logged
+            // in here, so home.blade.php will auto-slide-in the admin sign-in
+            // panel with a "Successfully registered" alert (window.adminJustRegistered).
+            return redirect()->route('home_route')
+                ->with('admin_just_registered', true)
+                ->with('registered_email', $admin->email)
+                ->with('success', 'Email verified successfully!');
         } else {
             return back()->withErrors(['otp' => 'Invalid or expired OTP']);
         }
