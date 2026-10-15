@@ -63,7 +63,7 @@ class NewAdminRegistrationRequest extends Notification implements ShouldQueue
             ->line('Review the request and approve or reject it using the button below. The applicant cannot verify or sign in until you approve.')
             ->action('Review Registration Request', $reviewUrl)
             ->line('If you did not expect this request, you can safely ignore this email.')
-            ->salutation("Regards,\n" . 'Prime Minister\'s Office');
+            ->salutation("Best regards,\nPublic Facilities Reservation System.");
     }
 
     /**

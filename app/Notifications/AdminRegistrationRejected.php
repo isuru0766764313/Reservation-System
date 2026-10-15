@@ -50,7 +50,7 @@ class AdminRegistrationRejected extends Notification implements ShouldQueue
             ->greeting('Dear ' . $this->applicant->company_name . ',')
             ->line('We are sorry to inform you that your administrator account registration for the **Public Facilities Reservation Portal** has been rejected.')
             ->line('If you believe this is a mistake, please contact the system administrator for more information.')
-            ->salutation("Regards,\n" . 'Prime Minister\'s Office');
+            ->salutation("Best regards,\nPublic Facilities Reservation System.");
     }
 
     /**
