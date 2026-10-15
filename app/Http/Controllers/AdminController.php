@@ -16,12 +16,16 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Services\ESMSWS;//sms api
 use App\Http\Controllers\SmsServiceController;
 use App\Notifications\SendAdminOTP;
+use App\Notifications\NewAdminRegistrationRequest;
 
 class AdminController extends Controller
 {
     function ShowRegisterPage()
     {
-        return view('home');
+        // A super admin can only be registered once (the very first admin).
+        $superAdminExists = AdminModel::where('admin_type', 'super')->exists();
+
+        return view('home', compact('superAdminExists'));
     }
 
     function Register(Request $request)
@@ -37,24 +41,36 @@ class AdminController extends Controller
 
         $request->validate(['company_name' => 'required|max:50', 'telephone_number' => 'required', 'email' => 'required|email|unique:admins_table', 'password' => 'required', 'confirm_password' => 'required']);
 
-        $email_otp = Str::random(6); // generate randome otp for email
-        $mobile_otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);// generate randome otp for mobile
-        // add row of data
+        $superAdminExists = AdminModel::where('admin_type', 'super')->exists();
+
+        // Determine admin type: only the very first registration can be a super admin,
+        // and only when the user explicitly selected it in the (hidden otherwise) dropdown.
+        $requestedType = $request->input('admin_type', 'organisation');
+        $adminType = (!$superAdminExists && $requestedType === 'super') ? 'super' : 'organisation';
+
         $data['company_name'] = $request->company_name;
         $data['telephone_number'] = $request->telephone_number;
         $data['email'] = $request->email;
         $data['password'] = Hash::make($request->password);// Hash::make for encryption
-        $data['email_verification_otp'] = $email_otp;
-        $data['mobile_verification_otp'] = $mobile_otp;
-        $data['otp_expires_at'] = Carbon::now()->addMinutes(10);
+        $data['admin_type'] = $adminType;
 
-        $admin = AdminModel::create($data); // add raw of data to table
+        // ---- Super admin bootstrap path (first admin, no approval needed) ----
+        if ($adminType === 'super') {
+            $email_otp = Str::random(6); // generate randome otp for email
+            $mobile_otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);// generate randome otp for mobile
 
-        // lets check creation of $admin is successfull or not
-        if (!$admin) {
-            //if  there is no $admin redirects to "home_route" with a error massage.
-            return redirect(route('admin.registration.get.route'))->with('error_key_1', 'Registration is failed. Pls try again');
-        } else {
+            $data['approval_status'] = 'approved'; // super admin approves itself
+            $data['approved_at'] = Carbon::now();
+            $data['email_verification_otp'] = $email_otp;
+            $data['mobile_verification_otp'] = $mobile_otp;
+            $data['otp_expires_at'] = Carbon::now()->addMinutes(10);
+
+            $admin = AdminModel::create($data); // add raw of data to table
+
+            if (!$admin) {
+                return redirect(route('admin.registration.get.route'))->with('error_key_1', 'Registration is failed. Pls try again');
+            }
+
             // send sms otp to admin at registration..
             $message = 'Welcome to Public Facilities Reservation System. Your OTP for registration is : ' . PHP_EOL . '"' . $mobile_otp . '" Do not share this code with others.';
             $recipients = ($request->telephone_number);
@@ -74,6 +90,25 @@ class AdminController extends Controller
                     'telephone_number' => $admin->telephone_number
                 ]);
         }
+
+        // ---- Organisation admin path (needs super admin approval before OTP) ----
+        $data['approval_status'] = 'pending';
+
+        $admin = AdminModel::create($data); // add raw of data to table
+
+        if (!$admin) {
+            return redirect(route('admin.registration.get.route'))->with('error_key_1', 'Registration is failed. Pls try again');
+        }
+
+        // Notify the super admin so they can approve/reject this request.
+        $superAdmin = AdminModel::where('admin_type', 'super')->first();
+        if ($superAdmin) {
+            $superAdmin->notify(new NewAdminRegistrationRequest($admin));
+        }
+
+        // No OTP is sent yet — the applicant must wait for approval.
+        return redirect()->route('home_route')
+            ->with('success', 'Your admin registration was submitted. It will be reviewed by the administrator and you will be notified once approved.');
     }
 
 
