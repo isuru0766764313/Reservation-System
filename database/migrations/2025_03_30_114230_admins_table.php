@@ -20,6 +20,9 @@ class AdminsTable extends Migration
             $table->string('telephone_number'); // String to store "+94XXXXXXXXX"
             $table->string('email')->unique(); // Unique email constraint
             $table->string('password'); // Will store hashed password
+            $table->string('admin_type', 20)->default('organisation');
+            $table->string('approval_status', 20)->default('pending');
+            $table->timestamp('approved_at')->nullable();
             $table->string('bank')->nullable();
             $table->string('account_name')->nullable();
             $table->string('account_number')->nullable();
