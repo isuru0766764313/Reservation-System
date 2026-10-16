@@ -48,7 +48,7 @@ class AdminRegistrationRejected extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject('Admin Registration Rejected')
             ->greeting('Dear ' . $this->applicant->company_name . ',')
-            ->line('We are sorry to inform you that your administrator account registration for the **Public Facilities Reservation Portal** has been rejected.')
+            ->line('We are sorry to inform you that your administrator account registration for the **Public Facilities Reservation System** has been rejected.')
             ->line('If you believe this is a mistake, please contact the system administrator for more information.')
             ->salutation("Best regards,\nPublic Facilities Reservation System.");
     }
