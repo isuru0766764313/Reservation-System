@@ -55,7 +55,7 @@
                 @endif
 
                 @if($applicantAdmin->approval_status === 'approved' && $applicantAdmin->approved_at)
-                    <p class="text-xs text-gray-400">Approved on {{ $applicantAdmin->approved_at->format('Y-m-d H:i') }}</p>
+                    <p class="text-xs text-gray-400">Approved on {{ \Carbon\Carbon::parse($applicantAdmin->approved_at)->format('Y-m-d H:i') }}</p>
                 @endif
 
                 <p class="text-sm text-gray-500">This request has already been decided. No further action is possible.</p>

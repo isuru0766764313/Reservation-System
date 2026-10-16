@@ -52,6 +52,7 @@ class AdminModel extends Authenticatable
         'mobile_verified_at' => 'datetime',
         'otp_expires_at' => 'datetime',
         'password_reset_expiry' => 'datetime',
+        'approved_at' => 'datetime',
     ];
     
 
