@@ -1029,13 +1029,17 @@
                   @if($reservation->customer && $reservation->customer->type !== 'private')
 
                     @if ($reservation->status == 1)
+                      @php
+                        // Discount applies only to the true/base charge (excluding facilities charge)
+                        $baseCharge = max(0, (float) $reservation->charge - (float) ($reservation->facilities_charge ?? 0));
+                      @endphp
                       <dt class="col-sm-4">Discount (%):</dt>
                       <dd class="col-sm-8">
                         <div class="input-group input-group-sm">
                           <input type="number" class="form-control form-control-sm" step="0.1" min="0" max="100"
                             id="discount-custom-{{ $reservation->id }}" placeholder="0"
-                            data-charge="{{ $reservation->charge }}"
-                            value="{{ $reservation->discount_custom ? round(($reservation->discount_custom / $reservation->charge) * 100, 2) : '' }}">
+                            data-charge="{{ $baseCharge }}" data-total-charge="{{ $reservation->charge }}"
+                            value="{{ $reservation->discount_custom && $baseCharge > 0 ? round(($reservation->discount_custom / $baseCharge) * 100, 2) : '' }}">
                           <span class="input-group-text">%</span>
                         </div>
                         <small class="text-muted" id="discount-amount-{{ $reservation->id }}">
@@ -1299,6 +1303,8 @@
         if (e.target.id && e.target.id.startsWith('discount-custom-')) {
           const reservationId = e.target.id.replace('discount-custom-', '');
           const charge = parseFloat(e.target.getAttribute('data-charge')) || 0;
+          const totalCharge = parseFloat(e.target.getAttribute('data-total-charge'));
+          const effectiveTotalCharge = isNaN(totalCharge) ? charge : totalCharge;
           const percentage = parseFloat(e.target.value) || 0;
           const amount = (charge * percentage / 100).toFixed(2);
           const displayEl = document.getElementById('discount-amount-' + reservationId);
@@ -1307,7 +1313,7 @@
           }
           const finalChargeEl = document.getElementById('final-charge-' + reservationId);
           if (finalChargeEl) {
-            const finalCharge = charge - parseFloat(amount);
+            const finalCharge = effectiveTotalCharge - parseFloat(amount);
             finalChargeEl.textContent = 'Rs. ' + finalCharge.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
           }
         }

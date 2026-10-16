@@ -9,6 +9,8 @@ use App\Models\Reservation;
 use App\Models\Payments;
 use App\Models\ReservationModel;
 use App\Models\PackagesModel;
+use App\Models\FixedPriceFacilitiesModel;
+use App\Models\UnitPriceFacilitiesModel;
 use App\Notifications\reservation_request_admin;
 use App\Notifications\reservation_request_customer;
 use App\Notifications\PaymentConfirmation;
@@ -123,6 +125,7 @@ class ReservationController extends Controller
             'user_cancelled' => false,
 
             'charge' => $totalCharge,
+            'facilities_charge' => $facilitiesCharge,
             'advanceAmount' => 25000, // make advance amount to be fixed
             'discount' => $hall->discount ?? null,
             'discount_custom' => $request->discount_custom ?? null,
@@ -208,6 +211,48 @@ class ReservationController extends Controller
         // Use the dynamically calculated total charge from the frontend
         $totalCharge = $request->total_charge;
 
+        // Server-side recalculation of the facilities charge (customer-selected extras only,
+        // excluding the package price and package discount) so it can be stored separately.
+        $facilitiesCharge = 0;
+
+        if ($request->has('package_fixed_facilities')) {
+            $selectedFixedFacilityIds = array_filter(array_map(function ($item) {
+                return is_array($item) ? ($item['id'] ?? null) : $item;
+            }, (array) $request->package_fixed_facilities));
+
+            $facilitiesCharge += (float) FixedPriceFacilitiesModel::whereIn('id', $selectedFixedFacilityIds)
+                ->where('hall_id', $hall->id)
+                ->sum('charge');
+        }
+
+        if ($request->has('package_unit_facilities')) {
+            // Hours arrive as a parallel array (package_unit_hours[]) from the booking form.
+            $hoursList = array_values((array) $request->input('package_unit_hours', []));
+
+            $unitItems = collect((array) $request->package_unit_facilities)
+                ->values()
+                ->map(function ($item, $index) use ($hoursList) {
+                    if (is_array($item)) {
+                        return ['id' => $item['id'] ?? null, 'hours' => (float) ($item['hours'] ?? 0)];
+                    }
+                    $hours = isset($hoursList[$index]) ? (float) $hoursList[$index] : 1;
+                    return ['id' => $item, 'hours' => $hours];
+                })
+                ->filter(fn($item) => !empty($item['id']));
+
+            if ($unitItems->isNotEmpty()) {
+                $unitFacilityPrices = UnitPriceFacilitiesModel::whereIn('id', $unitItems->pluck('id'))
+                    ->where('hall_id', $hall->id)
+                    ->pluck('charge', 'id');
+
+                foreach ($unitItems as $item) {
+                    if (isset($unitFacilityPrices[$item['id']])) {
+                        $facilitiesCharge += (float) $unitFacilityPrices[$item['id']] * $item['hours'];
+                    }
+                }
+            }
+        }
+
         // Create reservation
         $reservation = ReservationModel::create([
             'ref_code' => $this->generateRefCode(),
@@ -229,6 +274,7 @@ class ReservationController extends Controller
             'user_cancelled' => false,
 
             'charge' => $totalCharge,
+            'facilities_charge' => $facilitiesCharge,
             'advanceAmount' => 25000, // make advance amount to be fixed
             'discount' => $hall->discount,
             'deposit' => $hall->deposit,
