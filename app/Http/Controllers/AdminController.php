@@ -139,7 +139,16 @@ class AdminController extends Controller
         $applicantAdmin = AdminModel::find($applicant);
 
         if (!$applicantAdmin || $applicantAdmin->admin_type === 'super') {
-            return back()->with('approval_error', 'This registration request does not exist.');
+            return view('AdminApprovalPage', ['error' => 'This registration request does not exist.']);
+        }
+
+        // Guard against re-clicking the email link after a decision was made:
+        // show the "already decided" screen instead of re-approving / re-notifying.
+        if ($applicantAdmin->approval_status !== 'pending') {
+            return view('AdminApprovalPage', [
+                'applicantAdmin' => $applicantAdmin,
+                'result' => $applicantAdmin->approval_status,
+            ]);
         }
 
         $applicantAdmin->update([
@@ -164,7 +173,16 @@ class AdminController extends Controller
         $applicantAdmin = AdminModel::find($applicant);
 
         if (!$applicantAdmin || $applicantAdmin->admin_type === 'super') {
-            return back()->with('approval_error', 'This registration request does not exist.');
+            return view('AdminApprovalPage', ['error' => 'This registration request does not exist.']);
+        }
+
+        // Guard against re-clicking the email link after a decision was made:
+        // show the "already decided" screen instead of re-rejecting / re-notifying.
+        if ($applicantAdmin->approval_status !== 'pending') {
+            return view('AdminApprovalPage', [
+                'applicantAdmin' => $applicantAdmin,
+                'result' => $applicantAdmin->approval_status,
+            ]);
         }
 
         $applicantAdmin->update([
