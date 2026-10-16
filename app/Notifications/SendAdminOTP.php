@@ -55,7 +55,7 @@ class SendAdminOTP extends Notification implements ShouldQueue
             ))
             ->line('⏰ **This code will expire in 10 minutes.**')
             ->line('If you did not create an account, please ignore this email.')
-            ->salutation("Regards,\n" . 'Prime Minister\'s Office');
+            ->salutation("Best regards,\nPublic Facilities Reservation System.");
     }
 
     /**
