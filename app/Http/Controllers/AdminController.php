@@ -139,7 +139,16 @@ class AdminController extends Controller
         $applicantAdmin = AdminModel::find($applicant);
 
         if (!$applicantAdmin || $applicantAdmin->admin_type === 'super') {
-            return back()->with('approval_error', 'This registration request does not exist.');
+            return view('AdminApprovalPage', ['error' => 'This registration request does not exist.']);
+        }
+
+        // Guard against re-clicking the email link after a decision was made:
+        // show the "already decided" screen instead of re-approving / re-notifying.
+        if ($applicantAdmin->approval_status !== 'pending') {
+            return view('AdminApprovalPage', [
+                'applicantAdmin' => $applicantAdmin,
+                'result' => $applicantAdmin->approval_status,
+            ]);
         }
 
         $applicantAdmin->update([
@@ -164,7 +173,16 @@ class AdminController extends Controller
         $applicantAdmin = AdminModel::find($applicant);
 
         if (!$applicantAdmin || $applicantAdmin->admin_type === 'super') {
-            return back()->with('approval_error', 'This registration request does not exist.');
+            return view('AdminApprovalPage', ['error' => 'This registration request does not exist.']);
+        }
+
+        // Guard against re-clicking the email link after a decision was made:
+        // show the "already decided" screen instead of re-rejecting / re-notifying.
+        if ($applicantAdmin->approval_status !== 'pending') {
+            return view('AdminApprovalPage', [
+                'applicantAdmin' => $applicantAdmin,
+                'result' => $applicantAdmin->approval_status,
+            ]);
         }
 
         $applicantAdmin->update([
@@ -228,8 +246,13 @@ class AdminController extends Controller
             $request->session()->forget('verify_admin_id');
             Auth::guard('admin')->login($admin);
 
-            // Redirect to your specified route after verification
-            return redirect()->route('home_route')->with('success', 'Email verified successfully!');
+            // Redirect to home after verification. The admin is already logged
+            // in here, so home.blade.php will auto-slide-in the admin sign-in
+            // panel with a "Successfully registered" alert (window.adminJustRegistered).
+            return redirect()->route('home_route')
+                ->with('admin_just_registered', true)
+                ->with('registered_email', $admin->email)
+                ->with('success', 'Email verified successfully!');
         } else {
             return back()->withErrors(['otp' => 'Invalid or expired OTP']);
         }

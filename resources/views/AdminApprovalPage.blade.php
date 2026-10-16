@@ -31,7 +31,7 @@
                     <div class="mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-green-100">
                         <i class="fas fa-check-circle text-3xl text-green-500"></i>
                     </div>
-                    <h1 class="text-2xl font-bold text-gray-800">Registration Approved</h1>
+                    <h1 class="text-2xl font-bold text-gray-800">Already Approved</h1>
                     <p class="text-gray-600">
                         <strong>{{ $applicantAdmin->company_name }}</strong> ({{ $applicantAdmin->email }})
                         has been <span class="font-semibold text-green-600">approved</span>.
@@ -44,7 +44,7 @@
                     <div class="mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-red-100">
                         <i class="fas fa-times-circle text-3xl text-red-500"></i>
                     </div>
-                    <h1 class="text-2xl font-bold text-gray-800">Registration Rejected</h1>
+                    <h1 class="text-2xl font-bold text-gray-800">Already Rejected</h1>
                     <p class="text-gray-600">
                         <strong>{{ $applicantAdmin->company_name }}</strong> ({{ $applicantAdmin->email }})
                         has been <span class="font-semibold text-red-600">rejected</span>.
@@ -57,6 +57,8 @@
                 @if($applicantAdmin->approval_status === 'approved' && $applicantAdmin->approved_at)
                     <p class="text-xs text-gray-400">Approved on {{ $applicantAdmin->approved_at->format('Y-m-d H:i') }}</p>
                 @endif
+
+                <p class="text-sm text-gray-500">This request has already been decided. No further action is possible.</p>
 
                 <a href="{{ route('home_route') }}" class="inline-block mt-2 text-indigo-600 font-semibold hover:underline">Back to Home</a>
             </div>
