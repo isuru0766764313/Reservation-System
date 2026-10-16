@@ -123,6 +123,7 @@ class ReservationController extends Controller
             'user_cancelled' => false,
 
             'charge' => $totalCharge,
+            'facilities_charge' => $facilitiesCharge,
             'advanceAmount' => 25000, // make advance amount to be fixed
             'discount' => $hall->discount ?? null,
             'discount_custom' => $request->discount_custom ?? null,
