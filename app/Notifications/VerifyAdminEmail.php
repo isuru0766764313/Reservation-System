@@ -55,7 +55,6 @@ class VerifyAdminEmail extends Notification implements ShouldQueue
             ->greeting('Dear Admin,')
             ->line('Welcome to the **Public Facilities Reservation Portal** (Prime Minister\'s Office).')
             ->line('Please click the button below to verify your email address and activate your admin account.')
-            ->line('⏰ **This verification link will expire in 60 minutes.**')
             ->action('Verify Email Address', $url)
             ->line('If you did not create an account, no further action is required.')
             ->salutation("Best regards,\nPublic Facilities Reservation System.");
