@@ -55,7 +55,7 @@ class ReservationModel extends Model
     protected $casts =
         [
             'charge'=> 'decimal:2',
-            'facilities_charge'=> 'decimal:2',
+            'facilities_charge' => 'decimal:2',
             'advanceAmount'=> 'decimal:2',
             'discount'=> 'decimal:2',
             'discount_custom'=> 'decimal:2',

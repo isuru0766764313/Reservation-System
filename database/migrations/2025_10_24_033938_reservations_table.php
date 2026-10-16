@@ -30,6 +30,7 @@ class ReservationsTable extends Migration
             $table->time('start_time');
             $table->time('end_time');
             $table->decimal('charge', 10, 2);
+            $table->decimal('facilities_charge', 10, 2)->default(0.00);
             $table->decimal('advanceAmount', 10, 2)->default(0.00);
             $table->decimal('discount', 10, 2)->nullable()->default(null);
             $table->decimal('discount_custom', 10, 2)->nullable()->default(null);
