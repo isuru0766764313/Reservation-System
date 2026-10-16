@@ -48,7 +48,7 @@ class AdminRegistrationApproved extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject('Admin Registration Approved')
             ->greeting('Dear ' . $this->applicant->company_name . ',')
-            ->line('Good news! Your administrator account registration for the **Public Facilities Reservation Portal** has been approved.')
+            ->line('Good news! Your administrator account registration for the **Public Facilities Reservation System** has been approved.')
             ->line('You can now sign in with your email and password. For security, you will be asked to complete OTP verification (email & mobile) on your first sign in.')
             ->action('Sign In Now', route('admin.login.get.route'))
             ->salutation("Best regards,\nPublic Facilities Reservation System.");
