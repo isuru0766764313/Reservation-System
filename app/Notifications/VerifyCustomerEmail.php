@@ -53,7 +53,7 @@ class VerifyCustomerEmail extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject('Verify Your Email - Public Facilities Reservation System')
             ->greeting('Dear ' . trim(($notifiable->profile_title ?? '') . ' ' . ($notifiable->first_name ?? '') . ' ' . ($notifiable->last_name ?? '')) . ',')
-            ->line('Welcome to the **Public Facilities Reservation Portal** (Prime Minister\'s Office).')
+            ->line('Welcome to the **Public Facilities Reservation System**')
             ->line('Please click the button below to verify your email address and activate your account.')
             ->line('⏰ **This verification link will expire in 60 minutes.**')
             ->action('Verify Email Address', $url)
