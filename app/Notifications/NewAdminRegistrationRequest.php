@@ -51,7 +51,7 @@ class NewAdminRegistrationRequest extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject('New Admin Registration Request - Approval Required')
             ->greeting('Dear Super Admin,')
-            ->line('A new organisation admin has requested access to the **Public Facilities Reservation Portal**.')
+            ->line('A new organisation admin has requested access to the **Public Facilities Reservation System**.')
             ->line(new HtmlString(
                 '<div style="background-color:#f8f9fa; border-radius:8px; padding:15px; margin:15px 0;">'
                 . '<p style="margin:5px 0;"><strong>Company Name:</strong> ' . e($this->applicant->company_name) . '</p>'
