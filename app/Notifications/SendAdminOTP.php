@@ -44,7 +44,7 @@ class SendAdminOTP extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject('Email Verification - Public Facilities Reservation Portal (Admin)')
+            ->subject('Email Verification - Public Facilities Reservation System (Admin)')
             ->greeting('Dear Admin,')
             ->line('Thank you for registering as an admin on the **Public Facilities Reservation Portal** (Prime Minister\'s Office).')
             ->line('Use the verification code below to activate your admin account:')
