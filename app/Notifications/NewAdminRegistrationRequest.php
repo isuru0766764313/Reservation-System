@@ -57,7 +57,6 @@ class NewAdminRegistrationRequest extends Notification implements ShouldQueue
                 . '<p style="margin:5px 0;"><strong>Company Name:</strong> ' . e($this->applicant->company_name) . '</p>'
                 . '<p style="margin:5px 0;"><strong>Email:</strong> ' . e($this->applicant->email) . '</p>'
                 . '<p style="margin:5px 0;"><strong>Contact Number:</strong> ' . e($this->applicant->telephone_number) . '</p>'
-                . '<p style="margin:5px 0;"><strong>Requested On:</strong> ' . $this->applicant->created_at->format('Y-m-d H:i') . '</p>'
                 . '</div>'
             ))
             ->line('Review the request and approve or reject it using the button below. The applicant cannot verify or sign in until you approve.')
