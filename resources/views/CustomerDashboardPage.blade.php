@@ -1154,7 +1154,8 @@
                                                                     // Once truly cancelled (fee record, user flag, or status = Cancelled) never show Cancel again
                                                                     $cancelRecord = $reservation->payments->where('payment_alias', 'Cancellation')->first() || $reservation->user_cancelled || (int) $reservation->status === 5;
                                                                     $cancelAvail = empty($reservation->cancellationExpiryDate) || \Carbon\Carbon::parse($reservation->cancellationExpiryDate)->isFuture();
-                                                                    $rescheduleAvail = empty($reservation->rescheduledExpiryDate) || \Carbon\Carbon::parse($reservation->rescheduledExpiryDate)->isFuture();
+                                                                    // Re-schedule allowed only for statuses: 3 (Confirmed), 4 (Reserved), 7 (Re-scheduled)
+                                                                    $rescheduleAvail = in_array((int) $reservation->status, [3, 4, 7]) && (empty($reservation->rescheduledExpiryDate) || \Carbon\Carbon::parse($reservation->rescheduledExpiryDate)->isFuture());
                                                                 @endphp
                                                                 @if (!$cancelRecord && ($cancelAvail || $rescheduleAvail))
                                                                     <div class="ref-spacer"></div>
@@ -1287,7 +1288,8 @@
                         // Once truly cancelled (fee record, user flag, or status = Cancelled) never show Cancel again
                         $cancelRecord = $reservation->payments->where('payment_alias', 'Cancellation')->first() || $reservation->user_cancelled || (int) $reservation->status === 5;
                         $cancelAvail = empty($reservation->cancellationExpiryDate) || \Carbon\Carbon::parse($reservation->cancellationExpiryDate)->isFuture();
-                        $rescheduleAvail = empty($reservation->rescheduledExpiryDate) || \Carbon\Carbon::parse($reservation->rescheduledExpiryDate)->isFuture();
+                        // Re-schedule allowed only for statuses: 3 (Confirmed), 4 (Reserved), 7 (Re-scheduled)
+                        $rescheduleAvail = in_array((int) $reservation->status, [3, 4, 7]) && (empty($reservation->rescheduledExpiryDate) || \Carbon\Carbon::parse($reservation->rescheduledExpiryDate)->isFuture());
                     @endphp
                     <div class="reservation-mobile-card">
                         <div class="reservation-mobile-header">
@@ -1468,7 +1470,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-primary" id="saveRescheduleBtn" disabled><i
-                                    class="fas fa-save me-2"></i>Save Changes</button>
+                                    class="fas fa-paper-plane me-2"></i>Submit Re-schedule Request</button>
                         </div>
                     </form>
                 </div>
@@ -2518,14 +2520,14 @@
                 const submitBtn = document.getElementById('saveRescheduleBtn');
                 const originalBtnHtml = submitBtn.innerHTML;
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
                 fetch(form.action, {
                     method: 'PATCH',
                     headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value, 'X-Requested-With': 'XMLHttpRequest' },
                     body: new URLSearchParams(new FormData(form))
                 })
                     .then(response => response.json())
-                    .then(data => { if (data.success) { alert('Reservation rescheduled successfully!'); location.reload(); } else throw new Error(data.message || 'Error rescheduling'); })
+                    .then(data => { if (data.success) { alert(data.message || 'Re-schedule request submitted successfully! It will be applied once the admin approves it.'); location.reload(); } else throw new Error(data.message || 'Error submitting re-schedule request'); })
                     .catch(error => { alert(error.message); submitBtn.disabled = false; submitBtn.innerHTML = originalBtnHtml; });
             });
         });

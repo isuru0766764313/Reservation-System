@@ -843,6 +843,14 @@ class ReservationController extends Controller
             'new_post_arrange_time' => 'nullable|integer|min:0|max:' . ($reservation->hall->max_post_arrange_hours ?? 5),
         ]);
 
+        // Re-schedule requests allowed only for statuses: 3 (Confirmed), 4 (Reserved), 7 (Re-scheduled)
+        if (!in_array((int) $reservation->status, [3, 4, 7])) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'This reservation cannot be re-scheduled at its current status.'], 400);
+            }
+            return redirect()->back()->with('error', 'This reservation cannot be re-scheduled at its current status.');
+        }
+
         // Check if reservation has already passed
         $originalEndDateTime = Carbon::parse($reservation->reservation_date . ' ' . $reservation->end_time);
         if ($originalEndDateTime->isPast()) {
