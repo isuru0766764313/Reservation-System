@@ -1151,7 +1151,8 @@
                                                             {{ $reservation->ref_code ?? $reservation->id }}
                                                                 @php
                                                                     $Rbadge = \App\Http\Controllers\ReservationController::getCustomerStatusBadge($reservation);
-                                                                    $cancelRecord = $reservation->payments->where('payment_alias', 'Cancellation')->first() || $reservation->user_cancelled;
+                                                                    // Once truly cancelled (fee record, user flag, or status = Cancelled) never show Cancel again
+                                                                    $cancelRecord = $reservation->payments->where('payment_alias', 'Cancellation')->first() || $reservation->user_cancelled || (int) $reservation->status === 5;
                                                                     $cancelAvail = empty($reservation->cancellationExpiryDate) || \Carbon\Carbon::parse($reservation->cancellationExpiryDate)->isFuture();
                                                                     $rescheduleAvail = empty($reservation->rescheduledExpiryDate) || \Carbon\Carbon::parse($reservation->rescheduledExpiryDate)->isFuture();
                                                                 @endphp
@@ -1276,7 +1277,8 @@
                     @php
                         // Same source of truth as the desktop table
                         $Rbadge = \App\Http\Controllers\ReservationController::getCustomerStatusBadge($reservation);
-                        $cancelRecord = $reservation->payments->where('payment_alias', 'Cancellation')->first() || $reservation->user_cancelled;
+                        // Once truly cancelled (fee record, user flag, or status = Cancelled) never show Cancel again
+                        $cancelRecord = $reservation->payments->where('payment_alias', 'Cancellation')->first() || $reservation->user_cancelled || (int) $reservation->status === 5;
                         $cancelAvail = empty($reservation->cancellationExpiryDate) || \Carbon\Carbon::parse($reservation->cancellationExpiryDate)->isFuture();
                         $rescheduleAvail = empty($reservation->rescheduledExpiryDate) || \Carbon\Carbon::parse($reservation->rescheduledExpiryDate)->isFuture();
                     @endphp

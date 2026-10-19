@@ -756,7 +756,7 @@ class ReservationController extends Controller
         if (auth('customer')->id() !== $reservation->customer_id) {
             abort(403, 'Unauthorized action');
         } else {
-            if ($reservation->user_cancelled) {
+            if ($reservation->user_cancelled || (int) $reservation->status === 5) {
                 // if user has already cancelled the reservation
                 return back()->with('error', 'Reservation already cancelled!');
             } else {
@@ -766,18 +766,28 @@ class ReservationController extends Controller
                 $actualStartTime = $start->copy()->subHours($reservation->pre_arrange_time)->format('H:i:s');
                 $actualEndTime = $end->copy()->addHours($reservation->post_arrange_time)->format('H:i:s');
 
-                // Record the cancellation fee (covered by amounts already paid)
-                // Charge and other payment records remain untouched
-                Payments::create([
-                    'reservation_id' => $reservation->id,
-                    'payment_alias' => 'Cancellation',
-                    'amount' => $reservation->hall->cancellation_fee,
-                    'receipt_path' => null,
-                    'status' => 2, // approved - no admin verification needed
-                ]);
+                // Pending reservations have no payments yet, so there is nothing to charge a
+                // cancellation fee against. Skip the Cancellation payment record for them.
+                // All other statuses keep the existing behavior (fee recorded, untouched otherwise).
+                $isPending = (int) $reservation->status === 1;
+
+                if (!$isPending) {
+                    // Record the cancellation fee (covered by amounts already paid)
+                    // Charge and other payment records remain untouched
+                    Payments::create([
+                        'reservation_id' => $reservation->id,
+                        'payment_alias' => 'Cancellation',
+                        'amount' => $reservation->hall->cancellation_fee,
+                        'receipt_path' => null,
+                        'status' => 2, // approved - no admin verification needed
+                    ]);
+                }
 
                 $reservation->update([
-                    'user_cancelled' => true,
+                    // For Pending bookings we do not flag user_cancelled (keeps the
+                    // non-pending flow's source of truth unchanged); status 5 alone
+                    // marks the cancellation and hides the button.
+                    'user_cancelled' => !$isPending,
                     'status' => 5,
                 ]);
 
@@ -788,8 +798,11 @@ class ReservationController extends Controller
                     ->where('end_time', $actualEndTime)
                     ->delete();
 
-                $admin = AdminModel::find($reservation->hall->admin_id);
-                $admin->notify(new CustomerCancelled($reservation));
+                // Notify the hall admin only for non-pending cancellations (existing flow)
+                if (!$isPending) {
+                    $admin = AdminModel::find($reservation->hall->admin_id);
+                    $admin->notify(new CustomerCancelled($reservation));
+                }
 
                 if (request()->ajax() || request()->expectsJson()) {
                     return response()->json(['success' => true, 'message' => 'Reservation cancelled successfully!']);
