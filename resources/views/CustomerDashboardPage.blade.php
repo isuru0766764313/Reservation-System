@@ -2049,7 +2049,13 @@
                     return false;
                 }
             }
-            if (!confirm('Are you sure you want to cancel this reservation?\nCancellation fee: Rs. ' + cancellationFee + '/= will be deducted from your paid amount.')) {
+            // Pending reservations incur no cancellation fee, so skip the fee confirmation alert for them
+            const isPending = String(currentStatus).toLowerCase() === 'pending' || String(currentStatus) === '1';
+            if (!isPending) {
+                if (!confirm('Are you sure you want to cancel this reservation?\nCancellation fee: Rs. ' + cancellationFee + '/= will be deducted from your paid amount.')) {
+                    return false;
+                }
+            } else if (!confirm('Are you sure you want to cancel this reservation?')) {
                 return false;
             }
             // Direct cancellation - no slip upload, no admin approval needed
