@@ -11,6 +11,8 @@ use App\Models\AdminModel;
 use App\Models\HallUnAvailability;
 use App\Notifications\ReservationAccepted;
 use App\Notifications\ReservationRejectedEmail;
+use App\Models\RescheduleRequest;
+use App\Notifications\RescheduleRequestResultCustomer;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\SmsServiceController;
@@ -311,6 +313,145 @@ class AdminDashboardController extends Controller
         } else {
             return view('admin-view-slip', compact('reservation'));
         }
+    }
+
+    /**
+     * Admin accepts a pending re-schedule request.
+     *
+     * Only now the reservation is actually moved to the newly requested date and
+     * time period: the old HallUnAvailability record is removed, a new one is
+     * created for the requested slot, the reservation details are updated and
+     * its status becomes Rescheduled (7). The customer is notified by email.
+     */
+    public function acceptRescheduleRequest(Request $request, RescheduleRequest $rescheduleRequest)
+    {
+        $reservation = $rescheduleRequest->reservation;
+        $hall = $reservation->hall;
+
+        // Verify the logged-in admin owns this hall
+        if (auth('admin')->id() !== $hall->admin_id) {
+            abort(403, 'Unauthorized action');
+        }
+
+        // Only pending requests can be processed
+        if ((int) $rescheduleRequest->status !== RescheduleRequest::STATUS_PENDING) {
+            return back()->with('error', 'This re-schedule request has already been processed!');
+        }
+
+        // Do not apply a re-schedule for a reservation that has ended / been cancelled or rejected
+        $originalEndDateTime = \Carbon\Carbon::parse($reservation->reservation_date . ' ' . $reservation->end_time);
+        if ($originalEndDateTime->isPast() || in_array((int) $reservation->status, [5, 6], true)) {
+            $rescheduleRequest->update(['status' => RescheduleRequest::STATUS_REJECTED]);
+            return back()->with('error', 'Cannot re-schedule a reservation that has already ended or is cancelled/rejected. The request was rejected.');
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $newDate = $rescheduleRequest->new_date;
+            $newStartTime = $rescheduleRequest->new_start_time;
+            $newEndTime = $rescheduleRequest->new_end_time;
+            $newPreArrange = (int) $rescheduleRequest->new_pre_arrange_time;
+            $newPostArrange = (int) $rescheduleRequest->new_post_arrange_time;
+
+            // Calculate actual times for the NEW reservation (including arrange buffers)
+            $newStart = \Carbon\Carbon::createFromFormat('H:i', substr($newStartTime, 0, 5));
+            $newEnd = \Carbon\Carbon::createFromFormat('H:i', substr($newEndTime, 0, 5));
+
+            $newActualStart = $newStart->copy()->subHours($newPreArrange)->format('H:i');
+            $newActualEnd = $newEnd->copy()->addHours($newPostArrange)->format('H:i');
+
+            // Calculate old actual start/end times to match the specific unavailability record
+            $oldStart = \Carbon\Carbon::parse($reservation->start_time);
+            $oldEnd = \Carbon\Carbon::parse($reservation->end_time);
+            $oldActualStart = $oldStart->copy()->subHours($reservation->pre_arrange_time)->format('H:i:s');
+            $oldActualEnd = $oldEnd->copy()->addHours($reservation->post_arrange_time)->format('H:i:s');
+
+            // Step 1: Delete old HallUnAvailability record (match specific record)
+            $deletedCount = HallUnAvailability::where('hall_id', $reservation->hall_id)
+                ->where('date', $reservation->reservation_date)
+                ->where('start_time', $oldActualStart)
+                ->where('end_time', $oldActualEnd)
+                ->delete();
+
+            \Log::info('Admin accepted reschedule. Deleted ' . $deletedCount . ' old HallUnAvailability record(s) for hall ' . $reservation->hall_id);
+
+            // Step 2: Create new HallUnAvailability record with the requested details
+            $hallUnavailability = HallUnAvailability::create([
+                'hall_id' => $reservation->hall_id,
+                'date' => $newDate,
+                'start_time' => $newActualStart,
+                'end_time' => $newActualEnd,
+            ]);
+
+            // Step 3: Apply the new schedule to the reservation and mark it Rescheduled (7)
+            $reservation->update([
+                'reservation_date' => $newDate,
+                'start_time' => $newStartTime,
+                'end_time' => $newEndTime,
+                'pre_arrange_time' => $newPreArrange,
+                'post_arrange_time' => $newPostArrange,
+                're_scheduled' => true,
+                'status' => 7,
+            ]);
+
+            // Step 4: Mark the request as accepted
+            $rescheduleRequest->update(['status' => RescheduleRequest::STATUS_ACCEPTED]);
+
+            DB::commit();
+
+            \Log::info('Reservation rescheduled after admin approval. Reservation ID: ' . $reservation->id);
+
+            // Notify the customer that their re-schedule request was accepted
+            $customer = CustomerModel::find($reservation->customer_id);
+            if ($customer) {
+                $customer->notify(new RescheduleRequestResultCustomer($rescheduleRequest, true));
+            }
+
+            return back()->with('success', 'Re-schedule request accepted. Reservation has been re-scheduled.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Admin reschedule-accept error for reservation ' . $reservation->id . ': ' . $e->getMessage());
+            \Log::error('Error trace: ' . $e->getTraceAsString());
+
+            return back()->with('error', 'An error occurred while accepting the re-schedule request. Please try again.');
+        }
+    }
+
+    /**
+     * Admin rejects a pending re-schedule request.
+     *
+     * Nothing changes on the reservation — it keeps its current date/time and
+     * status. The request is marked rejected and the customer is notified by email.
+     */
+    public function rejectRescheduleRequest(Request $request, RescheduleRequest $rescheduleRequest)
+    {
+        $reservation = $rescheduleRequest->reservation;
+        $hall = $reservation->hall;
+
+        // Verify the logged-in admin owns this hall
+        if (auth('admin')->id() !== $hall->admin_id) {
+            abort(403, 'Unauthorized action');
+        }
+
+        // Only pending requests can be processed
+        if ((int) $rescheduleRequest->status !== RescheduleRequest::STATUS_PENDING) {
+            return back()->with('error', 'This re-schedule request has already been processed!');
+        }
+
+        $rescheduleRequest->update([
+            'status' => RescheduleRequest::STATUS_REJECTED,
+            'remarks' => $request->input('remarks'),
+        ]);
+
+        // Notify the customer that their re-schedule request was rejected
+        $customer = CustomerModel::find($reservation->customer_id);
+        if ($customer) {
+            $customer->notify(new RescheduleRequestResultCustomer($rescheduleRequest, false));
+        }
+
+        return back()->with('success', 'Re-schedule request rejected. The reservation remains unchanged.');
     }
 
 

@@ -236,6 +236,9 @@ Route::middleware(['auth:admin', 'verified.admin'])->prefix('admin')->group(func
     Route::patch('/slip/payment/{payment}/reject',[ReservationController::class,'rejectSinglePayment'])->name('admin.payment.reject');
     // reject the reservation itself (not payments)
     Route::patch('/reservations/{reservation}/reject-reservation',[ReservationController::class,'rejectReservation'])->name('admin.reservation.reject');
+    // accept/reject a customer's pending re-schedule request
+    Route::patch('/reschedule-request/{rescheduleRequest}/accept', [AdminDashboardController::class, 'acceptRescheduleRequest'])->name('admin.reschedule.request.accept');
+    Route::patch('/reschedule-request/{rescheduleRequest}/reject', [AdminDashboardController::class, 'rejectRescheduleRequest'])->name('admin.reschedule.request.reject');
     // accept advance payment only (unlock remaining payment for customer)
     Route::patch('/slip/{reservation}/accept-advance',[ReservationController::class,'acceptAdvancePayment'])->name('admin.slip.acceptAdvance');
     Route::post('/logout', [AdminController::class, 'Logout'])->name('admin.logout.route');
