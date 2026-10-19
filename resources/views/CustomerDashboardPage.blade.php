@@ -1468,7 +1468,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-primary" id="saveRescheduleBtn" disabled><i
-                                    class="fas fa-save me-2"></i>Save Changes</button>
+                                    class="fas fa-paper-plane me-2"></i>Submit Re-schedule Request</button>
                         </div>
                     </form>
                 </div>
@@ -2518,14 +2518,14 @@
                 const submitBtn = document.getElementById('saveRescheduleBtn');
                 const originalBtnHtml = submitBtn.innerHTML;
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
                 fetch(form.action, {
                     method: 'PATCH',
                     headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value, 'X-Requested-With': 'XMLHttpRequest' },
                     body: new URLSearchParams(new FormData(form))
                 })
                     .then(response => response.json())
-                    .then(data => { if (data.success) { alert('Reservation rescheduled successfully!'); location.reload(); } else throw new Error(data.message || 'Error rescheduling'); })
+                    .then(data => { if (data.success) { alert(data.message || 'Re-schedule request submitted successfully! It will be applied once the admin approves it.'); location.reload(); } else throw new Error(data.message || 'Error submitting re-schedule request'); })
                     .catch(error => { alert(error.message); submitBtn.disabled = false; submitBtn.innerHTML = originalBtnHtml; });
             });
         });

@@ -34,8 +34,11 @@ class AdminDashboardController extends Controller
         // Get all hall IDs belonging to this admin
         $hallIds = HallModel::where('admin_id', $admin->id)->pluck('id');
         // Get reservations for these halls
+        // `pendingRescheduleRequest` is eager-loaded so the dashboard can show a
+        // "Pending Review" badge for reservations whose re-schedule request has
+        // NOT yet been accepted/rejected by the admin.
         $reservationQuery = ReservationModel::whereIn('hall_id', $hallIds)
-            ->with(['hall', 'customer', 'payments', 'rescheduleRequests']);
+            ->with(['hall', 'customer', 'payments', 'rescheduleRequests', 'pendingRescheduleRequest']);
 
         // Search reservations by reference code, customer name, or property/hall name.
         if ($request->filled('search')) {
