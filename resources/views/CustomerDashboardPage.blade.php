@@ -1151,11 +1151,11 @@
                                                             {{ $reservation->ref_code ?? $reservation->id }}
                                                                 @php
                                                                     $Rbadge = \App\Http\Controllers\ReservationController::getCustomerStatusBadge($reservation);
-                                                                    $cancelRecord = $reservation->payments->where('payment_alias', 'Cancellation')->first();
+                                                                    $cancelRecord = $reservation->payments->where('payment_alias', 'Cancellation')->first() || $reservation->user_cancelled;
                                                                     $cancelAvail = empty($reservation->cancellationExpiryDate) || \Carbon\Carbon::parse($reservation->cancellationExpiryDate)->isFuture();
                                                                     $rescheduleAvail = empty($reservation->rescheduledExpiryDate) || \Carbon\Carbon::parse($reservation->rescheduledExpiryDate)->isFuture();
                                                                 @endphp
-                                                                @if (in_array($Rbadge['status_id'], [3, 4]) && !$cancelRecord && ($cancelAvail || $rescheduleAvail))
+                                                                @if (!$cancelRecord && ($cancelAvail || $rescheduleAvail))
                                                                     <div class="ref-spacer"></div>
                                                                     <div class="d-flex gap-1">
                                                                     @if($cancelAvail)
@@ -1276,7 +1276,7 @@
                     @php
                         // Same source of truth as the desktop table
                         $Rbadge = \App\Http\Controllers\ReservationController::getCustomerStatusBadge($reservation);
-                        $cancelRecord = $reservation->payments->where('payment_alias', 'Cancellation')->first();
+                        $cancelRecord = $reservation->payments->where('payment_alias', 'Cancellation')->first() || $reservation->user_cancelled;
                         $cancelAvail = empty($reservation->cancellationExpiryDate) || \Carbon\Carbon::parse($reservation->cancellationExpiryDate)->isFuture();
                         $rescheduleAvail = empty($reservation->rescheduledExpiryDate) || \Carbon\Carbon::parse($reservation->rescheduledExpiryDate)->isFuture();
                     @endphp
@@ -1303,7 +1303,7 @@
                             <button class="btn btn-primary btn-sm view-btn" data-bs-toggle="modal"
                                 data-bs-target="#PayNowModel-{{ $reservation->id }}"><i class="fas fa-eye me-1"></i>
                                 Payment Details</button>
-                            @if (in_array($Rbadge['status_id'], [3, 4]) && !$cancelRecord && ($cancelAvail || $rescheduleAvail))
+                            @if (!$cancelRecord && ($cancelAvail || $rescheduleAvail))
                                 @if($cancelAvail)
                                     <button type="button" class="btn btn-danger btn-sm" title="Cancel"
                                         onclick="setupCancellationPayment('{{ $reservation->id }}', '{{ number_format($reservation->hall->cancellation_fee, 2) }}', '{{ $reservation->cancellationExpiryDate ?? '' }}', '{{ $reservation->status }}', '{{ route('customer.reservation.cancel', $reservation->id) }}')">
