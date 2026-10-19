@@ -1154,7 +1154,8 @@
                                                                     // Once truly cancelled (fee record, user flag, or status = Cancelled) never show Cancel again
                                                                     $cancelRecord = $reservation->payments->where('payment_alias', 'Cancellation')->first() || $reservation->user_cancelled || (int) $reservation->status === 5;
                                                                     $cancelAvail = empty($reservation->cancellationExpiryDate) || \Carbon\Carbon::parse($reservation->cancellationExpiryDate)->isFuture();
-                                                                    $rescheduleAvail = empty($reservation->rescheduledExpiryDate) || \Carbon\Carbon::parse($reservation->rescheduledExpiryDate)->isFuture();
+                                                                    // Re-schedule allowed only for statuses: 3 (Confirmed), 4 (Reserved), 7 (Re-scheduled)
+                                                                    $rescheduleAvail = in_array((int) $reservation->status, [3, 4, 7]) && (empty($reservation->rescheduledExpiryDate) || \Carbon\Carbon::parse($reservation->rescheduledExpiryDate)->isFuture());
                                                                 @endphp
                                                                 @if (!$cancelRecord && ($cancelAvail || $rescheduleAvail))
                                                                     <div class="ref-spacer"></div>
@@ -1287,7 +1288,8 @@
                         // Once truly cancelled (fee record, user flag, or status = Cancelled) never show Cancel again
                         $cancelRecord = $reservation->payments->where('payment_alias', 'Cancellation')->first() || $reservation->user_cancelled || (int) $reservation->status === 5;
                         $cancelAvail = empty($reservation->cancellationExpiryDate) || \Carbon\Carbon::parse($reservation->cancellationExpiryDate)->isFuture();
-                        $rescheduleAvail = empty($reservation->rescheduledExpiryDate) || \Carbon\Carbon::parse($reservation->rescheduledExpiryDate)->isFuture();
+                        // Re-schedule allowed only for statuses: 3 (Confirmed), 4 (Reserved), 7 (Re-scheduled)
+                        $rescheduleAvail = in_array((int) $reservation->status, [3, 4, 7]) && (empty($reservation->rescheduledExpiryDate) || \Carbon\Carbon::parse($reservation->rescheduledExpiryDate)->isFuture());
                     @endphp
                     <div class="reservation-mobile-card">
                         <div class="reservation-mobile-header">
