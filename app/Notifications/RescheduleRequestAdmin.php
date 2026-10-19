@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Route;
 
 class RescheduleRequestAdmin extends Notification implements ShouldQueue
 {
@@ -80,8 +81,18 @@ class RescheduleRequestAdmin extends Notification implements ShouldQueue
             ->line('Pre-arrange Time: **' . $req->new_pre_arrange_time . ' hour(s)**')
             ->line('Post-arrange Time: **' . $req->new_post_arrange_time . ' hour(s)**')
             ->line('Full Event Time Period: **' . date('h:i A', strtotime($newActualStart)) . ' - ' . date('h:i A', strtotime($newActualEnd)) . '**')
-            ->line('---')
-            ->salutation("Best regards,\nPublic Facilities Reservation System.");
+            ->line('---');
+
+        // Action buttons — only available when the admin dashboard route exists (i.e. we are
+        // not running unit tests where routes are not loaded). This keeps the notification
+        // safe in every environment while giving admins one-click actions in real emails.
+        if (Route::has('admin.dashboard.route')) {
+            $dashboardUrl = route('admin.dashboard.route') . '#reservationModal-' . $reservation->id;
+            $mail->line('You can accept or reject this request directly from your dashboard by opening the reservation detail modal (Ref. Code #' . ($reservation->ref_code ?? $reservation->id) . ').')
+                ->action('Open Dashboard & Review Request', $dashboardUrl);
+        }
+
+        $mail->salutation("Best regards,\nPublic Facilities Reservation System.");
 
         return $mail;
     }

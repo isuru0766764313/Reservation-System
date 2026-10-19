@@ -761,6 +761,7 @@
               <th>Date</th>
               <th>Period</th>
               <th>Status</th>
+              <th>Reschedule Requests</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -771,6 +772,7 @@
                 $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
                 $preliminaryPayment = $reservation->advanceAmount;
                 $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
+                $pendingReschedReq = $reservation->rescheduleRequests->firstWhere('status', \App\Models\RescheduleRequest::STATUS_PENDING);
               @endphp
               <tr>
                 <td class="align-middle">{{ $reservation->ref_code ?? $loop->iteration }}</td>
@@ -784,6 +786,16 @@
                 <td class="align-middle">
                   @php $badge = \App\Http\Controllers\ReservationController::getCustomerStatusBadge($reservation); @endphp
                   <span class="badge {{ $badge['class'] }}">{{ $badge['label'] }}</span>
+                </td>
+                <td class="align-middle">
+                  @if($pendingReschedReq)
+                    <a href="#reservationModal-{{ $reservation->id }}" class="badge bg-custom-rescheduled text-decoration-none"
+                      data-bs-toggle="modal" data-bs-target="#reservationModal-{{ $reservation->id }}" title="View and act on the request in the reservation detail">
+                      <i class="fas fa-clock me-1"></i>Pending Review
+                    </a>
+                  @else
+                    <span class="text-muted small">-</span>
+                  @endif
                 </td>
                 <td class="align-middle">
                   <button class="btn btn-success btn-sm action-btn view-btn" data-bs-toggle="modal"
@@ -947,6 +959,7 @@
       }
       $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
       $advancePaidStatus = $reservation->advancePaid ? 'Yes' : 'No';
+      $pendingReschedReq = $reservation->rescheduleRequests->firstWhere('status', \App\Models\RescheduleRequest::STATUS_PENDING);
     @endphp
 
     <div class="modal fade" id="reservationModal-{{ $reservation->id }}" tabindex="-1">
@@ -958,6 +971,79 @@
           </div>
           <div class="modal-body">
             <div class="row mb-4">
+              @if($pendingReschedReq)
+                <!-- Pending Re-schedule Request from Customer -->
+                <div class="col-md-12 mb-3">
+                  <div class="card border-warning">
+                    <div class="card-header bg-warning text-dark py-2">
+                      <i class="fas fa-exchange-alt me-2"></i><strong>Pending Re-schedule Request</strong>
+                      <span class="badge bg-dark ms-2">Awaiting your approval</span>
+                    </div>
+                    <div class="card-body py-3">
+                      <div class="table-responsive">
+                        <table class="table table-sm table-bordered mb-3 align-middle">
+                          <thead class="table-light">
+                            <tr>
+                              <th></th>
+                              <th>Date</th>
+                              <th>Event Time Period</th>
+                              <th>Pre-arrange</th>
+                              <th>Post-arrange</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td class="text-muted">Current</td>
+                              <td>{{ \Carbon\Carbon::parse($pendingReschedReq->old_date)->format('d M Y') }}</td>
+                              <td>{{ date('h:i A', strtotime($pendingReschedReq->old_start_time)) }} -
+                                {{ date('h:i A', strtotime($pendingReschedReq->old_end_time)) }}</td>
+                              <td>{{ $pendingReschedReq->old_pre_arrange_time }} hr(s)</td>
+                              <td>{{ $pendingReschedReq->old_post_arrange_time }} hr(s)</td>
+                            </tr>
+                            <tr class="table-warning">
+                              <td class="fw-bold">Requested</td>
+                              <td class="fw-bold">{{ \Carbon\Carbon::parse($pendingReschedReq->new_date)->format('d M Y') }}</td>
+                              <td class="fw-bold">{{ date('h:i A', strtotime($pendingReschedReq->new_start_time)) }} -
+                                {{ date('h:i A', strtotime($pendingReschedReq->new_end_time)) }}</td>
+                              <td>{{ $pendingReschedReq->new_pre_arrange_time }} hr(s)</td>
+                              <td>{{ $pendingReschedReq->new_post_arrange_time }} hr(s)</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="d-flex flex-wrap gap-2">
+                        <form method="POST"
+                          action="{{ route('admin.reschedule.request.accept', $pendingReschedReq->id) }}"
+                          onsubmit="return confirm('Accept this re-schedule request? The reservation will be moved to the new date and time.');">
+                          @csrf
+                          @method('PATCH')
+                          <button type="submit" class="btn btn-success btn-sm">
+                            <i class="fas fa-check me-1"></i>Accept Re-schedule
+                          </button>
+                        </form>
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="collapse"
+                          data-bs-target="#rejectRescheduleReq-{{ $pendingReschedReq->id }}">
+                          <i class="fas fa-times me-1"></i>Reject Re-schedule
+                        </button>
+                      </div>
+                      <div class="collapse mt-2" id="rejectRescheduleReq-{{ $pendingReschedReq->id }}">
+                        <form method="POST" action="{{ route('admin.reschedule.request.reject', $pendingReschedReq->id) }}"
+                          onsubmit="return validateRejectRescheduleRemarks(this);">
+                          @csrf
+                          @method('PATCH')
+                          <div class="input-group input-group-sm">
+                            <textarea class="form-control" name="remarks" rows="2" required
+                              placeholder="Reason for rejecting this re-schedule request..."></textarea>
+                            <button type="submit" class="btn btn-danger">
+                              <i class="fas fa-times me-1"></i>Confirm Reject
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              @endif
               <div class="col-md-6">
                 <dl class="row">
                   <dt class="col-sm-4">Hall Name:</dt>
@@ -1228,6 +1314,18 @@
   <script>
 
     document.addEventListener('DOMContentLoaded', function () {
+      // Auto-open the reservation detail modal when arriving from a re-schedule request
+      // email link (URL hash like #reservationModal-5) or after an accept/reject redirect.
+      (function openRescheduleTargetModal() {
+        var targetId = window.location.hash.replace('#', '');
+        if (targetId && targetId.startsWith('reservationModal-')) {
+          var modalEl = document.getElementById(targetId);
+          if (modalEl) {
+            new bootstrap.Modal(modalEl).show();
+          }
+        }
+      })();
+
       /*******************************************************************************Add Packages- inside the DOMContentLoaded******************************************************************************/
       /* Packages Modal Event Listener*/
       const packagesModal = document.getElementById('AddPackagesModal');
@@ -1647,6 +1745,17 @@
         return;
       }
       btn.closest('form').submit();
+    }
+
+    // Validate remarks before rejecting a customer's re-schedule request
+    function validateRejectRescheduleRemarks(form) {
+      const remarks = form.querySelector('textarea[name="remarks"]');
+      if (!remarks || !remarks.value.trim()) {
+        alert('Please enter the reason for rejecting this re-schedule request.');
+        if (remarks) remarks.focus();
+        return false;
+      }
+      return confirm('Reject this re-schedule request? The reservation will remain on its current date and time.');
     }
 
     // Hide accept/reject buttons for a slip once admin clicks either one
