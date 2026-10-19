@@ -35,7 +35,7 @@ class AdminDashboardController extends Controller
         $hallIds = HallModel::where('admin_id', $admin->id)->pluck('id');
         // Get reservations for these halls
         $reservationQuery = ReservationModel::whereIn('hall_id', $hallIds)
-            ->with(['hall', 'customer', 'payments']);
+            ->with(['hall', 'customer', 'payments', 'rescheduleRequests']);
 
         // Search reservations by reference code, customer name, or property/hall name.
         if ($request->filled('search')) {
