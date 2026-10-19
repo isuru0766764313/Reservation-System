@@ -1165,6 +1165,12 @@
                                                                     </button>
                                                                     @endif
                                                                     @if($rescheduleAvail)
+                                                                        @php $pendingResched = $reservation->pending_reschedule_request ?? null; @endphp
+                                                                        @if($pendingResched)
+                                                                    <button type="button" class="btn btn-secondary btn-sm action-btn icon-action-btn" disabled title="Re-schedule request submitted ({{ \Carbon\Carbon::parse($pendingResched->new_date)->format('d M Y') }}, {{ date('h:i A', strtotime($pendingResched->new_start_time)) }} - {{ date('h:i A', strtotime($pendingResched->new_end_time)) }}) - awaiting admin approval">
+                                                                        <i class="fas fa-hourglass-half"></i>
+                                                                    </button>
+                                                                        @else
                                                                     <button type="button" class="btn btn-warning btn-sm action-btn icon-action-btn reschedule-btn" title="Re-schedule"
                                                                         data-reservation-id="{{ $reservation->id }}"
                                                                         data-hall-id="{{ $reservation->hall_id }}"
@@ -1177,6 +1183,7 @@
                                                                         data-rescheduled-expiry="{{ $reservation->rescheduledExpiryDate ?? '' }}">
                                                                         <i class="fas fa-calendar-alt"></i>
                                                                     </button>
+                                                                        @endif
                                                                     @endif
                                                                     </div>
                                                                 @endif
@@ -1313,6 +1320,12 @@
                                     </button>
                                 @endif
                                 @if($rescheduleAvail)
+                                    @php $pendingResched = $reservation->pending_reschedule_request ?? null; @endphp
+                                    @if($pendingResched)
+                                    <button type="button" class="btn btn-secondary btn-sm" disabled title="Re-schedule request submitted ({{ \Carbon\Carbon::parse($pendingResched->new_date)->format('d M Y') }}, {{ date('h:i A', strtotime($pendingResched->new_start_time)) }} - {{ date('h:i A', strtotime($pendingResched->new_end_time)) }}) - awaiting admin approval">
+                                        <i class="fas fa-hourglass-half me-1"></i>Awaiting Approval
+                                    </button>
+                                    @else
                                     <button type="button" class="btn btn-warning btn-sm reschedule-btn" title="Re-schedule"
                                         data-reservation-id="{{ $reservation->id }}" data-hall-id="{{ $reservation->hall_id }}"
                                         data-hall-name="{{ $reservation->hall_name }}"
@@ -1324,6 +1337,7 @@
                                         data-rescheduled-expiry="{{ $reservation->rescheduledExpiryDate ?? '' }}">
                                         <i class="fas fa-calendar-alt me-1"></i>Re-schedule
                                     </button>
+                                    @endif
                                 @endif
                             @endif
                             <button class="btn btn-view btn-custom" data-bs-toggle="modal"

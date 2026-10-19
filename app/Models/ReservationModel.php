@@ -127,4 +127,17 @@ class ReservationModel extends Model
     {
         return $this->hasMany(Payments::class, 'reservation_id');
     }
+
+    // Re-schedule requests raised by the customer (awaiting admin approval)
+    public function rescheduleRequests()
+    {
+        return $this->hasMany(RescheduleRequest::class, 'reservation_id');
+    }
+
+    // The single pending re-schedule request for this reservation, if any
+    public function pendingRescheduleRequest()
+    {
+        return $this->hasOne(RescheduleRequest::class, 'reservation_id')
+            ->where('status', RescheduleRequest::STATUS_PENDING);
+    }
 }

@@ -30,6 +30,8 @@ use Ramsey\Uuid\Type\Decimal;
 use App\Notifications\ReservationRejectedEmail;
 use App\Notifications\CustomerCancelled;
 use App\Models\CustomerModel;
+use App\Models\RescheduleRequest;
+use App\Notifications\RescheduleRequestAdmin;
 
 class ReservationController extends Controller
 {
@@ -813,6 +815,15 @@ class ReservationController extends Controller
     }
 
 
+    /**
+     * Customer submits a re-schedule REQUEST (no longer applied directly).
+     *
+     * The requested new date/time period is stored in the reschedule_requests_table
+     * with a pending status and the hall admin is notified by email. The actual
+     * re-schedule (updating the reservation + hall availability + status 7) only
+     * happens once the admin accepts the request
+     * (see AdminDashboardController::acceptRescheduleRequest).
+     */
     public function re_schedule_reservation_by_customer(Request $request, ReservationModel $reservation)
     {
         // Verify customer owns this reservation
@@ -841,24 +852,26 @@ class ReservationController extends Controller
             return redirect()->back()->with('error', 'Cannot re-schedule a reservation that has already ended.');
         }
 
-        DB::beginTransaction();
+        // Block duplicate submissions while a request is still awaiting admin approval
+        if ($reservation->pendingRescheduleRequest()->exists()) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You already have a pending re-schedule request for this reservation. Please wait for the admin to review it.'
+                ], 400);
+            }
+            return redirect()->back()->with('error', 'You already have a pending re-schedule request for this reservation.');
+        }
+
+        // Get new values with defaults
+        $newDate = $validated['new_date'];
+        $newStartTime = $validated['new_start_time'];
+        $newEndTime = $validated['new_end_time'];
+        $newPreArrange = (int) ($request->input('new_pre_arrange_time') ?? 0);
+        $newPostArrange = (int) ($request->input('new_post_arrange_time') ?? 0);
 
         try {
-            // Get new values with defaults
-            $newDate = $validated['new_date'];
-            $newStartTime = $validated['new_start_time'];
-            $newEndTime = $validated['new_end_time'];
-            $newPreArrange = (int) ($request->input('new_pre_arrange_time') ?? 0);
-            $newPostArrange = (int) ($request->input('new_post_arrange_time') ?? 0);
-
-            // Calculate actual times for the NEW reservation
-            $newStart = Carbon::createFromFormat('H:i', $newStartTime);
-            $newEnd = Carbon::createFromFormat('H:i', $newEndTime);
-
-            $newActualStart = $newStart->copy()->subHours($newPreArrange)->format('H:i');
-            $newActualEnd = $newEnd->copy()->addHours($newPostArrange)->format('H:i');
-
-            \Log::info('Rescheduling reservation ID: ' . $reservation->id, [
+            \Log::info('Re-schedule REQUESTED for reservation ID: ' . $reservation->id, [
                 'old_date' => $reservation->reservation_date,
                 'old_start' => $reservation->start_time,
                 'old_end' => $reservation->end_time,
@@ -867,89 +880,58 @@ class ReservationController extends Controller
                 'new_end' => $newEndTime,
                 'new_pre_arrange' => $newPreArrange,
                 'new_post_arrange' => $newPostArrange,
-                'new_actual_start' => $newActualStart,
-                'new_actual_end' => $newActualEnd,
             ]);
 
-            // Calculate old actual start/end times to match the specific unavailability record
-            $oldStart = Carbon::parse($reservation->start_time);
-            $oldEnd = Carbon::parse($reservation->end_time);
-            $oldActualStart = $oldStart->copy()->subHours($reservation->pre_arrange_time)->format('H:i:s');
-            $oldActualEnd = $oldEnd->copy()->addHours($reservation->post_arrange_time)->format('H:i:s');
-
-            // Step 1: Delete old HallUnAvailability record (match specific record)
-            $deletedCount = HallUnAvailability::where('hall_id', $reservation->hall_id)
-                ->where('date', $reservation->reservation_date)
-                ->where('start_time', $oldActualStart)
-                ->where('end_time', $oldActualEnd)
-                ->delete();
-
-            \Log::info('Deleted ' . $deletedCount . ' old HallUnAvailability record(s) for hall ' . $reservation->hall_id);
-
-            // Step 2: Create new HallUnAvailability record with updated details
-            $hallUnavailability = HallUnAvailability::create([
+            // Store the request as PENDING — nothing on the reservation or the
+            // hall availability is changed until the admin approves it.
+            $rescheduleRequest = RescheduleRequest::create([
+                'reservation_id' => $reservation->id,
+                'customer_id' => $reservation->customer_id,
                 'hall_id' => $reservation->hall_id,
-                'date' => $newDate,
-                'start_time' => $newActualStart,
-                'end_time' => $newActualEnd,
+                'new_date' => $newDate,
+                'new_start_time' => $newStartTime,
+                'new_end_time' => $newEndTime,
+                'new_pre_arrange_time' => $newPreArrange,
+                'new_post_arrange_time' => $newPostArrange,
+                'old_date' => $reservation->reservation_date,
+                'old_start_time' => $reservation->start_time,
+                'old_end_time' => $reservation->end_time,
+                'old_pre_arrange_time' => $reservation->pre_arrange_time,
+                'old_post_arrange_time' => $reservation->post_arrange_time,
+                'status' => RescheduleRequest::STATUS_PENDING,
             ]);
 
-            \Log::info('Created new HallUnAvailability record with ID: ' . $hallUnavailability->id);
-
-            // Step 3: Update the reservation with new details
-            $updateData = [
-                'reservation_date' => $newDate,
-                'start_time' => $newStartTime,
-                'end_time' => $newEndTime,
-                'pre_arrange_time' => $newPreArrange,
-                'post_arrange_time' => $newPostArrange,
-                're_scheduled' => true,
-            ];
-
-            // Only move the status to Rescheduled (7) if it is not already Reserved (4);
-            // a Reserved reservation keeps its status when re-scheduled.
-            if ((int) $reservation->status !== 4) {
-                $updateData['status'] = 7;
+            // Notify the hall admin via email so they can accept/reject from the dashboard
+            $admin = AdminModel::find($reservation->hall->admin_id);
+            if ($admin) {
+                $admin->notify(new RescheduleRequestAdmin($rescheduleRequest));
             }
 
-            $reservation->update($updateData);
+            \Log::info('Pending re-schedule request created with ID: ' . $rescheduleRequest->id);
 
-
-
-            // Only move the status to Rescheduled (7) if it is not already Reserved (4);
-            // a Reserved reservation keeps its status when re-scheduled.
-            if ((int) $reservation->status !== 4) {
-                $updateData['status'] = 7;
-            }
-
-            \Log::info('Updated ReservationModel with ID: ' . $reservation->id);
-
-            DB::commit();
-
-            \Log::info('Reservation rescheduled successfully. Reservation ID: ' . $reservation->id);
+            $successMessage = 'Re-schedule request submitted successfully! It will be applied once the admin approves it.';
 
             if ($request->ajax()) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'Reservation rescheduled successfully!'
+                    'message' => $successMessage
                 ]);
             }
 
-            return redirect()->back()->with('success', 'Reservation rescheduled successfully!');
+            return redirect()->back()->with('success', $successMessage);
 
         } catch (\Exception $e) {
-            DB::rollBack();
-            \Log::error('Reschedule error for reservation ' . $reservation->id . ': ' . $e->getMessage());
+            \Log::error('Reschedule request error for reservation ' . $reservation->id . ': ' . $e->getMessage());
             \Log::error('Error trace: ' . $e->getTraceAsString());
 
             if ($request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'An error occurred while rescheduling. Please try again.'
+                    'message' => 'An error occurred while submitting the re-schedule request. Please try again.'
                 ], 500);
             }
 
-            return redirect()->back()->with('error', 'An error occurred while rescheduling. Please try again.');
+            return redirect()->back()->with('error', 'An error occurred while submitting the re-schedule request. Please try again.');
         }
     }
 

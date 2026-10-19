@@ -482,6 +482,7 @@ class CustomerController extends Controller
                 'hall.availability', // Load hall's unavailable slots
                 'hall.admin',        // Load hall's owner (admin)
                 'payments',    // load with payments
+                'rescheduleRequests', // load re-schedule requests (pending approval state)
             ]);
 
         // Search reservations by reference code or property/hall name.
@@ -510,6 +511,11 @@ class CustomerController extends Controller
             $reservation->remaining = $reservation->charge - $totalPaid;
             $reservation->advance_amount = $reservation->charge * 0.1; // should be 1 lkh
             $reservation->is_advance_paid = $totalPaid >= $reservation->advance_amount;
+
+            // Pending re-schedule request (awaiting admin approval), if any —
+            // eager-loaded below to avoid an N+1 query in the dashboard view.
+            $reservation->pending_reschedule_request = $reservation->rescheduleRequests
+                ->firstWhere('status', \App\Models\RescheduleRequest::STATUS_PENDING);
 
             return $reservation;
         });
