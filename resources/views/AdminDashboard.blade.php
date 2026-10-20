@@ -810,10 +810,11 @@
               $Pbadge = \App\Http\Controllers\ReservationController::getCustomerPaymentStatusBadge($reservation);
               $payments = $reservation->payments; // collection of all payments for this reservation
                                           @endphp
-                                          <ul class="list-unstyled mb-0" style="font-size:0.85rem;">
+                                          <div class="d-flex flex-column align-items-center">
                                             <button class="btn btn-primary btn-sm action-btn view-btn mb-2" data-bs-toggle="modal"
                                               data-bs-target="#reservationModal-{{ $reservation->id }}"><i class="fas fa-eye me-2"></i>View
                                             </button>
+                                          <ul class="list-unstyled mb-0 text-start" style="font-size:0.85rem;">
                                             @foreach($payments as $payment)
                                               @php
                 $stageLabel = match ($payment->payment_alias) {
@@ -834,6 +835,7 @@
                                               </li>
                                             @endforeach
                                           </ul>
+                                          </div>
                                         </td>
                                       </tr>
             @endforeach
