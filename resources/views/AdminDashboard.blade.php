@@ -761,48 +761,81 @@
               <th>Date</th>
               <th>Period</th>
               <th>Status</th>
-              <th>Reschedule Requests</th>
+              <!--<th>Reschedule Requests</th>-->
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             @foreach($reservations as $reservation)
-              @php
-                // Calculate total amount paid for this reservation
-                $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
-                $preliminaryPayment = $reservation->advanceAmount;
-                $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
-                $pendingReschedReq = $reservation->rescheduleRequests->firstWhere('status', \App\Models\RescheduleRequest::STATUS_PENDING);
-              @endphp
-              <tr>
-                <td class="align-middle">{{ $reservation->ref_code ?? $loop->iteration }}</td>
-                <td class="align-middle">{{ $reservation->customer->first_name }} {{ $reservation->customer->last_name }}
-                </td>
-                <td class="align-middle">{{ $reservation->hall->name }}</td>
-                <td class="align-middle">{{ $reservation->reservation_date }}</td>
-                <td class="align-middle">{{ date('h.i A', strtotime($reservation->start_time)) }} To
-                  {{ date('h.i A', strtotime($reservation->end_time)) }}
-                </td>
-                <td class="align-middle">
-                  @php $badge = \App\Http\Controllers\ReservationController::getCustomerStatusBadge($reservation); @endphp
-                  <span class="badge {{ $badge['class'] }}">{{ $badge['label'] }}</span>
-                </td>
-                <td class="align-middle">
-                  @if($pendingReschedReq)
-                    <a href="#reservationModal-{{ $reservation->id }}" class="badge bg-custom-rescheduled text-decoration-none"
-                      data-bs-toggle="modal" data-bs-target="#reservationModal-{{ $reservation->id }}" title="View and act on the request in the reservation detail">
-                      <i class="fas fa-clock me-1"></i>Pending Review
-                    </a>
-                  @else
-                    <span class="text-muted small">-</span>
-                  @endif
-                </td>
-                <td class="align-middle">
-                  <button class="btn btn-success btn-sm action-btn view-btn" data-bs-toggle="modal"
-                    data-bs-target="#reservationModal-{{ $reservation->id }}"><i class="fas fa-eye me-2"></i>View
-                  </button>
-                </td>
-              </tr>
+                                      @php
+              // Calculate total amount paid for this reservation
+              $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
+              $preliminaryPayment = $reservation->advanceAmount;
+              $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
+              $pendingReschedReq = $reservation->rescheduleRequests->firstWhere('status', \App\Models\RescheduleRequest::STATUS_PENDING);
+                                      @endphp
+                                      <tr>
+                                        <td class="align-middle">{{ $reservation->ref_code ?? $loop->iteration }}</td>
+                                        <td class="align-middle">{{ $reservation->customer->first_name }} {{ $reservation->customer->last_name }}
+                                        </td>
+                                        <td class="align-middle">{{ $reservation->hall->name }}</td>
+                                        <td class="align-middle">{{ $reservation->reservation_date }}</td>
+                                        <td class="align-middle">{{ date('h.i A', strtotime($reservation->start_time)) }} To
+                                          {{ date('h.i A', strtotime($reservation->end_time)) }}
+                                        </td>
+                                        <td class="align-middle">
+                                          @php $badge = \App\Http\Controllers\ReservationController::getCustomerStatusBadge($reservation); @endphp
+                                          <span class="badge {{ $badge['class'] }}">{{ $badge['label'] }}</span>
+                                        </td>
+                                        <!--<td class="align-middle">
+                                          @if($pendingReschedReq)
+                                            <a href="#reservationModal-{{ $reservation->id }}"
+                                              class="badge bg-custom-rescheduled text-decoration-none" data-bs-toggle="modal"
+                                              data-bs-target="#reservationModal-{{ $reservation->id }}"
+                                              title="View and act on the request in the reservation detail">
+                                              <i class="fas fa-clock me-1"></i>Pending Review
+                                            </a>
+                                          @else
+                                            <span class="text-muted small">-</span>
+                                          @endif
+                                        </td>-->
+                                        <td class="align-middle">
+                                          @php
+              $prelim = $reservation->payments->where('payment_alias', 'Preliminary')->first();
+              $remain = $reservation->payments->where('payment_alias', 'Remainings')->first();
+              $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
+              $preliminaryPayment = $reservation->advanceAmount;
+              $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
+              $Rbadge = \App\Http\Controllers\ReservationController::getCustomerStatusBadge($reservation);
+              $Pbadge = \App\Http\Controllers\ReservationController::getCustomerPaymentStatusBadge($reservation);
+              $payments = $reservation->payments; // collection of all payments for this reservation
+                                          @endphp
+                                          <ul class="list-unstyled mb-0" style="font-size:0.85rem;">
+                                            <button class="btn btn-primary btn-sm action-btn view-btn mb-2" data-bs-toggle="modal"
+                                              data-bs-target="#reservationModal-{{ $reservation->id }}"><i class="fas fa-eye me-2"></i>View
+                                            </button>
+                                            @foreach($payments as $payment)
+                                              @php
+                $stageLabel = match ($payment->payment_alias) {
+                  'Preliminary' => 'Advance Payment',
+                  'Remainings' => 'Balance Payment',
+                  'Cancellation' => 'Cancellation Fee',
+                  default => $payment->payment_alias,
+                };
+                $statusIcon = match ((int) $payment->status) {
+                  2 => '<i class="fas fa-check-circle text-success"></i>',
+                  3 => '<i class="fas fa-times-circle text-danger"></i>',
+                  default => '<i class="fas fa-hourglass-half text-warning"></i>',
+                };
+                                              @endphp
+                                              <li class="mb-1 d-flex align-items-center gap-2">
+                                                <span>{!! $statusIcon !!}</span>
+                                                <span class="text-muted">{{ $stageLabel }} : Rs. {{ number_format($payment->amount, 2) }}</span>
+                                              </li>
+                                            @endforeach
+                                          </ul>
+                                        </td>
+                                      </tr>
             @endforeach
           </tbody>
         </table>
@@ -944,22 +977,22 @@
   @foreach($reservations as $reservation)
 
     @php
-      // Calculate total amount paid for this reservation
-      $preliminaryPayment = $reservation->advanceAmount;
+  // Calculate total amount paid for this reservation
+  $preliminaryPayment = $reservation->advanceAmount;
 
-      if ((int) $reservation->status === 5) {
-        $cancellationFee = $reservation->payments->where('payment_alias', 'Cancellation')->first()?->amount ?? 0;
-        $totalPaid = $reservation->payments->where('status', 2)->where('payment_alias', '!=', 'Cancellation')->sum('amount'); // only approved sum wihtout cancellation record
-        $actualPaid = $reservation->payments->where('payment_alias', '!=', 'Cancellation')->sum('amount'); // total sum wihtout cancellation record
-        $paybackAmount = max(0, $actualPaid - $cancellationFee); // cancellation fee should be subtracted.
-      } else {
-        $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
-        $actualPaid = $reservation->payments->sum('amount');
-        $paybackAmount = $actualPaid;
-      }
-      $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
-      $advancePaidStatus = $reservation->advancePaid ? 'Yes' : 'No';
-      $pendingReschedReq = $reservation->rescheduleRequests->firstWhere('status', \App\Models\RescheduleRequest::STATUS_PENDING);
+  if ((int) $reservation->status === 5) {
+    $cancellationFee = $reservation->payments->where('payment_alias', 'Cancellation')->first()?->amount ?? 0;
+    $totalPaid = $reservation->payments->where('status', 2)->where('payment_alias', '!=', 'Cancellation')->sum('amount'); // only approved sum wihtout cancellation record
+    $actualPaid = $reservation->payments->where('payment_alias', '!=', 'Cancellation')->sum('amount'); // total sum wihtout cancellation record
+    $paybackAmount = max(0, $actualPaid - $cancellationFee); // cancellation fee should be subtracted.
+  } else {
+    $totalPaid = $reservation->payments->where('status', 2)->sum('amount');
+    $actualPaid = $reservation->payments->sum('amount');
+    $paybackAmount = $actualPaid;
+  }
+  $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
+  $advancePaidStatus = $reservation->advancePaid ? 'Yes' : 'No';
+  $pendingReschedReq = $reservation->rescheduleRequests->firstWhere('status', \App\Models\RescheduleRequest::STATUS_PENDING);
     @endphp
 
     <div class="modal fade" id="reservationModal-{{ $reservation->id }}" tabindex="-1">
@@ -996,15 +1029,18 @@
                               <td class="text-muted">Current</td>
                               <td>{{ \Carbon\Carbon::parse($pendingReschedReq->old_date)->format('d M Y') }}</td>
                               <td>{{ date('h:i A', strtotime($pendingReschedReq->old_start_time)) }} -
-                                {{ date('h:i A', strtotime($pendingReschedReq->old_end_time)) }}</td>
+                                {{ date('h:i A', strtotime($pendingReschedReq->old_end_time)) }}
+                              </td>
                               <td>{{ $pendingReschedReq->old_pre_arrange_time }} hr(s)</td>
                               <td>{{ $pendingReschedReq->old_post_arrange_time }} hr(s)</td>
                             </tr>
                             <tr class="table-warning">
                               <td class="fw-bold">Requested</td>
-                              <td class="fw-bold">{{ \Carbon\Carbon::parse($pendingReschedReq->new_date)->format('d M Y') }}</td>
+                              <td class="fw-bold">{{ \Carbon\Carbon::parse($pendingReschedReq->new_date)->format('d M Y') }}
+                              </td>
                               <td class="fw-bold">{{ date('h:i A', strtotime($pendingReschedReq->new_start_time)) }} -
-                                {{ date('h:i A', strtotime($pendingReschedReq->new_end_time)) }}</td>
+                                {{ date('h:i A', strtotime($pendingReschedReq->new_end_time)) }}
+                              </td>
                               <td>{{ $pendingReschedReq->new_pre_arrange_time }} hr(s)</td>
                               <td>{{ $pendingReschedReq->new_post_arrange_time }} hr(s)</td>
                             </tr>
@@ -1012,8 +1048,7 @@
                         </table>
                       </div>
                       <div class="d-flex flex-wrap gap-2">
-                        <form method="POST"
-                          action="{{ route('admin.reschedule.request.accept', $pendingReschedReq->id) }}"
+                        <form method="POST" action="{{ route('admin.reschedule.request.accept', $pendingReschedReq->id) }}"
                           onsubmit="return confirm('Accept this re-schedule request? The reservation will be moved to the new date and time.');">
                           @csrf
                           @method('PATCH')
@@ -1116,15 +1151,15 @@
 
                     @if ($reservation->status == 1)
                       @php
-                        // Discount applies only to the true/base charge (excluding facilities charge)
-                        $baseCharge = max(0, (float) $reservation->charge - (float) ($reservation->facilities_charge ?? 0));
+      // Discount applies only to the true/base charge (excluding facilities charge)
+      $baseCharge = max(0, (float) $reservation->charge - (float) ($reservation->facilities_charge ?? 0));
                       @endphp
                       <dt class="col-sm-4">Discount (%):</dt>
                       <dd class="col-sm-8">
                         <div class="input-group input-group-sm">
                           <input type="number" class="form-control form-control-sm" step="0.1" min="0" max="100"
-                            id="discount-custom-{{ $reservation->id }}" placeholder="0"
-                            data-charge="{{ $baseCharge }}" data-total-charge="{{ $reservation->charge }}"
+                            id="discount-custom-{{ $reservation->id }}" placeholder="0" data-charge="{{ $baseCharge }}"
+                            data-total-charge="{{ $reservation->charge }}"
                             value="{{ $reservation->discount_custom && $baseCharge > 0 ? round(($reservation->discount_custom / $baseCharge) * 100, 2) : '' }}">
                           <span class="input-group-text">%</span>
                         </div>
@@ -1250,12 +1285,12 @@
                             @endif
                           </form>
                           <!--<form action="{{ route('admin.payment.reject', $payment) }}" method="POST" class="d-inline slip-action-form">
-                                                                                                                                                                                @csrf
-                                                                                                                                                                                @method('PATCH')
-                                                                                                                                                                                <button type="submit" class="btn btn-danger" title="Reject payment">
-                                                                                                                                                                                  <i class="fas fa-times me-2"></i> Reject
-                                                                                                                                                                                </button>
-                                                                                                                                                                              </form>-->
+                                                                                                                                                                                          @csrf
+                                                                                                                                                                                          @method('PATCH')
+                                                                                                                                                                                          <button type="submit" class="btn btn-danger" title="Reject payment">
+                                                                                                                                                                                            <i class="fas fa-times me-2"></i> Reject
+                                                                                                                                                                                          </button>
+                                                                                                                                                                                        </form>-->
                         @else
                           @if($payment->status == 2)
                             <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Accepted</span>
