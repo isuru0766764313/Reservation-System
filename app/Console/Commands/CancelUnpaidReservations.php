@@ -22,7 +22,7 @@ class CancelUnpaidReservations extends Command
      *
      * @var string
      */
-    protected $description = 'Automatically cancel reservations where advancePaymentDate has passed and advance has not been paid';
+    protected $description = 'Automatically cancel reservations where advancePaymentDate/balancePaymentDate has passed and the payment has not been made';
 
     /**
      * Execute the console command.
@@ -48,6 +48,26 @@ class CancelUnpaidReservations extends Command
             ->where('user_cancelled', false)
             ->get();
 
+        // Find reservations where:
+        // - balancePaymentDate is set and is <= today (deadline of one week prior to event passed)
+        // - status is 3 (advance approved, balance pending) — i.e. the reservation is not fully paid yet
+        // - accepted is not already false (not already rejected/cancelled)
+        // - user_cancelled is false (user hasn't manually cancelled)
+        $balanceUnpaid = ReservationModel::whereNotNull('balancePaymentDate')
+            ->where('balancePaymentDate', '<=', $today)
+            ->where('status', 3)
+            ->where(function ($query) {
+                $query->where('accepted', true)
+                      ->orWhereNull('accepted');
+            })
+            ->where('user_cancelled', false)
+            ->get();
+
+        // Merge both collections, avoiding duplicates by reservation id
+        $reservations = $reservations->keyBy('id')
+            ->merge($balanceUnpaid->keyBy('id'))
+            ->values();
+
         $count = 0;
 
         foreach ($reservations as $reservation) {
@@ -66,7 +86,7 @@ class CancelUnpaidReservations extends Command
                     ->where('end_time', $reservation->end_time)
                     ->delete();
 
-                Log::info('Auto-cancelled unpaid reservation ID: ' . $reservation->id . ' (Hall: ' . $reservation->hall_name . ', Date: ' . $reservation->reservation_date . ')');
+                Log::info('Auto-cancelled unpaid reservation ID: ' . $reservation->id . ' (Hall: ' . $reservation->hall_name . ', Date: ' . $reservation->reservation_date . ') - Advance due: ' . ($reservation->advancePaymentDate ?? 'N/A') . ', Balance due: ' . ($reservation->balancePaymentDate ?? 'N/A'));
 
                 $count++;
             } catch (\Exception $e) {
