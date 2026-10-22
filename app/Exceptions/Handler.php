@@ -3,7 +3,9 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Exceptions\PostTooLargeException;
 use Illuminate\Session\TokenMismatchException;
+use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -49,6 +51,23 @@ class Handler extends ExceptionHandler
             
             return redirect()->route('home_route')
                 ->with('error_key_2', 'Your session has expired. Please login again.');
+        });
+
+        // Uploaded file exceeded the server's post_max_size limit.
+        // Instead of showing the raw PostTooLargeException error page,
+        // flash a validation-style error and send the user back to the form.
+        $this->renderable(function (PostTooLargeException $e, $request) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'The uploaded file is too large. Maximum allowed size is 10MB.',
+                ], Response::HTTP_REQUEST_ENTITY_TOO_LARGE);
+            }
+
+            return redirect()->back()
+                ->withInput()
+                ->withErrors([
+                    'clearence_form' => 'The uploaded file is too large. Maximum allowed size is 10MB. Please choose a smaller PDF file.',
+                ]);
         });
     }
     

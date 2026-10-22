@@ -23,6 +23,7 @@ class ReservationModel extends Model
             'hall_name',
             'reservation_date',
             'advancePaymentDate',
+            'balancePaymentDate',
             'cancellationExpiryDate',
             'rescheduledExpiryDate',
             'start_time',

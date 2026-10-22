@@ -1106,6 +1106,13 @@
                         max="{{ $reservation->created_at->copy()->addDays(7)->format('Y-m-d') }}"
                         value="{{ $reservation->advancePaymentDate ?? $reservation->created_at->copy()->addDays(7)->format('Y-m-d') }}">
                     </dd>
+                    <dt class="col-sm-4">Balance payment due date:</dt>
+                    <dd class="col-sm-8">
+                      <input type="date" class="form-control form-control-sm" id="balancePaymentDate-{{ $reservation->id }}"
+                        name="balancePaymentDate" min="{{ now()->format('Y-m-d') }}"
+                        max="{{ \Carbon\Carbon::parse($reservation->reservation_date)->subDays(7)->format('Y-m-d') }}"
+                        value="{{ $reservation->balancePaymentDate ?? \Carbon\Carbon::parse($reservation->reservation_date)->subDays(7)->format('Y-m-d') }}">
+                    </dd>
                     <dt class="col-sm-4">Cancellation due date:</dt>
                     <dd class="col-sm-8">
                       <input type="date" class="form-control form-control-sm"
@@ -1125,6 +1132,8 @@
                   @else
                     <dt class="col-sm-4">Advance Payment Due Date:</dt>
                     <dd class="col-sm-8">{{ $reservation->advancePaymentDate ?? 'N/A' }}</dd>
+                    <dt class="col-sm-4">Balance Payment Due Date:</dt>
+                    <dd class="col-sm-8">{{ $reservation->balancePaymentDate ?? 'N/A' }}</dd>
                     <dt class="col-sm-4">Cancellation Due Date:</dt>
                     <dd class="col-sm-8">{{ $reservation->cancellationExpiryDate ?? 'N/A' }}</dd>
                     <dt class="col-sm-4">Re-schedule Due Date:</dt>
@@ -1236,6 +1245,8 @@
                     value="{{ $reservation->advanceAmount ?? 0 }}">
                   <input type="hidden" name="advancePaymentDate" id="advancePaymentDate-hidden-{{ $reservation->id }}"
                     value="{{ $reservation->advancePaymentDate ?? '' }}">
+                  <input type="hidden" name="balancePaymentDate" id="balancePaymentDate-hidden-{{ $reservation->id }}"
+                    value="{{ $reservation->balancePaymentDate ?? '' }}">
                   <input type="hidden" name="cancellationExpiryDate"
                     id="cancellationExpiryDate-hidden-{{ $reservation->id }}"
                     value="{{ $reservation->cancellationExpiryDate ?? '' }}">
@@ -1718,6 +1729,12 @@
         advDateInput.focus();
         return false;
       }
+      const balanceDateInput = document.getElementById('balancePaymentDate-' + reservationId);
+      if (balanceDateInput && balanceDateInput.value && balanceDateInput.validity.rangeOverflow) {
+        alert('Balance payment due date must be at least 7 days before the venue date.');
+        balanceDateInput.focus();
+        return false;
+      }
       const cancelDateInput = document.getElementById('cancellationExpiryDate-' + reservationId);
       if (cancelDateInput && cancelDateInput.value && cancelDateInput.validity.rangeOverflow) {
         alert('Cancellation due date must be at least 7 days before the venue date.');
@@ -1761,6 +1778,12 @@
       const advancePaymentDateHidden = document.getElementById('advancePaymentDate-hidden-' + reservationId);
       if (advancePaymentDateInput && advancePaymentDateHidden) {
         advancePaymentDateHidden.value = advancePaymentDateInput.value || '';
+      }
+      // Copy balancePaymentDate value
+      const balancePaymentDateInput = document.getElementById('balancePaymentDate-' + reservationId);
+      const balancePaymentDateHidden = document.getElementById('balancePaymentDate-hidden-' + reservationId);
+      if (balancePaymentDateInput && balancePaymentDateHidden) {
+        balancePaymentDateHidden.value = balancePaymentDateInput.value || '';
       }
       // Copy cancellationExpiryDate value
       const cancellationExpiryDateInput = document.getElementById('cancellationExpiryDate-' + reservationId);

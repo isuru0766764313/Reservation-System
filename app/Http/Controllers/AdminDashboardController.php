@@ -239,6 +239,9 @@ class AdminDashboardController extends Controller
             $advanceAmount = $request->input('advanceAmount', $reservation->advanceAmount);
             // Get date fields from request, default to current values if not provided
             $advancePaymentDate = $request->input('advancePaymentDate', $reservation->advancePaymentDate);
+            // Default balance payment due date to one week prior to the reservation date
+            $balancePaymentDate = $request->input('balancePaymentDate', $reservation->balancePaymentDate
+                ?? \Carbon\Carbon::parse($reservation->reservation_date)->subDays(7)->toDateString());
             $cancellationExpiryDate = $request->input('cancellationExpiryDate', $reservation->cancellationExpiryDate);
             $rescheduledExpiryDate = $request->input('rescheduledExpiryDate', $reservation->rescheduledExpiryDate);
 
@@ -255,6 +258,7 @@ class AdminDashboardController extends Controller
                 'discount_custom' => $discountCustom,
                 'advanceAmount' => $advanceAmount,
                 'advancePaymentDate' => $advancePaymentDate,
+                'balancePaymentDate' => $balancePaymentDate,
                 'cancellationExpiryDate' => $cancellationExpiryDate,
                 'rescheduledExpiryDate' => $rescheduledExpiryDate,
             ]);

@@ -1258,30 +1258,44 @@ $emptySlots = 5 - $existingCount;
     document.addEventListener('DOMContentLoaded', function() {
         const pdfInput = document.getElementById('pdfInput');
         const clearenceInput = document.getElementById('clearenceInput');
+        const MAX_FILE_SIZE_MB = 10;
+        const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
         
         if (pdfInput) {
             pdfInput.addEventListener('change', function(e) {
                 if (this.files.length > 0) {
-                    const fileName = this.files[0].name;
-                    document.getElementById('pdfName').textContent = fileName;
+                    const file = this.files[0];
+                    if (file.size > MAX_FILE_SIZE_BYTES) {
+                        alert('The selected PDF file is larger than ' + MAX_FILE_SIZE_MB + 'MB (' + (file.size / (1024 * 1024)).toFixed(2) + 'MB). Please choose a smaller PDF file.');
+                        this.value = '';
+                        document.getElementById('pdfFilename').style.display = 'none';
+                        return;
+                    }
+                    document.getElementById('pdfName').textContent = file.name;
                     document.getElementById('pdfFilename').style.display = 'block';
                 } else {
                     document.getElementById('pdfFilename').style.display = 'none';
                 }
             });
-            
-            // If there's already a file selected (from previous submission with errors)
+
             if (pdfInput.files.length > 0) {
                 document.getElementById('pdfName').textContent = pdfInput.files[0].name;
                 document.getElementById('pdfFilename').style.display = 'block';
             }
         }
         
+
         if (clearenceInput) {
             clearenceInput.addEventListener('change', function(e) {
                 if (this.files.length > 0) {
-                    const fileName = this.files[0].name;
-                    document.getElementById('clearenceName').textContent = fileName;
+                    const file = this.files[0];
+                    if (file.size > MAX_FILE_SIZE_BYTES) {
+                        alert('The selected application form file is larger than ' + MAX_FILE_SIZE_MB + 'MB (' + (file.size / (1024 * 1024)).toFixed(2) + 'MB). Please choose a smaller PDF file.');
+                        this.value = ''; // clear the selection so it won't be submitted
+                        document.getElementById('clearenceFilename').style.display = 'none';
+                        return;
+                    }
+                    document.getElementById('clearenceName').textContent = file.name;
                     document.getElementById('clearenceFilename').style.display = 'block';
                 } else {
                     document.getElementById('clearenceFilename').style.display = 'none';
@@ -1294,6 +1308,33 @@ $emptySlots = 5 - $existingCount;
                 document.getElementById('clearenceFilename').style.display = 'block';
             }
         }
+
+
+        // Final guard: prevent form submission if any oversized file is still attached
+        const hallForm = document.querySelector('form[enctype="multipart/form-data"]');
+        if (hallForm) {
+            hallForm.addEventListener('submit', function(e) {
+                const inputs = [pdfInput, clearenceInput];
+                for (const input of inputs) {
+                    if (input && input.files.length > 0 && input.files[0].size > MAX_FILE_SIZE_BYTES) {
+                        e.preventDefault();
+                        alert('File size is larger than the allowed maximum of ' + MAX_FILE_SIZE_MB + 'MB. Please select a smaller PDF file before submitting.');
+                        return false;
+                    }
+                }
+            });
+        }
+
+        // Belt & braces: if an oversized file somehow slips through (e.g. JS change
+        // event missed), strip it right before the real submit fires so the request
+        // never exceeds the server's post_max_size and triggers PostTooLargeException.
+        hallForm.addEventListener('submit', function() {
+            [pdfInput, clearenceInput].forEach(function(input) {
+                if (input && input.files.length > 0 && input.files[0].size > MAX_FILE_SIZE_BYTES) {
+                    input.value = '';
+                }
+            });
+        }, false);
     });
     </script>
 
