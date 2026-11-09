@@ -299,7 +299,7 @@
 
             <!-- Customer Login Form -->
             <div id="customer-login-form" class="form-container space-y-6">
-                <h2 class="text-3xl font-bold text-center text-gray-800">Customer Log In</h2>
+                <h2 class="text-3xl font-bold text-center text-gray-800">User Log In</h2>
                 <p class="text-center text-gray-600">Please sign in to make a reservation.</p>
                 <!-- Contextual hint shown when the visitor was redirected here after clicking a hall -->
                 <div id="auth-redirect-hint" class="hidden bg-indigo-50 border border-indigo-200 text-indigo-700 px-4 py-3 rounded-lg relative" role="alert">
@@ -370,7 +370,7 @@
 
             <!-- Customer Sign Up Form -->
             <div id="customer-signup-form" class="form-container space-y-6 hidden">
-                <h2 class="text-3xl font-bold text-center text-gray-800">Customer Register</h2>
+                <h2 class="text-3xl font-bold text-center text-gray-800">User Register</h2>
                 <p class="text-center text-gray-600">Join us to book your event today.</p>
                 <form action="{{route('registration_post_route')}}" method="post" class="space-y-4" id="CustomerRegitrationForm">
                     @csrf
