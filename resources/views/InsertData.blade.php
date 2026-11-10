@@ -687,10 +687,6 @@ if (isset($hall) && $hall->availability->count() > 0 && empty($oldAvailability))
             'end_time' => $item['end_time'] ?? ''
         ];
     });
-    // If empty, add one empty row
-    if ($availabilityToShow->isEmpty()) {
-        $availabilityToShow = collect([(object) ['date' => '', 'start_time' => '', 'end_time' => '']]);
-    }
 }
                                     @endphp
                                     
