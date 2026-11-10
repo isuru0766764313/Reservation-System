@@ -61,7 +61,7 @@ class HallController extends Controller
             'unitpricefacility.*.name' => 'nullable|string',
             'unitpricefacility.*.charge' => 'nullable|numeric|min:0',
 
-            'availability' => 'required|array|min:1',
+            'availability' => 'nullable|array',
             'availability.*.date' => 'required|date|after_or_equal:today',
             'availability.*.start_time' => 'required|date_format:H:i',
             'availability.*.end_time' => 'required|date_format:H:i|after:availability.*.start_time',
@@ -135,7 +135,7 @@ class HallController extends Controller
                 }
             }
             // Save un-availability time periods as slots
-            foreach ($request->availability as $slot) 
+            foreach ($request->availability ?? [] as $slot)
             {
                 HallUnAvailability::create
                 ([
@@ -202,7 +202,7 @@ class HallController extends Controller
             'unitpricefacility.*.name' => 'nullable|string',
             'unitpricefacility.*.charge' => 'nullable|numeric|min:0',
 
-            'availability' => 'required|array|min:1',
+            'availability' => 'nullable|array',
             'availability.*.date' => 'required|date|after_or_equal:today',
             'availability.*.start_time' => 'required|date_format:H:i',
             'availability.*.end_time' => 'required|date_format:H:i|after:availability.*.start_time',
@@ -310,7 +310,7 @@ class HallController extends Controller
 
             // Handle availability - delete existing and create new
             $hall->availability()->delete();
-            foreach ($request->availability as $slot) {
+            foreach ($request->availability ?? [] as $slot) {
                 HallUnAvailability::create([
                     'hall_id' => $hall->id,
                     'date' => $slot['date'],
