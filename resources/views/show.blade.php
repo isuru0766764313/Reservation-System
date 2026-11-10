@@ -1085,7 +1085,7 @@ $images = $hall->images ?? [];
         function formatMoney(amount) {
             return Number(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
-        const hourlyRate = {{ $hall->price }};
+        const hourlyRate = {{ $hall->price ?? 0 }};
         const fullyUnavailableDates = @json($fullyUnavailableDates);
         const hallBookingMethod = '{{ $hall->booking_method ?? 'both' }}';
 
