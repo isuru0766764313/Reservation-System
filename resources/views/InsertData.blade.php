@@ -488,17 +488,14 @@ $oldFixedFacilities = old('fixedpricefacility', []);
 if (isset($hall) && $hall->fixedfacilities->count() > 0 && empty($oldFixedFacilities)) {
     $fixedFacilitiesToShow = $hall->fixedfacilities;
 } else {
-    // Use old input (could be empty array if creating new with no old input)
+    // Use old input as-is. An empty list is allowed: at least one fixed price
+    // facility is NOT compulsory (all rows may be removed / table left empty).
     $fixedFacilitiesToShow = collect($oldFixedFacilities)->map(function ($item, $index) {
         return (object) [
             'name' => $item['name'] ?? '',
             'charge' => $item['charge'] ?? ''
         ];
     });
-    // If empty, add one empty row
-    if ($fixedFacilitiesToShow->isEmpty()) {
-        $fixedFacilitiesToShow = collect([(object) ['name' => '', 'charge' => '']]);
-    }
 }
                                         @endphp
                                         
@@ -1070,12 +1067,8 @@ $emptySlots = 5 - $existingCount;
             if (e.target.closest('.remove-row1'))
                 {
                 const row = e.target.closest('.fixed-price-facility-row');
-                if (document.querySelectorAll('.fixed-price-facility-row').length > 1){
-                    row.remove();
-                }
-                else {
-                    alert('At least one time slot is required');
-                }
+                // All fixed price facility rows can be removed; at least one record is not compulsory
+                row.remove();
             }
         });
 
