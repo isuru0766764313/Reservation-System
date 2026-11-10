@@ -1133,14 +1133,7 @@ $emptySlots = 5 - $existingCount;
             if(e.target.closest('.remove-row'))
             {
                 const row = e.target.closest('.availability-row');
-                if(document.querySelectorAll('.availability-row').length > 1)
-                {
-                    row.remove();
-                }
-                else
-                {
-                    alert('At least one time slot is required');
-                }
+                row.remove();
             }
         });
         // Real-time end time validation
