@@ -558,10 +558,6 @@ if (isset($hall) && $hall->unitfacilities->count() > 0 && empty($oldUnitFaciliti
             'charge' => $item['charge'] ?? ''
         ];
     });
-    // If empty, add one empty row
-    if ($unitFacilitiesToShow->isEmpty()) {
-        $unitFacilitiesToShow = collect([(object) ['name' => '', 'charge' => '']]);
-    }
 }
                                         @endphp
                                         
@@ -1100,12 +1096,7 @@ $emptySlots = 5 - $existingCount;
             if (e.target.closest('.remove-row2'))
                 {
                 const row = e.target.closest('.unit-price-facility-row');
-                if (document.querySelectorAll('.unit-price-facility-row').length > 1){
-                    row.remove();
-                }
-                else {
-                    alert('At least one time slot is required');
-                }
+                row.remove();
             }
         });
 
