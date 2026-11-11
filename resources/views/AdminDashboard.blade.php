@@ -978,7 +978,7 @@
   <!-- Reservation Detail Modal -->
   @foreach($reservations as $reservation)
 
-      @php
+        @php
     // Calculate total amount paid for this reservation
     $preliminaryPayment = $reservation->advanceAmount;
 
@@ -995,364 +995,365 @@
     $remainingAmount = max(0, (($reservation->charge - ($reservation->discount_custom ?? 0)) + $reservation->deposit) - $totalPaid);
     $advancePaidStatus = $reservation->advancePaid ? 'Yes' : 'No';
     $pendingReschedReq = $reservation->rescheduleRequests->firstWhere('status', \App\Models\RescheduleRequest::STATUS_PENDING);
-      @endphp
+        @endphp
 
-      <div class="modal fade" id="reservationModal-{{ $reservation->id }}" tabindex="-1">
-        <div class="modal-dialog modal-lg" style="max-width: 1100px;">
-          <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-              <h5 class="modal-title">Reservation Ref. Code : {{$reservation->ref_code}}</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-              <div class="row mb-4">
-                @if($pendingReschedReq)
-                  <!-- Pending Re-schedule Request from Customer -->
-                  <div class="col-md-12 mb-3">
-                    <div class="card border-warning">
-                      <div class="card-header bg-warning text-dark py-2">
-                        <i class="fas fa-exchange-alt me-2"></i><strong>Pending Re-schedule Request</strong>
-                        <span class="badge bg-dark ms-2">Awaiting your approval</span>
-                      </div>
-                      <div class="card-body py-3">
-                        <div class="table-responsive">
-                          <table class="table table-sm table-bordered mb-3 align-middle">
-                            <thead class="table-light">
-                              <tr>
-                                <th></th>
-                                <th>Date</th>
-                                <th>Event Time Period</th>
-                                <th>Pre-arrange</th>
-                                <th>Post-arrange</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr>
-                                <td class="text-muted">Current</td>
-                                <td>{{ \Carbon\Carbon::parse($pendingReschedReq->old_date)->format('d M Y') }}</td>
-                                <td>{{ date('h:i A', strtotime($pendingReschedReq->old_start_time)) }} -
-                                  {{ date('h:i A', strtotime($pendingReschedReq->old_end_time)) }}
-                                </td>
-                                <td>{{ $pendingReschedReq->old_pre_arrange_time }} hr(s)</td>
-                                <td>{{ $pendingReschedReq->old_post_arrange_time }} hr(s)</td>
-                              </tr>
-                              <tr class="table-warning">
-                                <td class="fw-bold">Requested</td>
-                                <td class="fw-bold">{{ \Carbon\Carbon::parse($pendingReschedReq->new_date)->format('d M Y') }}
-                                </td>
-                                <td class="fw-bold">{{ date('h:i A', strtotime($pendingReschedReq->new_start_time)) }} -
-                                  {{ date('h:i A', strtotime($pendingReschedReq->new_end_time)) }}
-                                </td>
-                                <td>{{ $pendingReschedReq->new_pre_arrange_time }} hr(s)</td>
-                                <td>{{ $pendingReschedReq->new_post_arrange_time }} hr(s)</td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                        <div class="d-flex flex-wrap gap-2">
-                          <form method="POST" action="{{ route('admin.reschedule.request.accept', $pendingReschedReq->id) }}"
-                            onsubmit="return confirm('Accept this re-schedule request? The reservation will be moved to the new date and time.');">
-                            @csrf
-                            @method('PATCH')
-                            <button type="submit" class="btn btn-success btn-sm">
-                              <i class="fas fa-check me-1"></i>Accept Re-schedule
-                            </button>
-                          </form>
-                          <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="collapse"
-                            data-bs-target="#rejectRescheduleReq-{{ $pendingReschedReq->id }}">
-                            <i class="fas fa-times me-1"></i>Reject Re-schedule
-                          </button>
-                        </div>
-                        <div class="collapse mt-2" id="rejectRescheduleReq-{{ $pendingReschedReq->id }}">
-                          <form method="POST" action="{{ route('admin.reschedule.request.reject', $pendingReschedReq->id) }}"
-                            onsubmit="return validateRejectRescheduleRemarks(this);">
-                            @csrf
-                            @method('PATCH')
-                            <div class="input-group input-group-sm">
-                              <textarea class="form-control" name="remarks" rows="2" required
-                                placeholder="Reason for rejecting this re-schedule request..."></textarea>
-                              <button type="submit" class="btn btn-danger">
-                                <i class="fas fa-times me-1"></i>Confirm Reject
-                              </button>
-                            </div>
-                          </form>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                @endif
-                <div class="col-md-6">
-                  <dl class="row">
-                    <dt class="col-sm-4">Hall Name:</dt>
-                    <dd class="col-sm-8">{{ $reservation->hall_name }}</dd>
-                    <dt class="col-sm-4">Customer Name:</dt>
-                    <dd class="col-sm-8">{{ $reservation->customer_name }}</dd>
-                    <dt class="col-sm-4">Customer Email:</dt>
-                    <dd class="col-sm-8">{{ $reservation->customer_email }}</dd>
-                    <dt class="col-sm-4">Customer Phone:</dt>
-                    <dd class="col-sm-8">{{ $reservation->customer_tel }}</dd>
-                    <dt class="col-sm-4">Reservation Date:</dt>
-                    <dd class="col-sm-8">{{ date('Y-m-d', strtotime($reservation->reservation_date)) }}</dd>
-                    <dt class="col-sm-4">Event period:</dt>
-                    <dd class="col-sm-8">
-                      {{ date('h:i A', strtotime($reservation->start_time)) }} -
-                      {{ date('h:i A', strtotime($reservation->end_time)) }}
-                    </dd>
-                    @if ($reservation->status == 1)
-                      <dt class="col-sm-4">Advance payment due date:</dt>
-                      <dd class="col-sm-8">
-                        <input type="date" class="form-control form-control-sm" id="advancePaymentDate-{{ $reservation->id }}"
-                          name="advancePaymentDate" min="{{ now()->format('Y-m-d') }}"
-                          max="{{ $reservation->created_at->copy()->addDays(7)->format('Y-m-d') }}"
-                          value="{{ $reservation->advancePaymentDate ?? $reservation->created_at->copy()->addDays(7)->format('Y-m-d') }}">
-                      </dd>
-                      <dt class="col-sm-4">Balance payment due date:</dt>
-                      <dd class="col-sm-8">
-                        <input type="date" class="form-control form-control-sm" id="balancePaymentDate-{{ $reservation->id }}"
-                          name="balancePaymentDate" min="{{ now()->format('Y-m-d') }}"
-                          max="{{ \Carbon\Carbon::parse($reservation->reservation_date)->subDays(7)->format('Y-m-d') }}"
-                          value="{{ $reservation->balancePaymentDate ?? \Carbon\Carbon::parse($reservation->reservation_date)->subDays(7)->format('Y-m-d') }}">
-                      </dd>
-                      <dt class="col-sm-4">Cancellation due date:</dt>
-                      <dd class="col-sm-8">
-                        <input type="date" class="form-control form-control-sm"
-                          id="cancellationExpiryDate-{{ $reservation->id }}" name="cancellationExpiryDate"
-                          min="{{ now()->format('Y-m-d') }}"
-                          max="{{ \Carbon\Carbon::parse($reservation->reservation_date)->subDays(7)->format('Y-m-d') }}"
-                          value="{{ $reservation->cancellationExpiryDate ?? \Carbon\Carbon::parse($reservation->reservation_date)->subDays(7)->format('Y-m-d') }}">
-                      </dd>
-                      <dt class="col-sm-4">Re-schedule due date:</dt>
-                      <dd class="col-sm-8">
-                        <input type="date" class="form-control form-control-sm"
-                          id="rescheduledExpiryDate-{{ $reservation->id }}" name="rescheduledExpiryDate"
-                          min="{{ now()->format('Y-m-d') }}"
-                          max="{{ \Carbon\Carbon::parse($reservation->reservation_date)->subDays(7)->format('Y-m-d') }}"
-                          value="{{ $reservation->rescheduledExpiryDate ?? \Carbon\Carbon::parse($reservation->reservation_date)->subDays(7)->format('Y-m-d') }}">
-                      </dd>
-                    @else
-                      <dt class="col-sm-4">Advance Payment Due Date:</dt>
-                      <dd class="col-sm-8">{{ $reservation->advancePaymentDate ?? 'N/A' }}</dd>
-                      <dt class="col-sm-4">Balance Payment Due Date:</dt>
-                      <dd class="col-sm-8">{{ $reservation->balancePaymentDate ?? 'N/A' }}</dd>
-                      <dt class="col-sm-4">Cancellation Due Date:</dt>
-                      <dd class="col-sm-8">{{ $reservation->cancellationExpiryDate ?? 'N/A' }}</dd>
-                      <dt class="col-sm-4">Re-schedule Due Date:</dt>
-                      <dd class="col-sm-8">{{ $reservation->rescheduledExpiryDate ?? 'N/A' }}</dd>
-                    @endif
-                  </dl>
-                </div>
-                <div class="col-md-6">
-                  <!--<h6><i class="fas fa-building me-2"></i>Hall Details</h6>-->
-                  <dl class="row">
-                    <dt class="col-sm-4">Reservation Type:</dt>
-                    <dd class="col-sm-8">{{ ucfirst($reservation->reservation_type) }}</dd>
-                    @if($reservation->reservation_type === 'package' && $reservation->package)
-                      <dt class="col-sm-4">Package:</dt>
-                      <dd class="col-sm-8">{{ $reservation->package->name }}</dd>
-                    @endif
-                    @if($reservation->reservation_type === 'package')
-                      <dt class="col-sm-4">Pre-arrange hours:</dt>
-                      <dd class="col-sm-8">{{ $reservation->pre_arrange_time }} hours</dd>
-                      <dt class="col-sm-4">Post-arrange hours:</dt>
-                      <dd class="col-sm-8">{{ $reservation->post_arrange_time }} hours</dd>
-                    @endif
-                    <dt class="col-sm-4">Charge:</dt>
-                    <dd class="col-sm-8 fw-bold">Rs. {{ number_format($reservation->charge, 2) }}</dd>
-                    @if($reservation->customer && $reservation->customer->type !== 'private')
-
-                      @if ($reservation->status == 1)
-                        @php
-        // Discount applies only to the true/base charge (excluding facilities charge)
-        $baseCharge = max(0, (float) $reservation->charge - (float) ($reservation->facilities_charge ?? 0));
-                        @endphp
-                        <dt class="col-sm-4">Discount (%):</dt>
-                        <dd class="col-sm-8">
-                          <div class="input-group input-group-sm">
-                            <input type="number" class="form-control form-control-sm" step="0.1" min="0" max="100"
-                              id="discount-custom-{{ $reservation->id }}" placeholder="0" data-charge="{{ $baseCharge }}"
-                              data-total-charge="{{ $reservation->charge }}"
-                              value="{{ $reservation->discount_custom && $baseCharge > 0 ? round(($reservation->discount_custom / $baseCharge) * 100, 2) : '' }}">
-                            <span class="input-group-text">%</span>
-                          </div>
-                          <small class="text-muted" id="discount-amount-{{ $reservation->id }}">
-                            @if($reservation->discount_custom)
-                              = Rs. {{ number_format($reservation->discount_custom, 2) }}
-                            @endif
-                          </small>
-                        </dd>
-                      @else
-                        @if ($reservation->discount_custom > 0)
-                          <dt class="col-sm-4">Discount :</dt>
-                          <dd class="col-sm-8">Rs. {{ number_format($reservation->discount_custom, 2) }}</dd>
-                        @endif
-                      @endif
-                      @if ($reservation->status == 1 || $reservation->discount_custom > 0)
-                        <dt class="col-sm-4">Final Charge:</dt>
-                        <dd class="col-sm-8 fw-bold text-success" id="final-charge-{{ $reservation->id }}">
-                          Rs. {{ number_format($reservation->charge - ($reservation->discount_custom ?? 0), 2) }}
-                        </dd>
-                      @endif
-                    @endif
-
-                    @if ($reservation->status == 1)
-                      <dt class="col-sm-4">Advance Payment:</dt>
-                      <dd class="col-sm-8">
-                        <input type="number" class="form-control form-control-sm" step="0.01" min="0"
-                          max="{{ $reservation->advanceAmount }}" id="advanceAmount-{{ $reservation->id }}" placeholder="0.00"
-                          value="{{ $reservation->advanceAmount ?? 0 }}"
-                          data-cancellation-fee="{{ $reservation->hall->cancellation_fee }}">
-                      </dd>
-                    @else
-                      <dt class="col-sm-4">Advance Payment:</dt>
-                      <dd class="col-sm-8">Rs. {{ number_format($reservation->advanceAmount, 2) }}</dd>
-                    @endif
-
-                    <dt class="col-sm-4">Refundable Deposit:</dt>
-                    <dd class="col-sm-8 fw-bold">Rs. {{ number_format($reservation->deposit, 2) }}</dd>
-
-                    @if ($reservation->status == 5)
-                      <dt class="col-sm-4">Cancellation fee:</dt>
-                      <dd class="col-sm-8 fw-bold text-success">Rs. {{ number_format($cancellationFee, 2) }}</dd>
-                      <dt class="col-sm-4">Payback Amount:</dt>
-                      <dd class="col-sm-8 fw-bold text-danger">Rs. {{ number_format($paybackAmount, 2) }}</dd>
-                    @elseif($reservation->status == 6)
-                      <dt class="col-sm-4">Payback Amount:</dt>
-                      <dd class="col-sm-8 fw-bold text-danger">Rs. {{ number_format($paybackAmount, 2) }}</dd>
-                    @else
-                      <dt class="col-sm-4">Total Paid:</dt>
-                      <dd class="col-sm-8 fw-bold text-success">Rs. {{ number_format($totalPaid, 2) }}</dd>
-                    @endif
-
-                    @if(!in_array($reservation->status, [1, 5, 6, 7]))
-                      <dt class="col-sm-4">Remaining to be paid:</dt>
-                      <dd class="col-sm-8 fw-bold text-danger">Rs. {{ number_format($remainingAmount, 2) }}</dd>
-                    @endif
-                  </dl>
-                  <button class="btn btn-primary open-terms-btn mt-2"
-                    data-pdf="{{ asset('storage/' . $reservation->clearence_form) }}">
-                    <i class="fas fa-file-contract me-2"></i> View Application form
-                  </button>
-                </div>
+        <div class="modal fade" id="reservationModal-{{ $reservation->id }}" tabindex="-1">
+          <div class="modal-dialog modal-lg" style="max-width: 1100px;">
+            <div class="modal-content">
+              <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Reservation Ref. Code : {{$reservation->ref_code}}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
               </div>
-              @if($reservation->status == 1)
-                <div class="me-auto">
-                  <form method="POST" action="{{route('admin.reservations.accept', $reservation->id)}}"
-                    onsubmit="updateDiscountCustom('{{ $reservation->id }}')">
-                    @csrf @method('PATCH')
-                    <input type="hidden" name="discount_custom" id="discount-custom-hidden-{{ $reservation->id }}"
-                      value="{{ $reservation->discount_custom ?? 0 }}">
-                    <input type="hidden" name="advanceAmount" id="advanceAmount-hidden-{{ $reservation->id }}"
-                      value="{{ $reservation->advanceAmount ?? 0 }}">
-                    <input type="hidden" name="advancePaymentDate" id="advancePaymentDate-hidden-{{ $reservation->id }}"
-                      value="{{ $reservation->advancePaymentDate ?? '' }}">
-                    <input type="hidden" name="balancePaymentDate" id="balancePaymentDate-hidden-{{ $reservation->id }}"
-                      value="{{ $reservation->balancePaymentDate ?? '' }}">
-                    <input type="hidden" name="cancellationExpiryDate"
-                      id="cancellationExpiryDate-hidden-{{ $reservation->id }}"
-                      value="{{ $reservation->cancellationExpiryDate ?? '' }}">
-                    <input type="hidden" name="rescheduledExpiryDate" id="rescheduledExpiryDate-hidden-{{ $reservation->id }}"
-                      value="{{ $reservation->rescheduledExpiryDate ?? '' }}">
-                    <button type="button" class="btn btn-success" onclick="acceptReservation(this, '{{ $reservation->id }}')"
-                      @if($reservation->accepted !== null) disabled @endif>
-                      <i
-                        class="fas fa-check me-2"></i>{{ $reservation->accepted !== null && $reservation->accepted ? 'Already Accepted' : 'Accept' }}</button>
-                  </form>
-                </div>
-              @endif
-            </div>
-            @if ((int) $reservation->status !== 1)
-              <!--Payment Slips appearing here-->
-              <div class="mb-4 px-4">
-                <h6 class="border-bottom pb-2"><i class="fas fa-file-invoice me-2"></i>Payment Slips</h6>
-                <div class="text-center bg-light p-3 rounded">
-                  @php $paymentCount = $reservation->payments->where('payment_alias', '!=', 'Cancellation')->count(); @endphp
-                  @if($paymentCount > 0)
-                    @foreach($reservation->payments->where('payment_alias', '!=', 'Cancellation') as $index => $payment)
-                      <div class="mb-3">
-                        <h6 class="text-muted">Payment stage : {{ $index + 1 }}
-                          @if($payment->payment_alias && $payment->payment_alias === 'Preliminary')
-                            <span class="badge bg-info ms-2">Advance Payment</span>
-                          @elseif($payment->payment_alias && $payment->payment_alias === 'Remainings')
-                            <span class="badge bg-info ms-2">Balance Payment</span>
-                          @endif
-                          <span class="badge bg-secondary ms-1">Rs. {{ number_format($payment->amount, 2) }}</span>
-                        </h6>
-                        @if(\Illuminate\Support\Str::endsWith($payment->receipt_path, '.pdf'))
-                          <iframe src="{{ asset('storage/' . $payment->receipt_path) }}" width="100%" height="400px" class="border">
-                          </iframe>
-                        @else
-                          <img src="{{ asset('storage/' . $payment->receipt_path) }}" alt="Payment Slip #{{ $index + 1 }}"
-                            class="img-fluid" style="max-height: 400px">
-                        @endif
-                        <div class="mt-3 d-flex justify-content-center align-items-center gap-3"
-                          id="slipActions-{{ $payment->id }}">
-                          @if($payment->status == 1)
-                            <form action="{{ route('admin.payment.accept', $payment) }}" method="POST"
-                              class="d-inline slip-action-form">
+              <div class="modal-body">
+                <div class="row mb-4">
+                  @if($pendingReschedReq)
+                    <!-- Pending Re-schedule Request from Customer -->
+                    <div class="col-md-12 mb-3">
+                      <div class="card border-warning">
+                        <div class="card-header bg-warning text-dark py-2">
+                          <i class="fas fa-exchange-alt me-2"></i><strong>Pending Re-schedule Request</strong>
+                          <span class="badge bg-dark ms-2">Awaiting your approval</span>
+                        </div>
+                        <div class="card-body py-3">
+                          <div class="table-responsive">
+                            <table class="table table-sm table-bordered mb-3 align-middle">
+                              <thead class="table-light">
+                                <tr>
+                                  <th></th>
+                                  <th>Date</th>
+                                  <th>Event Time Period</th>
+                                  <th>Pre-arrange</th>
+                                  <th>Post-arrange</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <td class="text-muted">Current</td>
+                                  <td>{{ \Carbon\Carbon::parse($pendingReschedReq->old_date)->format('d M Y') }}</td>
+                                  <td>{{ date('h:i A', strtotime($pendingReschedReq->old_start_time)) }} -
+                                    {{ date('h:i A', strtotime($pendingReschedReq->old_end_time)) }}
+                                  </td>
+                                  <td>{{ $pendingReschedReq->old_pre_arrange_time }} hr(s)</td>
+                                  <td>{{ $pendingReschedReq->old_post_arrange_time }} hr(s)</td>
+                                </tr>
+                                <tr class="table-warning">
+                                  <td class="fw-bold">Requested</td>
+                                  <td class="fw-bold">{{ \Carbon\Carbon::parse($pendingReschedReq->new_date)->format('d M Y') }}
+                                  </td>
+                                  <td class="fw-bold">{{ date('h:i A', strtotime($pendingReschedReq->new_start_time)) }} -
+                                    {{ date('h:i A', strtotime($pendingReschedReq->new_end_time)) }}
+                                  </td>
+                                  <td>{{ $pendingReschedReq->new_pre_arrange_time }} hr(s)</td>
+                                  <td>{{ $pendingReschedReq->new_post_arrange_time }} hr(s)</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                          <div class="d-flex flex-wrap gap-2">
+                            <form method="POST" action="{{ route('admin.reschedule.request.accept', $pendingReschedReq->id) }}"
+                              onsubmit="return confirm('Accept this re-schedule request? The reservation will be moved to the new date and time.');">
                               @csrf
                               @method('PATCH')
-                              @if ((int) $reservation->status !== 6 && (int) $reservation->status !== 5)
-                                <button type="submit" class="btn btn-success" title="Accept payment">
-                                  <i class="fas fa-check me-2"></i> Accept
-                                </button>
-                              @endif
+                              <button type="submit" class="btn btn-success btn-sm">
+                                <i class="fas fa-check me-1"></i>Accept Re-schedule
+                              </button>
                             </form>
-                            <!--<form action="{{ route('admin.payment.reject', $payment) }}" method="POST" class="d-inline slip-action-form">
-                                                                                                                                                                                            @csrf
-                                                                                                                                                                                            @method('PATCH')
-                                                                                                                                                                                            <button type="submit" class="btn btn-danger" title="Reject payment">
-                                                                                                                                                                                              <i class="fas fa-times me-2"></i> Reject
-                                                                                                                                                                                            </button>
-                                                                                                                                                                                          </form>-->
-                          @else
-                            @if($payment->status == 2)
-                              <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Accepted</span>
-                            @elseif($payment->status == 3)
-                              <span class="badge bg-danger"><i class="fas fa-times-circle me-1"></i>Rejected</span>
-                            @endif
-                          @endif
+                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="collapse"
+                              data-bs-target="#rejectRescheduleReq-{{ $pendingReschedReq->id }}">
+                              <i class="fas fa-times me-1"></i>Reject Re-schedule
+                            </button>
+                          </div>
+                          <div class="collapse mt-2" id="rejectRescheduleReq-{{ $pendingReschedReq->id }}">
+                            <form method="POST" action="{{ route('admin.reschedule.request.reject', $pendingReschedReq->id) }}"
+                              onsubmit="return validateRejectRescheduleRemarks(this);">
+                              @csrf
+                              @method('PATCH')
+                              <div class="input-group input-group-sm">
+                                <textarea class="form-control" name="remarks" rows="2" required
+                                  placeholder="Reason for rejecting this re-schedule request..."></textarea>
+                                <button type="submit" class="btn btn-danger">
+                                  <i class="fas fa-times me-1"></i>Confirm Reject
+                                </button>
+                              </div>
+                            </form>
+                          </div>
                         </div>
                       </div>
-                    @endforeach
-                  @else
-                    <div class="alert alert-warning mb-0">
-                      <i class="fas fa-exclamation-circle me-2"></i>
-                      @if($reservation->status == 5)
-                        User Cancelled
-                      @elseif($reservation->status == 6)
-                        Admin rejected
-                      @endif
-                      No payment is done yet for this reservation. May be it is pending or rejected.
                     </div>
                   @endif
-                </div>
-              </div>
-            @endif
+                  <div class="col-md-6">
+                    <dl class="row">
+                      <dt class="col-sm-4">Hall Name:</dt>
+                      <dd class="col-sm-8">{{ $reservation->hall_name }}</dd>
+                      <dt class="col-sm-4">Customer Name:</dt>
+                      <dd class="col-sm-8">{{ $reservation->customer_name }}</dd>
+                      <dt class="col-sm-4">Customer Email:</dt>
+                      <dd class="col-sm-8">{{ $reservation->customer_email }}</dd>
+                      <dt class="col-sm-4">Customer Phone:</dt>
+                      <dd class="col-sm-8">{{ $reservation->customer_tel }}</dd>
+                      <dt class="col-sm-4">Reservation Date:</dt>
+                      <dd class="col-sm-8">{{ date('Y-m-d', strtotime($reservation->reservation_date)) }}</dd>
+                      <dt class="col-sm-4">Event period:</dt>
+                      <dd class="col-sm-8">
+                        {{ date('h:i A', strtotime($reservation->start_time)) }} -
+                        {{ date('h:i A', strtotime($reservation->end_time)) }}
+                      </dd>
+                      @if ($reservation->status == 1)
+                        <dt class="col-sm-4">Advance payment due date:</dt>
+                        <dd class="col-sm-8">
+                          <input type="date" class="form-control form-control-sm" id="advancePaymentDate-{{ $reservation->id }}"
+                            name="advancePaymentDate" min="{{ now()->format('Y-m-d') }}"
+                            max="{{ $reservation->created_at->copy()->addDays(7)->format('Y-m-d') }}"
+                            value="{{ $reservation->advancePaymentDate ?? $reservation->created_at->copy()->addDays(7)->format('Y-m-d') }}">
+                        </dd>
+                        <dt class="col-sm-4">Balance payment due date:</dt>
+                        <dd class="col-sm-8">
+                          <input type="date" class="form-control form-control-sm" id="balancePaymentDate-{{ $reservation->id }}"
+                            name="balancePaymentDate" min="{{ now()->format('Y-m-d') }}"
+                            max="{{ \Carbon\Carbon::parse($reservation->reservation_date)->subDays(7)->format('Y-m-d') }}"
+                            value="{{ $reservation->balancePaymentDate ?? \Carbon\Carbon::parse($reservation->reservation_date)->subDays(7)->format('Y-m-d') }}">
+                        </dd>
+                        <dt class="col-sm-4">Cancellation due date:</dt>
+                        <dd class="col-sm-8">
+                          <input type="date" class="form-control form-control-sm"
+                            id="cancellationExpiryDate-{{ $reservation->id }}" name="cancellationExpiryDate"
+                            min="{{ now()->format('Y-m-d') }}"
+                            max="{{ \Carbon\Carbon::parse($reservation->reservation_date)->subDays(7)->format('Y-m-d') }}"
+                            value="{{ $reservation->cancellationExpiryDate ?? \Carbon\Carbon::parse($reservation->reservation_date)->subDays(7)->format('Y-m-d') }}">
+                        </dd>
+                        <dt class="col-sm-4">Re-schedule due date:</dt>
+                        <dd class="col-sm-8">
+                          <input type="date" class="form-control form-control-sm"
+                            id="rescheduledExpiryDate-{{ $reservation->id }}" name="rescheduledExpiryDate"
+                            min="{{ now()->format('Y-m-d') }}"
+                            max="{{ \Carbon\Carbon::parse($reservation->reservation_date)->subDays(7)->format('Y-m-d') }}"
+                            value="{{ $reservation->rescheduledExpiryDate ?? \Carbon\Carbon::parse($reservation->reservation_date)->subDays(7)->format('Y-m-d') }}">
+                        </dd>
+                      @else
+                        <dt class="col-sm-4">Advance Payment Due Date:</dt>
+                        <dd class="col-sm-8">{{ $reservation->advancePaymentDate ?? 'N/A' }}</dd>
+                        <dt class="col-sm-4">Balance Payment Due Date:</dt>
+                        <dd class="col-sm-8">{{ $reservation->balancePaymentDate ?? 'N/A' }}</dd>
+                        <dt class="col-sm-4">Cancellation Due Date:</dt>
+                        <dd class="col-sm-8">{{ $reservation->cancellationExpiryDate ?? 'N/A' }}</dd>
+                        <dt class="col-sm-4">Re-schedule Due Date:</dt>
+                        <dd class="col-sm-8">{{ $reservation->rescheduledExpiryDate ?? 'N/A' }}</dd>
+                      @endif
+                    </dl>
+                  </div>
+                  <div class="col-md-6">
+                    <!--<h6><i class="fas fa-building me-2"></i>Hall Details</h6>-->
+                    <dl class="row">
+                      <dt class="col-sm-4">Reservation Type:</dt>
+                      <dd class="col-sm-8">{{ ucfirst($reservation->reservation_type) }}</dd>
+                      @if($reservation->reservation_type === 'package' && $reservation->package)
+                        <dt class="col-sm-4">Package:</dt>
+                        <dd class="col-sm-8">{{ $reservation->package->name }}</dd>
+                      @endif
+                      @if($reservation->reservation_type === 'package')
+                        <dt class="col-sm-4">Pre-arrange hours:</dt>
+                        <dd class="col-sm-8">{{ $reservation->pre_arrange_time }} hours</dd>
+                        <dt class="col-sm-4">Post-arrange hours:</dt>
+                        <dd class="col-sm-8">{{ $reservation->post_arrange_time }} hours</dd>
+                      @endif
+                      <dt class="col-sm-4">Charge:</dt>
+                      <dd class="col-sm-8 fw-bold">Rs. {{ number_format($reservation->charge, 2) }}</dd>
+                      @if($reservation->customer && $reservation->customer->type !== 'private')
 
-            <div class="modal-footer">
+                        @if ($reservation->status == 1)
+                          @php
+        // Discount applies only to the true/base charge (excluding facilities charge)
+        $baseCharge = max(0, (float) $reservation->charge - (float) ($reservation->facilities_charge ?? 0));
+                          @endphp
+                          <dt class="col-sm-4">Discount (%):</dt>
+                          <dd class="col-sm-8">
+                            <div class="input-group input-group-sm">
+                              <input type="number" class="form-control form-control-sm" step="0.1" min="0" max="100"
+                                id="discount-custom-{{ $reservation->id }}" placeholder="0" data-charge="{{ $baseCharge }}"
+                                data-total-charge="{{ $reservation->charge }}"
+                                value="{{ $reservation->discount_custom && $baseCharge > 0 ? round(($reservation->discount_custom / $baseCharge) * 100, 2) : '' }}">
+                              <span class="input-group-text">%</span>
+                            </div>
+                            <small class="text-muted" id="discount-amount-{{ $reservation->id }}">
+                              @if($reservation->discount_custom)
+                                = Rs. {{ number_format($reservation->discount_custom, 2) }}
+                              @endif
+                            </small>
+                          </dd>
+                        @else
+                          @if ($reservation->discount_custom > 0)
+                            <dt class="col-sm-4">Discount :</dt>
+                            <dd class="col-sm-8">Rs. {{ number_format($reservation->discount_custom, 2) }}</dd>
+                          @endif
+                        @endif
+                        @if ($reservation->status == 1 || $reservation->discount_custom > 0)
+                          <dt class="col-sm-4">Final Charge:</dt>
+                          <dd class="col-sm-8 fw-bold text-success" id="final-charge-{{ $reservation->id }}">
+                            Rs. {{ number_format($reservation->charge - ($reservation->discount_custom ?? 0), 2) }}
+                          </dd>
+                        @endif
+                      @endif
 
-              @if ((int) $reservation->status !== 6 && (int) $reservation->status !== 5)
-                <div class="w-100">
-                  <form id="reject-reservation-form-{{ $reservation->id }}" class="text-end"
-                    action="{{ route('admin.reservation.reject', $reservation) }}" method="POST">
-                    @csrf
-                    @method('PATCH')
-                    <div class="mb-3">
-                      <textarea class="form-control" id="remarks-{{ $reservation->id }}" name="remarks" rows="4"
-                        placeholder="Please enter the reason for rejecting this reservation..."
-                        style="width: 100%;"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-danger">
-                      <i class="fas fa-times-circle me-2"></i>Reject Reservation
+                      @if ($reservation->status == 1)
+                        <dt class="col-sm-4">Advance Payment:</dt>
+                        <dd class="col-sm-8">
+                          <input type="number" class="form-control form-control-sm" step="0.01" min="0"
+                            max="{{ $reservation->advanceAmount }}" id="advanceAmount-{{ $reservation->id }}" placeholder="0.00"
+                            value="{{ $reservation->advanceAmount ?? 0 }}"
+                            data-cancellation-fee="{{ $reservation->hall->cancellation_fee }}">
+                        </dd>
+                      @else
+                        <dt class="col-sm-4">Advance Payment:</dt>
+                        <dd class="col-sm-8">Rs. {{ number_format($reservation->advanceAmount, 2) }}</dd>
+                      @endif
+
+                      <dt class="col-sm-4">Refundable Deposit:</dt>
+                      <dd class="col-sm-8 fw-bold">Rs. {{ number_format($reservation->deposit, 2) }}</dd>
+
+                      @if ($reservation->status == 5)
+                        <dt class="col-sm-4">Cancellation fee:</dt>
+                        <dd class="col-sm-8 fw-bold text-success">Rs. {{ number_format($cancellationFee, 2) }}</dd>
+                        <dt class="col-sm-4">Payback Amount:</dt>
+                        <dd class="col-sm-8 fw-bold text-danger">Rs. {{ number_format($paybackAmount, 2) }}</dd>
+                      @elseif($reservation->status == 6)
+                        <dt class="col-sm-4">Payback Amount:</dt>
+                        <dd class="col-sm-8 fw-bold text-danger">Rs. {{ number_format($paybackAmount, 2) }}</dd>
+                      @else
+                        <dt class="col-sm-4">Total Paid:</dt>
+                        <dd class="col-sm-8 fw-bold text-success">Rs. {{ number_format($totalPaid, 2) }}</dd>
+                      @endif
+
+                      @if(!in_array($reservation->status, [1, 5, 6, 7]))
+                        <dt class="col-sm-4">Remaining to be paid:</dt>
+                        <dd class="col-sm-8 fw-bold text-danger">Rs. {{ number_format($remainingAmount, 2) }}</dd>
+                      @endif
+                    </dl>
+                    <button class="btn btn-primary open-terms-btn mt-2"
+                      data-pdf="{{ asset('storage/' . $reservation->clearence_form) }}">
+                      <i class="fas fa-file-contract me-2"></i> View Application form
                     </button>
-                  </form>
+                  </div>
+                </div>
+                @if($reservation->status == 1)
+                  <div class="me-auto">
+                    <form method="POST" action="{{route('admin.reservations.accept', $reservation->id)}}"
+                      onsubmit="updateDiscountCustom('{{ $reservation->id }}')">
+                      @csrf @method('PATCH')
+                      <input type="hidden" name="discount_custom" id="discount-custom-hidden-{{ $reservation->id }}"
+                        value="{{ $reservation->discount_custom ?? 0 }}">
+                      <input type="hidden" name="advanceAmount" id="advanceAmount-hidden-{{ $reservation->id }}"
+                        value="{{ $reservation->advanceAmount ?? 0 }}">
+                      <input type="hidden" name="advancePaymentDate" id="advancePaymentDate-hidden-{{ $reservation->id }}"
+                        value="{{ $reservation->advancePaymentDate ?? '' }}">
+                      <input type="hidden" name="balancePaymentDate" id="balancePaymentDate-hidden-{{ $reservation->id }}"
+                        value="{{ $reservation->balancePaymentDate ?? '' }}">
+                      <input type="hidden" name="cancellationExpiryDate"
+                        id="cancellationExpiryDate-hidden-{{ $reservation->id }}"
+                        value="{{ $reservation->cancellationExpiryDate ?? '' }}">
+                      <input type="hidden" name="rescheduledExpiryDate" id="rescheduledExpiryDate-hidden-{{ $reservation->id }}"
+                        value="{{ $reservation->rescheduledExpiryDate ?? '' }}">
+                      <button type="button" class="btn btn-success" onclick="acceptReservation(this, '{{ $reservation->id }}')"
+                        @if($reservation->accepted !== null) disabled @endif>
+                        <i
+                          class="fas fa-check me-2"></i>{{ $reservation->accepted !== null && $reservation->accepted ? 'Already Accepted' : 'Accept' }}</button>
+                    </form>
+                  </div>
+                @endif
+              </div>
+              @if ((int) $reservation->status !== 1)
+                <!--Payment Slips appearing here-->
+                <div class="mb-4 px-4">
+                  <h6 class="border-bottom pb-2"><i class="fas fa-file-invoice me-2"></i>Payment Slips</h6>
+                  <div class="text-center bg-light p-3 rounded">
+                    @php $paymentCount = $reservation->payments->where('payment_alias', '!=', 'Cancellation')->count(); @endphp
+                    @if($paymentCount > 0)
+                      @foreach($reservation->payments->where('payment_alias', '!=', 'Cancellation') as $index => $payment)
+                        <div class="mb-3">
+                          <h6 class="text-muted">Payment stage : {{ $index + 1 }}
+                            @if($payment->payment_alias && $payment->payment_alias === 'Preliminary')
+                              <span class="badge bg-info ms-2">Advance Payment</span>
+                            @elseif($payment->payment_alias && $payment->payment_alias === 'Remainings')
+                              <span class="badge bg-info ms-2">Balance Payment</span>
+                            @endif
+                            <span class="badge bg-secondary ms-1">Rs. {{ number_format($payment->amount, 2) }}</span>
+                          </h6>
+                          @if(\Illuminate\Support\Str::endsWith($payment->receipt_path, '.pdf'))
+                            <iframe src="{{ asset('storage/' . $payment->receipt_path) }}" width="100%" height="400px" class="border">
+                            </iframe>
+                          @else
+                            <img src="{{ asset('storage/' . $payment->receipt_path) }}" alt="Payment Slip #{{ $index + 1 }}"
+                              class="img-fluid" style="max-height: 400px">
+                          @endif
+                          <div class="mt-3 d-flex justify-content-center align-items-center gap-3"
+                            id="slipActions-{{ $payment->id }}">
+                            @if($payment->status == 1)
+                              <form action="{{ route('admin.payment.accept', $payment) }}" method="POST"
+                                class="d-inline slip-action-form">
+                                @csrf
+                                @method('PATCH')
+                                @if ((int) $reservation->status !== 6 && (int) $reservation->status !== 5)
+                                  <button type="submit" class="btn btn-success" title="Accept payment">
+                                    <i class="fas fa-check me-2"></i> Accept
+                                  </button>
+                                @endif
+                              </form>
+                              <!--<form action="{{ route('admin.payment.reject', $payment) }}" method="POST" class="d-inline slip-action-form">
+                                                                                                                                                                                              @csrf
+                                                                                                                                                                                              @method('PATCH')
+                                                                                                                                                                                              <button type="submit" class="btn btn-danger" title="Reject payment">
+                                                                                                                                                                                                <i class="fas fa-times me-2"></i> Reject
+                                                                                                                                                                                              </button>
+                                                                                                                                                                                            </form>-->
+                            @else
+                              @if($payment->status == 2)
+                                <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Accepted</span>
+                              @elseif($payment->status == 3)
+                                <span class="badge bg-danger"><i class="fas fa-times-circle me-1"></i>Rejected</span>
+                              @endif
+                            @endif
+                          </div>
+                        </div>
+                      @endforeach
+                    @else
+                      <div class="alert alert-warning mb-0">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        @if($reservation->status == 5)
+                          User Cancelled
+                        @elseif($reservation->status == 6)
+                          Admin rejected
+                        @else
+                          No payment is done yet for this reservation. May be it is pending or rejected.
+                        @endif                      
+                      </div>
+                    @endif
+                  </div>
                 </div>
               @endif
 
+              <div class="modal-footer">
+
+                @if ((int) $reservation->status !== 6 && (int) $reservation->status !== 5)
+                  <div class="w-100">
+                    <form id="reject-reservation-form-{{ $reservation->id }}" class="text-end"
+                      action="{{ route('admin.reservation.reject', $reservation) }}" method="POST">
+                      @csrf
+                      @method('PATCH')
+                      <div class="mb-3">
+                        <textarea class="form-control" id="remarks-{{ $reservation->id }}" name="remarks" rows="4"
+                          placeholder="Please enter the reason for rejecting this reservation..."
+                          style="width: 100%;"></textarea>
+                      </div>
+                      <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-times-circle me-2"></i>Reject Reservation
+                      </button>
+                    </form>
+                  </div>
+                @endif
+
+              </div>
             </div>
           </div>
         </div>
-      </div>
   @endforeach
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
