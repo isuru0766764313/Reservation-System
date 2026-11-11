@@ -727,7 +727,7 @@ $images = $hall->images ?? [];
                                         {{ $hall->max_pre_arrange_hours ?? 5 }} hours)</small>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Post-time (Cleanup)</label>
+                                    <label class="form-label">Post-arrange Time (Cleanup)</label>
                                     <select class="form-select" name="post_arrange_time" id="postArrangeTimePackage">
                                         <option value="0">0 hours</option>
                                         @for ($i = 1; $i <= ($hall->max_post_arrange_hours ?? 5); $i++)
